@@ -496,6 +496,14 @@ textarea {
 .person-row { display: flex; gap: 8px; }
 .person-row input { flex: 1; }
 
+/* V2 iframe */
+.v2-frame {
+  width: 100%;
+  height: calc(100vh - var(--top-height) - var(--nav-height));
+  border: none;
+  display: block;
+}
+
 /* View transitions */
 .view-enter { animation: fade-in 0.2s ease; }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
@@ -702,6 +710,9 @@ textarea {
 
   </div><!-- /main -->
 
+  <!-- V2 View (outside main for full width) -->
+  <iframe v-if="view === 'v2'" class="v2-frame" src="v2.html"></iframe>
+
   <!-- Bottom Nav -->
   <div class="bottom-nav">
     <button class="nav-btn" :class="{active: view==='home'}" @click="view='home'">
@@ -715,6 +726,9 @@ textarea {
     </button>
     <button class="nav-btn" :class="{active: view==='share'}" @click="view='share'">
       <span class="icon">🔗</span><span class="label">Dela</span>
+    </button>
+    <button class="nav-btn" :class="{active: view==='v2'}" @click="view='v2'">
+      <span class="icon">🆕</span><span class="label">V2</span>
     </button>
   </div>
 

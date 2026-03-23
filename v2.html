@@ -1,0 +1,2318 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Utgifter</title>
+  <meta name="theme-color" content="#18a058">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Utgifter">
+  <link
+    rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2318a058'/%3E%3Cpath d='M18 24h28v6H18zm0 10h20v6H18zm0 10h28v6H18z' fill='white'/%3E%3C/svg%3E"
+  >
+  <link
+    rel="apple-touch-icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2318a058'/%3E%3Cpath d='M18 24h28v6H18zm0 10h20v6H18zm0 10h28v6H18z' fill='white'/%3E%3C/svg%3E"
+  >
+  <link id="manifest-link" rel="manifest">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f5f5;
+      --bg-accent: rgba(24, 160, 88, 0.12);
+      --bg-accent-strong: rgba(24, 160, 88, 0.22);
+      --card: #ffffff;
+      --card-muted: #f0f5f1;
+      --text: #122117;
+      --muted: #63716a;
+      --border: #d6e0d8;
+      --accent: #18a058;
+      --accent-soft: rgba(24, 160, 88, 0.12);
+      --accent-contrast: #ffffff;
+      --warning: #9a6b00;
+      --warning-bg: #fff3c2;
+      --danger: #d04a4a;
+      --danger-soft: rgba(208, 74, 74, 0.12);
+      --success: #18a058;
+      --shadow: 0 8px 24px rgba(18, 33, 23, 0.08);
+      --radius: 12px;
+      --radius-lg: 18px;
+      --topbar-height: 72px;
+      --bottom-nav-height: 82px;
+      --content-width: min(100%, 480px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0e1411;
+        --bg-accent: rgba(24, 160, 88, 0.16);
+        --bg-accent-strong: rgba(24, 160, 88, 0.24);
+        --card: #18211c;
+        --card-muted: #111914;
+        --text: #ecf2ee;
+        --muted: #a2afa8;
+        --border: #2a3930;
+        --accent: #20b866;
+        --accent-soft: rgba(32, 184, 102, 0.16);
+        --accent-contrast: #f7fbf8;
+        --warning: #f0c453;
+        --warning-bg: rgba(240, 196, 83, 0.15);
+        --danger: #ff7b7b;
+        --danger-soft: rgba(255, 123, 123, 0.14);
+        --success: #20b866;
+        --shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(circle at top left, var(--bg-accent-strong), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(255, 193, 7, 0.08), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      font-size: 16px;
+    }
+
+    button,
+    select,
+    input,
+    textarea,
+    summary {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      background: none;
+      color: inherit;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--text);
+      padding: 12px 14px;
+      min-height: 48px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    dialog {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      max-width: min(100vw - 24px, 420px);
+      width: calc(100vw - 24px);
+    }
+
+    dialog::backdrop {
+      background: rgba(8, 12, 10, 0.45);
+      backdrop-filter: blur(3px);
+    }
+
+    .dialog-card {
+      background: var(--card);
+      color: var(--text);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .dialog-title {
+      margin: 0 0 6px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .dialog-text {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .dialog-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 18px;
+    }
+
+    .app-shell {
+      width: var(--content-width);
+      min-height: 100vh;
+      position: relative;
+      padding: 0 16px calc(var(--bottom-nav-height) + 34px + env(safe-area-inset-bottom));
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: var(--topbar-height);
+      padding: 12px 0;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(to bottom, rgba(245, 245, 245, 0.92), rgba(245, 245, 245, 0.76), transparent);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .topbar {
+        background: linear-gradient(to bottom, rgba(14, 20, 17, 0.92), rgba(14, 20, 17, 0.76), transparent);
+      }
+    }
+
+    .title-wrap h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .title-wrap p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .month-select {
+      width: 150px;
+      padding-right: 40px;
+      background:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%) calc(100% - 24px) 50% / 8px 8px no-repeat,
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%) calc(100% - 18px) 50% / 8px 8px no-repeat,
+        var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .page-message {
+      margin-bottom: 12px;
+      padding: 14px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      color: var(--text);
+    }
+
+    .page-message.success {
+      border-color: rgba(24, 160, 88, 0.28);
+      background: var(--accent-soft);
+    }
+
+    .page-message.error {
+      border-color: rgba(208, 74, 74, 0.3);
+      background: var(--danger-soft);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .section-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .two-column {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .person-card {
+      padding: 14px;
+      background: linear-gradient(180deg, var(--card), var(--card-muted));
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 6px;
+      background: var(--card-muted);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .segmented button,
+    .tab-button,
+    .primary-button,
+    .secondary-button,
+    .danger-button,
+    .ghost-button,
+    .inline-button,
+    .fab,
+    .delete-button,
+    .nav-button {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .segmented button {
+      border-radius: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .segmented button.active {
+      background: var(--card);
+      color: var(--accent);
+      box-shadow: var(--shadow);
+    }
+
+    .summary-card {
+      padding: 18px;
+    }
+
+    .summary-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .summary-block {
+      padding: 14px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, var(--card-muted), transparent);
+      border: 1px solid var(--border);
+    }
+
+    .summary-block h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .metric-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      font-size: 0.96rem;
+    }
+
+    .metric-row strong {
+      font-size: 1rem;
+    }
+
+    .difference-card {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent-soft), transparent 60%);
+      border: 1px solid rgba(24, 160, 88, 0.26);
+    }
+
+    .difference-card.alert {
+      background: linear-gradient(135deg, var(--danger-soft), transparent 58%);
+      border-color: rgba(208, 74, 74, 0.32);
+    }
+
+    .difference-label {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+    }
+
+    .difference-value {
+      margin: 0;
+      font-size: 1.42rem;
+      line-height: 1.2;
+      font-weight: 800;
+      color: var(--success);
+    }
+
+    .difference-card.alert .difference-value {
+      color: var(--danger);
+    }
+
+    .difference-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .banner {
+      padding: 14px;
+      background: var(--warning-bg);
+      border: 1px solid rgba(154, 107, 0, 0.28);
+      border-radius: var(--radius);
+      color: var(--text);
+      display: grid;
+      gap: 12px;
+    }
+
+    .banner-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .banner-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .banner-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .primary-button,
+    .secondary-button,
+    .danger-button,
+    .ghost-button,
+    .inline-button {
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 700;
+      transition: transform 0.16s ease, filter 0.16s ease, background 0.16s ease, color 0.16s ease;
+    }
+
+    .primary-button {
+      background: var(--accent);
+      color: var(--accent-contrast);
+    }
+
+    .secondary-button {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .ghost-button {
+      background: transparent;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+    }
+
+    .danger-button {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid rgba(208, 74, 74, 0.22);
+    }
+
+    .inline-button {
+      background: transparent;
+      color: var(--accent);
+      padding-inline: 6px;
+    }
+
+    .primary-button:active,
+    .secondary-button:active,
+    .danger-button:active,
+    .ghost-button:active,
+    .inline-button:active,
+    .fab:active,
+    .delete-button:active,
+    .nav-button:active {
+      transform: scale(0.98);
+    }
+
+    .pending-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .pending-item {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid rgba(154, 107, 0, 0.18);
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .pending-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 16px;
+      padding: 0 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-button {
+      border-radius: 0;
+      padding: 10px 0 12px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab-button.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .expense-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .expense-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .expense-item:active {
+      transform: scale(0.995);
+    }
+
+    .expense-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .expense-name {
+      margin: 0;
+      font-weight: 700;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .expense-sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .expense-amount {
+      font-weight: 800;
+      white-space: nowrap;
+      font-size: 1rem;
+    }
+
+    .expense-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .delete-button {
+      border-radius: 999px;
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--danger-soft);
+      color: var(--danger);
+      font-size: 1.35rem;
+      font-weight: 500;
+    }
+
+    .inline-edit {
+      width: 100%;
+      display: grid;
+      gap: 10px;
+    }
+
+    .inline-edit .button-row {
+      justify-content: flex-end;
+    }
+
+    .empty-state {
+      position: relative;
+      padding: 26px 20px 42px;
+      text-align: center;
+      color: var(--muted);
+      background: linear-gradient(180deg, var(--card), var(--card-muted));
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .empty-state strong {
+      display: block;
+      color: var(--text);
+      font-size: 1.04rem;
+      margin-bottom: 8px;
+    }
+
+    .empty-state::after {
+      content: "↘";
+      position: absolute;
+      right: 22px;
+      bottom: -6px;
+      font-size: 2rem;
+      color: var(--accent);
+      animation: bob 1.2s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    .share-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .share-feedback {
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    details.card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px;
+      font-weight: 800;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details summary::after {
+      content: "+";
+      font-size: 1.3rem;
+      color: var(--muted);
+    }
+
+    details[open] summary::after {
+      content: "−";
+    }
+
+    .details-body {
+      padding: 0 16px 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: var(--content-width);
+      z-index: 25;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -10px 20px rgba(18, 33, 23, 0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .bottom-nav {
+        background: rgba(24, 33, 28, 0.92);
+      }
+    }
+
+    .nav-button {
+      border-radius: 14px;
+      padding: 8px 6px 10px;
+      display: grid;
+      gap: 4px;
+      justify-items: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .nav-button.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .nav-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .fab {
+      position: fixed;
+      left: calc(50% + min(50vw - 56px, 184px));
+      bottom: calc(var(--bottom-nav-height) + 18px + env(safe-area-inset-bottom));
+      z-index: 26;
+      border-radius: 999px;
+      padding: 0 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 56px;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      box-shadow: 0 18px 32px rgba(24, 160, 88, 0.28);
+      font-weight: 800;
+    }
+
+    .fab strong {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(var(--bottom-nav-height) + 86px + env(safe-area-inset-bottom));
+      z-index: 30;
+      width: min(calc(100vw - 24px), 420px);
+      background: rgba(18, 33, 23, 0.95);
+      color: #fff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .toast button {
+      color: #7de3a8;
+      font-weight: 800;
+    }
+
+    .view-enter-active,
+    .view-leave-active {
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .view-enter-from,
+    .view-leave-to {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 380px) {
+      .two-column,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .fab {
+        left: auto;
+        right: 16px;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="title-wrap">
+          <h1>Utgifter</h1>
+          <p>{{ monthLabel(currentMonth) }}</p>
+        </div>
+        <select v-model="currentMonth" class="month-select" aria-label="Välj månad">
+          <option v-for="option in monthOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </header>
+
+      <main class="section-stack">
+        <div v-if="startupNotice.text" :class="['page-message', startupNotice.type]">
+          {{ startupNotice.text }}
+        </div>
+
+        <transition name="view" mode="out-in">
+          <section :key="currentView" class="section-stack">
+            <template v-if="currentView === 'home'">
+              <div class="two-column">
+                <div class="card person-card field-stack">
+                  <div>
+                    <label class="label" for="name-a">Namn</label>
+                    <input id="name-a" v-model.trim="data.persons.a.name" placeholder="Person A">
+                  </div>
+                  <div>
+                    <label class="label" for="income-a">Inkomst</label>
+                    <input
+                      id="income-a"
+                      :value="data.persons.a.income || ''"
+                      inputmode="numeric"
+                      placeholder="0"
+                      @focus="selectAll"
+                      @input="updateIncome('a', $event.target.value)"
+                    >
+                  </div>
+                </div>
+
+                <div class="card person-card field-stack">
+                  <div>
+                    <label class="label" for="name-b">Namn</label>
+                    <input id="name-b" v-model.trim="data.persons.b.name" placeholder="Person B">
+                  </div>
+                  <div>
+                    <label class="label" for="income-b">Inkomst</label>
+                    <input
+                      id="income-b"
+                      :value="data.persons.b.income || ''"
+                      inputmode="numeric"
+                      placeholder="0"
+                      @focus="selectAll"
+                      @input="updateIncome('b', $event.target.value)"
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="segmented" role="tablist" aria-label="Delningsläge">
+                <button
+                  type="button"
+                  :class="{ active: data.splitMode === 'equal' }"
+                  @click="data.splitMode = 'equal'"
+                >
+                  Dela lika
+                </button>
+                <button
+                  type="button"
+                  :class="{ active: data.splitMode === 'income' }"
+                  @click="data.splitMode = 'income'"
+                >
+                  Dela efter inkomst
+                </button>
+              </div>
+
+              <div class="card summary-card">
+                <div class="metric-row">
+                  <span>Gemensamt totalt</span>
+                  <strong>{{ formatCurrency(summary.totalShared) }}</strong>
+                </div>
+
+                <div class="summary-grid">
+                  <div class="summary-block">
+                    <h3>{{ personName('a') }}</h3>
+                    <div class="metric-list">
+                      <div class="metric-row">
+                        <span>Del av gemensamt</span>
+                        <strong>{{ formatCurrency(summary.sharedA) }}</strong>
+                      </div>
+                      <div class="metric-row">
+                        <span>Personligt</span>
+                        <strong>{{ formatCurrency(summary.personalA) }}</strong>
+                      </div>
+                      <div class="metric-row">
+                        <span>Totalt</span>
+                        <strong>{{ formatCurrency(summary.grandA) }}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="summary-block">
+                    <h3>{{ personName('b') }}</h3>
+                    <div class="metric-list">
+                      <div class="metric-row">
+                        <span>Del av gemensamt</span>
+                        <strong>{{ formatCurrency(summary.sharedB) }}</strong>
+                      </div>
+                      <div class="metric-row">
+                        <span>Personligt</span>
+                        <strong>{{ formatCurrency(summary.personalB) }}</strong>
+                      </div>
+                      <div class="metric-row">
+                        <span>Totalt</span>
+                        <strong>{{ formatCurrency(summary.grandB) }}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div :class="['difference-card', differenceState.kind]">
+                  <p class="difference-label">Skillnad</p>
+                  <p class="difference-value">{{ differenceState.text }}</p>
+                  <p class="difference-note">
+                    Visar skillnaden mellan månadens totalsummor i den valda delningen.
+                  </p>
+                </div>
+              </div>
+            </template>
+
+            <template v-else-if="currentView === 'shared'">
+              <div v-if="pendingRecurring.length" class="banner">
+                <div class="banner-top">
+                  <div>
+                    <p class="banner-title">{{ pendingRecurring.length }} återkommande utgifter väntar</p>
+                    <p class="banner-subtitle">
+                      Lägg till dem direkt för {{ monthLabel(currentMonth).toLowerCase() }} eller justera först.
+                    </p>
+                  </div>
+                  <span class="pill">Månad</span>
+                </div>
+
+                <div class="button-row">
+                  <button type="button" class="primary-button" @click="acceptAllRecurring('all')">Lägg till alla</button>
+                  <button type="button" class="secondary-button" @click="showRecurringList = !showRecurringList">
+                    {{ showRecurringList ? 'Dölj' : 'Visa' }}
+                  </button>
+                </div>
+
+                <div v-if="showRecurringList" class="pending-list">
+                  <div v-for="template in pendingRecurring" :key="template.id" class="pending-item">
+                    <div class="pending-header">
+                      <strong>{{ recurringLabel(template) }}</strong>
+                      <span class="pill">{{ template.type === 'shared' ? 'Gemensamt' : personName(template.person) }}</span>
+                    </div>
+                    <input v-model.trim="recurringDrafts[template.id].name" placeholder="Namn">
+                    <input
+                      v-model="recurringDrafts[template.id].amount"
+                      inputmode="numeric"
+                      placeholder="Belopp"
+                      @focus="selectAll"
+                    >
+                    <div class="button-row">
+                      <button type="button" class="primary-button" @click="acceptRecurring(template.id)">Lägg till</button>
+                      <button type="button" class="ghost-button" @click="skipRecurring(template.id)">Hoppa över</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="currentMonthData.shared.length" class="expense-list">
+                <article
+                  v-for="item in currentMonthData.shared"
+                  :key="item.id"
+                  class="expense-item"
+                  @click="startEdit('shared', null, item)"
+                >
+                  <template v-if="isEditing('shared', null, item.id)">
+                    <form class="inline-edit" @submit.prevent="saveEdit('shared', null, item.id)" @click.stop>
+                      <input v-model.trim="editing.name" placeholder="Namn">
+                      <input
+                        v-model="editing.amount"
+                        inputmode="numeric"
+                        placeholder="Belopp"
+                        @focus="selectAll"
+                      >
+                      <div class="button-row">
+                        <button type="button" class="ghost-button" @click="cancelEdit">Avbryt</button>
+                        <button type="submit" class="primary-button">Spara</button>
+                      </div>
+                    </form>
+                  </template>
+                  <template v-else>
+                    <div class="expense-main">
+                      <p class="expense-name">{{ item.name }}</p>
+                      <p class="expense-sub">
+                        {{ item.recurring ? 'Återkommande' : 'Engångsutgift' }}
+                      </p>
+                    </div>
+                    <div class="expense-actions">
+                      <span class="expense-amount">{{ formatCurrency(item.amount) }}</span>
+                      <button
+                        type="button"
+                        class="delete-button"
+                        aria-label="Ta bort utgift"
+                        @click.stop="deleteExpense('shared', null, item.id)"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </template>
+                </article>
+              </div>
+
+              <div v-else class="empty-state">
+                <strong>Inga utgifter ännu</strong>
+                Lägg till månadens första gemensamma kostnad med knappen nere till höger.
+              </div>
+            </template>
+
+            <template v-else-if="currentView === 'personal'">
+              <div class="tabs">
+                <button
+                  type="button"
+                  :class="['tab-button', { active: personalTab === 'a' }]"
+                  @click="personalTab = 'a'"
+                >
+                  {{ personName('a') }}
+                </button>
+                <button
+                  type="button"
+                  :class="['tab-button', { active: personalTab === 'b' }]"
+                  @click="personalTab = 'b'"
+                >
+                  {{ personName('b') }}
+                </button>
+              </div>
+
+              <div v-if="personalPendingRecurring.length" class="banner">
+                <div class="banner-top">
+                  <div>
+                    <p class="banner-title">{{ personalPendingRecurring.length }} återkommande personliga poster väntar</p>
+                    <p class="banner-subtitle">
+                      Mallarna kan läggas in direkt på rätt person för månaden.
+                    </p>
+                  </div>
+                  <span class="pill">Personligt</span>
+                </div>
+
+                <div class="button-row">
+                  <button type="button" class="primary-button" @click="acceptAllRecurring('personal')">Lägg till alla</button>
+                  <button type="button" class="secondary-button" @click="showRecurringList = !showRecurringList">
+                    {{ showRecurringList ? 'Dölj' : 'Visa' }}
+                  </button>
+                </div>
+
+                <div v-if="showRecurringList" class="pending-list">
+                  <div v-for="template in personalPendingRecurring" :key="template.id" class="pending-item">
+                    <div class="pending-header">
+                      <strong>{{ recurringLabel(template) }}</strong>
+                      <span class="pill">{{ personName(template.person) }}</span>
+                    </div>
+                    <input v-model.trim="recurringDrafts[template.id].name" placeholder="Namn">
+                    <input
+                      v-model="recurringDrafts[template.id].amount"
+                      inputmode="numeric"
+                      placeholder="Belopp"
+                      @focus="selectAll"
+                    >
+                    <div class="button-row">
+                      <button type="button" class="primary-button" @click="acceptRecurring(template.id)">Lägg till</button>
+                      <button type="button" class="ghost-button" @click="skipRecurring(template.id)">Hoppa över</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="currentPersonalList.length" class="expense-list">
+                <article
+                  v-for="item in currentPersonalList"
+                  :key="item.id"
+                  class="expense-item"
+                  @click="startEdit('personal', personalTab, item)"
+                >
+                  <template v-if="isEditing('personal', personalTab, item.id)">
+                    <form class="inline-edit" @submit.prevent="saveEdit('personal', personalTab, item.id)" @click.stop>
+                      <input v-model.trim="editing.name" placeholder="Namn">
+                      <input
+                        v-model="editing.amount"
+                        inputmode="numeric"
+                        placeholder="Belopp"
+                        @focus="selectAll"
+                      >
+                      <div class="button-row">
+                        <button type="button" class="ghost-button" @click="cancelEdit">Avbryt</button>
+                        <button type="submit" class="primary-button">Spara</button>
+                      </div>
+                    </form>
+                  </template>
+                  <template v-else>
+                    <div class="expense-main">
+                      <p class="expense-name">{{ item.name }}</p>
+                      <p class="expense-sub">Personlig utgift</p>
+                    </div>
+                    <div class="expense-actions">
+                      <span class="expense-amount">{{ formatCurrency(item.amount) }}</span>
+                      <button
+                        type="button"
+                        class="delete-button"
+                        aria-label="Ta bort utgift"
+                        @click.stop="deleteExpense('personal', personalTab, item.id)"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </template>
+                </article>
+              </div>
+
+              <div v-else class="empty-state">
+                <strong>Inga utgifter ännu</strong>
+                Lägg in en personlig utgift för {{ personName(personalTab) }} med plusknappen.
+              </div>
+            </template>
+
+            <template v-else>
+              <div class="share-grid">
+                <div class="card">
+                  <h2 class="dialog-title">Dela månadens läge</h2>
+                  <p class="dialog-text">
+                    Skapar en komprimerad länk med allt innehåll i appen. På kompatibla mobiler används systemets delningsruta.
+                  </p>
+                  <div class="button-row">
+                    <button type="button" class="primary-button" @click="shareLink">Dela länk</button>
+                    <button type="button" class="secondary-button" @click="copyCompressedData">Kopiera data</button>
+                  </div>
+                  <p v-if="shareFeedback" class="share-feedback">{{ shareFeedback }}</p>
+                </div>
+
+                <details class="card" :open="sharePanelOpen" @toggle="sharePanelOpen = $event.target.open">
+                  <summary>Fler delningsval</summary>
+                  <div class="details-body">
+                    <p class="muted">
+                      Om länken blir för lång kan ni i stället kopiera den komprimerade datatexten och importera på den andra enheten.
+                    </p>
+                    <div class="button-row">
+                      <button type="button" class="secondary-button" @click="copyCompressedData">Kopiera data</button>
+                      <button type="button" class="ghost-button" @click="importText = ''">Töm fält</button>
+                    </div>
+                    <textarea
+                      v-model.trim="importText"
+                      placeholder="Klistra in komprimerad data eller en hel delningslänk här"
+                    ></textarea>
+                    <button type="button" class="primary-button" @click="importSharedData">Importera data</button>
+                  </div>
+                </details>
+
+                <div class="card">
+                  <h2 class="dialog-title">Export och underhåll</h2>
+                  <p class="dialog-text">
+                    Exportera rådata som JSON eller nollställ bara den valda månaden.
+                  </p>
+                  <div class="button-row">
+                    <button type="button" class="secondary-button" @click="exportJson">Exportera JSON</button>
+                    <button type="button" class="danger-button" @click="promptClearMonth">Rensa månad</button>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </section>
+        </transition>
+      </main>
+
+      <button
+        v-if="currentView === 'shared' || currentView === 'personal'"
+        type="button"
+        class="fab"
+        @click="openExpenseDialog(currentView === 'shared' ? 'shared' : 'personal')"
+      >
+        <strong>+</strong>
+        Ny utgift
+      </button>
+
+      <nav class="bottom-nav" aria-label="Huvudnavigation">
+        <button type="button" :class="['nav-button', { active: currentView === 'home' }]" @click="currentView = 'home'">
+          <span class="nav-icon" aria-hidden="true">🏠</span>
+          <span>Hem</span>
+        </button>
+        <button type="button" :class="['nav-button', { active: currentView === 'shared' }]" @click="currentView = 'shared'">
+          <span class="nav-icon" aria-hidden="true">📊</span>
+          <span>Gemensamt</span>
+        </button>
+        <button type="button" :class="['nav-button', { active: currentView === 'personal' }]" @click="currentView = 'personal'">
+          <span class="nav-icon" aria-hidden="true">👤</span>
+          <span>Personligt</span>
+        </button>
+        <button type="button" :class="['nav-button', { active: currentView === 'share' }]" @click="currentView = 'share'">
+          <span class="nav-icon" aria-hidden="true">🔗</span>
+          <span>Dela</span>
+        </button>
+      </nav>
+
+      <dialog ref="expenseDialog">
+        <div class="dialog-card">
+          <h2 class="dialog-title">{{ expenseDialogState.mode === 'shared' ? 'Ny gemensam utgift' : 'Ny personlig utgift' }}</h2>
+          <p class="dialog-text">
+            {{ expenseDialogState.mode === 'shared' ? 'Lägg till kostnaden för den här månaden.' : 'Lägg till en personlig kostnad för vald person.' }}
+          </p>
+
+          <div class="field-stack">
+            <div>
+              <label class="label" for="expense-name">Namn</label>
+              <input id="expense-name" ref="expenseNameInput" v-model.trim="expenseDialogState.name" placeholder="Till exempel Hyra">
+            </div>
+            <div>
+              <label class="label" for="expense-amount">Belopp</label>
+              <input
+                id="expense-amount"
+                ref="expenseAmountInput"
+                v-model="expenseDialogState.amount"
+                inputmode="numeric"
+                placeholder="0"
+                @focus="selectAll"
+              >
+            </div>
+            <label v-if="expenseDialogState.mode === 'shared'" class="label" style="display:flex;align-items:center;gap:10px;margin:0;">
+              <input v-model="expenseDialogState.recurring" type="checkbox" style="width:20px;height:20px;min-height:20px;">
+              Återkommande?
+            </label>
+          </div>
+
+          <div class="dialog-actions">
+            <button type="button" class="ghost-button" @click="closeExpenseDialog">Avbryt</button>
+            <button type="button" class="primary-button" @click="submitExpenseDialog">Spara</button>
+          </div>
+        </div>
+      </dialog>
+
+      <dialog ref="confirmDialog">
+        <div class="dialog-card">
+          <h2 class="dialog-title">{{ confirmState.title }}</h2>
+          <p class="dialog-text">{{ confirmState.text }}</p>
+          <div class="dialog-actions">
+            <button type="button" class="ghost-button" @click="closeConfirmDialog">Avbryt</button>
+            <button type="button" class="danger-button" @click="runConfirmAction">Rensa</button>
+          </div>
+        </div>
+      </dialog>
+
+      <div v-if="toast.visible" class="toast" role="status" aria-live="polite">
+        <span>{{ toast.text }}</span>
+        <button v-if="toast.actionLabel" type="button" @click="runToastAction">{{ toast.actionLabel }}</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    (async function () {
+      const STORAGE_KEY = 'expense-data';
+      const SHARE_LIMIT = 2000;
+      const VUE_URL = 'https://unpkg.com/vue@3/dist/vue.global.prod.js';
+      const currencyFormatter = new Intl.NumberFormat('sv-SE', {
+        style: 'currency',
+        currency: 'SEK',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      });
+      const monthFormatter = new Intl.DateTimeFormat('sv-SE', {
+        month: 'long',
+        year: 'numeric'
+      });
+      const supportsCompression = typeof CompressionStream !== 'undefined' && typeof DecompressionStream !== 'undefined';
+
+      function parseAmount(value) {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          return Math.max(0, Math.round(value));
+        }
+        const normalized = String(value ?? '').replace(/[^\d-]/g, '');
+        const parsed = Number.parseInt(normalized, 10);
+        return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+      }
+
+      function bytesToBase64(bytes) {
+        let binary = '';
+        const chunkSize = 0x8000;
+        for (let index = 0; index < bytes.length; index += chunkSize) {
+          binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
+        }
+        return btoa(binary);
+      }
+
+      function base64ToBytes(base64) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index += 1) {
+          bytes[index] = binary.charCodeAt(index);
+        }
+        return bytes;
+      }
+
+      function bytesToBase64Url(bytes) {
+        return bytesToBase64(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+      }
+
+      function base64UrlToBytes(value) {
+        const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = normalized + '==='.slice((normalized.length + 3) % 4);
+        return base64ToBytes(padded);
+      }
+
+      async function gzipText(text) {
+        const stream = new CompressionStream('gzip');
+        const writer = stream.writable.getWriter();
+        writer.write(new TextEncoder().encode(text));
+        writer.close();
+        return new Uint8Array(await new Response(stream.readable).arrayBuffer());
+      }
+
+      async function ungzipText(bytes) {
+        const stream = new DecompressionStream('gzip');
+        const writer = stream.writable.getWriter();
+        writer.write(bytes);
+        writer.close();
+        return await new Response(stream.readable).text();
+      }
+
+      function getCurrentMonthKey() {
+        const now = new Date();
+        return [
+          now.getFullYear(),
+          String(now.getMonth() + 1).padStart(2, '0')
+        ].join('-');
+      }
+
+      function makeMonthKey(date) {
+        return [
+          date.getFullYear(),
+          String(date.getMonth() + 1).padStart(2, '0')
+        ].join('-');
+      }
+
+      function monthLabel(monthKey) {
+        const [year, month] = monthKey.split('-').map(Number);
+        return monthFormatter.format(new Date(year, month - 1, 1));
+      }
+
+      function defaultData() {
+        return {
+          persons: {
+            a: { name: 'Person A', income: 0 },
+            b: { name: 'Person B', income: 0 }
+          },
+          splitMode: 'equal',
+          months: {},
+          recurringTemplates: []
+        };
+      }
+
+      function emptyMonth() {
+        return {
+          shared: [],
+          personal: {
+            a: [],
+            b: []
+          },
+          skippedRecurringIds: []
+        };
+      }
+
+      function normalizeItem(item) {
+        const source = item && typeof item === 'object' ? item : {};
+        return {
+          id: typeof source.id === 'string' ? source.id : crypto.randomUUID(),
+          name: typeof source.name === 'string' ? source.name : '',
+          amount: parseAmount(source.amount),
+          recurring: Boolean(source.recurring),
+          sourceTemplateId: typeof source.sourceTemplateId === 'string' ? source.sourceTemplateId : null
+        };
+      }
+
+      function normalizeTemplate(template) {
+        const source = template && typeof template === 'object' ? template : {};
+        const type = source.type === 'personal' ? 'personal' : 'shared';
+        const person = source.person === 'a' || source.person === 'b' ? source.person : null;
+        return {
+          id: typeof source.id === 'string' ? source.id : crypto.randomUUID(),
+          name: typeof source.name === 'string' ? source.name : '',
+          amount: parseAmount(source.amount),
+          type,
+          person: type === 'personal' ? person || 'a' : null
+        };
+      }
+
+      function normalizeMonth(month) {
+        const source = month && typeof month === 'object' ? month : {};
+        return {
+          shared: Array.isArray(source.shared)
+            ? source.shared.map(normalizeItem).filter((item) => item.name || item.amount)
+            : [],
+          personal: {
+            a: Array.isArray(source.personal && source.personal.a)
+              ? source.personal.a.map(normalizeItem).filter((item) => item.name || item.amount)
+              : [],
+            b: Array.isArray(source.personal && source.personal.b)
+              ? source.personal.b.map(normalizeItem).filter((item) => item.name || item.amount)
+              : []
+          },
+          skippedRecurringIds: Array.isArray(source.skippedRecurringIds)
+            ? source.skippedRecurringIds.filter((id) => typeof id === 'string')
+            : []
+        };
+      }
+
+      function normalizeData(raw) {
+        const base = defaultData();
+        const source = raw && typeof raw === 'object' ? raw : {};
+        const persons = source.persons && typeof source.persons === 'object' ? source.persons : {};
+        const result = {
+          persons: {
+            a: {
+              name: typeof persons.a?.name === 'string' && persons.a.name.trim() ? persons.a.name.trim() : base.persons.a.name,
+              income: parseAmount(persons.a?.income)
+            },
+            b: {
+              name: typeof persons.b?.name === 'string' && persons.b.name.trim() ? persons.b.name.trim() : base.persons.b.name,
+              income: parseAmount(persons.b?.income)
+            }
+          },
+          splitMode: source.splitMode === 'income' ? 'income' : 'equal',
+          months: {},
+          recurringTemplates: Array.isArray(source.recurringTemplates)
+            ? source.recurringTemplates.map(normalizeTemplate).filter((template) => template.name || template.amount)
+            : []
+        };
+
+        if (source.months && typeof source.months === 'object') {
+          for (const [monthKey, month] of Object.entries(source.months)) {
+            result.months[monthKey] = normalizeMonth(month);
+          }
+        }
+
+        return result;
+      }
+
+      function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+
+      function loadData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          return defaultData();
+        }
+
+        try {
+          return normalizeData(JSON.parse(raw));
+        } catch (error) {
+          console.error('Kunde inte läsa localStorage.', error);
+          return defaultData();
+        }
+      }
+
+      async function compressState(data) {
+        if (!supportsCompression) {
+          throw new Error('Komprimerad delning stöds inte i den här webbläsaren.');
+        }
+        return bytesToBase64Url(await gzipText(JSON.stringify(data)));
+      }
+
+      async function decompressState(encoded) {
+        if (!supportsCompression) {
+          throw new Error('Import kräver stöd för komprimerad delning i webbläsaren.');
+        }
+        const bytes = base64UrlToBytes(encoded.trim());
+        const json = await ungzipText(bytes);
+        return normalizeData(JSON.parse(json));
+      }
+
+      function extractPayload(input) {
+        const trimmed = String(input ?? '').trim();
+        if (!trimmed) {
+          return '';
+        }
+
+        if (trimmed.includes('#')) {
+          try {
+            const url = new URL(trimmed, location.href);
+            const params = new URLSearchParams(url.hash.replace(/^#/, ''));
+            return params.get('data') || '';
+          } catch (error) {
+            return trimmed;
+          }
+        }
+
+        if (trimmed.startsWith('#')) {
+          return new URLSearchParams(trimmed.slice(1)).get('data') || '';
+        }
+
+        if (trimmed.startsWith('data=')) {
+          return trimmed.slice(5);
+        }
+
+        return trimmed;
+      }
+
+      async function importHashData() {
+        const params = new URLSearchParams(location.hash.replace(/^#/, ''));
+        const payload = params.get('data');
+        if (!payload) {
+          return { type: '', text: '', data: loadData() };
+        }
+
+        try {
+          const imported = await decompressState(payload);
+          saveData(imported);
+          history.replaceState(null, '', location.pathname + location.search);
+          return {
+            type: 'success',
+            text: 'Data importerades från länken och sparades lokalt.',
+            data: imported
+          };
+        } catch (error) {
+          console.error('Kunde inte importera hash-data.', error);
+          history.replaceState(null, '', location.pathname + location.search);
+          return {
+            type: 'error',
+            text: 'Länken gick inte att läsa. Befintlig lokal data används i stället.',
+            data: loadData()
+          };
+        }
+      }
+
+      function preferredMonth(data) {
+        const now = getCurrentMonthKey();
+        if (data.months[now]) {
+          return now;
+        }
+        const months = Object.keys(data.months).sort();
+        return months.length ? months[months.length - 1] : now;
+      }
+
+      function ensureMonth(data, monthKey) {
+        if (!data.months[monthKey]) {
+          data.months[monthKey] = emptyMonth();
+        }
+        return data.months[monthKey];
+      }
+
+      function sumAmounts(items) {
+        return items.reduce((sum, item) => sum + parseAmount(item.amount), 0);
+      }
+
+      function setManifest() {
+        const iconSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#18a058'/><path d='M18 24h28v6H18zm0 10h20v6H18zm0 10h28v6H18z' fill='white'/></svg>";
+        const iconData = 'data:image/svg+xml;base64,' + bytesToBase64(new TextEncoder().encode(iconSvg));
+        const manifest = {
+          name: 'Utgiftshanterare',
+          short_name: 'Utgifter',
+          display: 'standalone',
+          start_url: '.',
+          theme_color: '#18a058',
+          background_color: '#f5f5f5',
+          icons: [
+            {
+              src: iconData,
+              sizes: '512x512',
+              type: 'image/svg+xml',
+              purpose: 'any maskable'
+            }
+          ]
+        };
+        const href = 'data:application/manifest+json;base64,' + bytesToBase64(new TextEncoder().encode(JSON.stringify(manifest)));
+        document.getElementById('manifest-link').setAttribute('href', href);
+      }
+
+      async function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+          return;
+        }
+
+        const input = document.createElement('textarea');
+        input.value = text;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+      }
+
+      function downloadText(filename, text, mimeType) {
+        const blob = new Blob([text], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
+
+      function registerServiceWorker() {
+        const isSupportedContext =
+          'serviceWorker' in navigator &&
+          (location.protocol === 'https:' || location.hostname === 'localhost');
+
+        if (!isSupportedContext) {
+          return;
+        }
+
+        const serviceWorkerCode = `
+          const CACHE_NAME = 'utgifter-pwa-v1';
+          const VUE_URL = ${JSON.stringify(VUE_URL)};
+
+          async function warmCache() {
+            const cache = await caches.open(CACHE_NAME);
+            const scopeUrl = new URL(self.registration.scope);
+            const urls = [
+              scopeUrl.href,
+              new URL('./', scopeUrl.href).href,
+              new URL('index.html', scopeUrl.href).href
+            ];
+
+            for (const url of urls) {
+              try {
+                const response = await fetch(url, { cache: 'reload' });
+                if (response.ok) {
+                  await cache.put(url, response.clone());
+                }
+              } catch (error) {}
+            }
+
+            try {
+              const vueResponse = await fetch(VUE_URL, { mode: 'no-cors', cache: 'reload' });
+              await cache.put(VUE_URL, vueResponse.clone());
+            } catch (error) {}
+          }
+
+          self.addEventListener('install', (event) => {
+            event.waitUntil(warmCache().then(() => self.skipWaiting()));
+          });
+
+          self.addEventListener('activate', (event) => {
+            event.waitUntil(self.clients.claim());
+          });
+
+          self.addEventListener('fetch', (event) => {
+            if (event.request.method !== 'GET') {
+              return;
+            }
+
+            event.respondWith((async () => {
+              const cache = await caches.open(CACHE_NAME);
+              const cached = await cache.match(event.request);
+              if (cached) {
+                return cached;
+              }
+
+              try {
+                const response = await fetch(event.request);
+                if (response && (response.ok || response.type === 'opaque')) {
+                  cache.put(event.request, response.clone());
+                }
+                return response;
+              } catch (error) {
+                const fallback = await cache.match(self.registration.scope) ||
+                  await cache.match(new URL('index.html', self.registration.scope).href);
+                if (fallback) {
+                  return fallback;
+                }
+                throw error;
+              }
+            })());
+          });
+        `;
+
+        const blob = new Blob([serviceWorkerCode], { type: 'text/javascript' });
+        const url = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(url).catch((error) => {
+          console.warn('Service worker kunde inte registreras.', error);
+        });
+      }
+
+      setManifest();
+      const boot = await importHashData();
+
+      const { createApp, computed, reactive, ref, watch, nextTick } = Vue;
+
+      createApp({
+        setup() {
+          const data = ref(boot.data);
+          const currentView = ref('home');
+          const currentMonth = ref(preferredMonth(data.value));
+          const personalTab = ref('a');
+          const shareFeedback = ref('');
+          const importText = ref('');
+          const sharePanelOpen = ref(false);
+          const showRecurringList = ref(false);
+          const expenseDialog = ref(null);
+          const confirmDialog = ref(null);
+          const expenseNameInput = ref(null);
+          const expenseAmountInput = ref(null);
+          const startupNotice = reactive({
+            type: boot.type || '',
+            text: boot.text || ''
+          });
+          const expenseDialogState = reactive({
+            mode: 'shared',
+            person: 'a',
+            name: '',
+            amount: '',
+            recurring: false
+          });
+          const confirmState = reactive({
+            title: '',
+            text: '',
+            action: null
+          });
+          const editing = reactive({
+            type: '',
+            person: null,
+            id: '',
+            name: '',
+            amount: ''
+          });
+          const recurringDrafts = reactive({});
+          const toast = reactive({
+            visible: false,
+            text: '',
+            actionLabel: ''
+          });
+
+          let toastTimeout = null;
+          let toastAction = null;
+
+          const monthOptions = computed(() => {
+            const now = new Date();
+            const keys = new Set(Object.keys(data.value.months));
+            for (let offset = -11; offset <= 1; offset += 1) {
+              keys.add(makeMonthKey(new Date(now.getFullYear(), now.getMonth() + offset, 1)));
+            }
+            keys.add(currentMonth.value);
+
+            return [...keys]
+              .sort()
+              .map((value) => ({
+                value,
+                label: monthLabel(value)
+              }));
+          });
+
+          const currentMonthData = computed(() => ensureMonth(data.value, currentMonth.value));
+          const currentPersonalList = computed(() => currentMonthData.value.personal[personalTab.value]);
+
+          const summary = computed(() => {
+            const month = currentMonthData.value;
+            const totalShared = sumAmounts(month.shared);
+            const personalA = sumAmounts(month.personal.a);
+            const personalB = sumAmounts(month.personal.b);
+            let sharedA = Math.round(totalShared / 2);
+            let sharedB = totalShared - sharedA;
+
+            if (data.value.splitMode === 'income') {
+              const incomeA = parseAmount(data.value.persons.a.income);
+              const incomeB = parseAmount(data.value.persons.b.income);
+              const incomeTotal = incomeA + incomeB;
+              if (incomeTotal > 0) {
+                sharedA = Math.round(totalShared * (incomeA / incomeTotal));
+                sharedB = totalShared - sharedA;
+              }
+            }
+
+            const grandA = sharedA + personalA;
+            const grandB = sharedB + personalB;
+            return {
+              totalShared,
+              personalA,
+              personalB,
+              sharedA,
+              sharedB,
+              grandA,
+              grandB,
+              difference: grandA - grandB
+            };
+          });
+
+          const differenceState = computed(() => {
+            const diff = summary.value.difference;
+            if (diff === 0) {
+              return {
+                kind: 'balanced',
+                text: 'Ni ligger helt jämnt'
+              };
+            }
+
+            const higher = diff > 0 ? personName('a') : personName('b');
+            const lower = diff > 0 ? personName('b') : personName('a');
+            return {
+              kind: 'alert',
+              text: `${higher} ligger ${formatCurrency(Math.abs(diff))} högre än ${lower}`
+            };
+          });
+
+          function templateExistsInMonth(template, month) {
+            if (template.type === 'shared') {
+              return month.shared.some((item) =>
+                item.sourceTemplateId === template.id ||
+                (item.recurring && item.name === template.name && parseAmount(item.amount) === template.amount)
+              );
+            }
+
+            return month.personal[template.person].some((item) =>
+              item.sourceTemplateId === template.id ||
+              (item.name === template.name && parseAmount(item.amount) === template.amount)
+            );
+          }
+
+          const pendingRecurring = computed(() => {
+            const month = currentMonthData.value;
+            const skipped = new Set(month.skippedRecurringIds || []);
+            return data.value.recurringTemplates.filter((template) => (
+              !skipped.has(template.id) && !templateExistsInMonth(template, month)
+            ));
+          });
+
+          const personalPendingRecurring = computed(() => pendingRecurring.value.filter((template) => template.type === 'personal'));
+
+          watch(
+            data,
+            (value) => {
+              saveData(value);
+            },
+            { deep: true }
+          );
+
+          watch(
+            currentMonth,
+            (monthKey) => {
+              ensureMonth(data.value, monthKey);
+              cancelEdit();
+              if (pendingRecurring.value.length) {
+                showRecurringList.value = true;
+              }
+            },
+            { immediate: true }
+          );
+
+          watch(
+            pendingRecurring,
+            (templates) => {
+              const activeIds = new Set();
+              for (const template of templates) {
+                activeIds.add(template.id);
+                if (!recurringDrafts[template.id]) {
+                  recurringDrafts[template.id] = {
+                    name: template.name,
+                    amount: String(template.amount || '')
+                  };
+                }
+              }
+              for (const id of Object.keys(recurringDrafts)) {
+                if (!activeIds.has(id)) {
+                  delete recurringDrafts[id];
+                }
+              }
+            },
+            { immediate: true }
+          );
+
+          function formatCurrency(amount) {
+            return currencyFormatter.format(parseAmount(amount));
+          }
+
+          function personName(person) {
+            const fallback = person === 'a' ? 'Person A' : 'Person B';
+            return data.value.persons[person].name.trim() || fallback;
+          }
+
+          function updateIncome(person, value) {
+            data.value.persons[person].income = parseAmount(value);
+          }
+
+          function selectAll(event) {
+            event.target.select();
+          }
+
+          function getExpenseList(type, person, monthKey = currentMonth.value) {
+            const month = ensureMonth(data.value, monthKey);
+            return type === 'shared' ? month.shared : month.personal[person];
+          }
+
+          function resetEditing() {
+            editing.type = '';
+            editing.person = null;
+            editing.id = '';
+            editing.name = '';
+            editing.amount = '';
+          }
+
+          function isEditing(type, person, id) {
+            return editing.type === type && editing.person === person && editing.id === id;
+          }
+
+          function startEdit(type, person, item) {
+            if (isEditing(type, person, item.id)) {
+              return;
+            }
+
+            editing.type = type;
+            editing.person = person;
+            editing.id = item.id;
+            editing.name = item.name;
+            editing.amount = String(parseAmount(item.amount) || '');
+          }
+
+          function cancelEdit() {
+            resetEditing();
+          }
+
+          function saveEdit(type, person, id) {
+            const list = getExpenseList(type, person);
+            const item = list.find((entry) => entry.id === id);
+            if (!item) {
+              resetEditing();
+              return;
+            }
+
+            const name = editing.name.trim();
+            const amount = parseAmount(editing.amount);
+            if (!name || amount <= 0) {
+              showToast('Fyll i namn och belopp.');
+              return;
+            }
+
+            item.name = name;
+            item.amount = amount;
+
+            if (item.sourceTemplateId) {
+              const template = data.value.recurringTemplates.find((entry) => entry.id === item.sourceTemplateId);
+              if (template) {
+                template.name = name;
+                template.amount = amount;
+              }
+            }
+
+            resetEditing();
+          }
+
+          function showToast(text, actionLabel = '', action = null) {
+            if (toastTimeout) {
+              clearTimeout(toastTimeout);
+            }
+
+            toast.visible = true;
+            toast.text = text;
+            toast.actionLabel = actionLabel;
+            toastAction = action;
+
+            toastTimeout = setTimeout(() => {
+              toast.visible = false;
+              toast.actionLabel = '';
+              toastAction = null;
+            }, 5000);
+          }
+
+          function runToastAction() {
+            if (typeof toastAction === 'function') {
+              toastAction();
+            }
+            toast.visible = false;
+            toast.actionLabel = '';
+            toastAction = null;
+            if (toastTimeout) {
+              clearTimeout(toastTimeout);
+            }
+          }
+
+          function deleteExpense(type, person, id) {
+            const monthKey = currentMonth.value;
+            const list = getExpenseList(type, person, monthKey);
+            const index = list.findIndex((item) => item.id === id);
+            if (index === -1) {
+              return;
+            }
+
+            const [removed] = list.splice(index, 1);
+            if (editing.id === id) {
+              resetEditing();
+            }
+
+            showToast('Utgift borttagen', 'Ångra', () => {
+              const restoreList = getExpenseList(type, person, monthKey);
+              restoreList.splice(Math.min(index, restoreList.length), 0, removed);
+            });
+          }
+
+          function openExpenseDialog(mode) {
+            expenseDialogState.mode = mode;
+            expenseDialogState.person = personalTab.value;
+            expenseDialogState.name = '';
+            expenseDialogState.amount = '';
+            expenseDialogState.recurring = false;
+            expenseDialog.value.showModal();
+            nextTick(() => expenseNameInput.value && expenseNameInput.value.focus());
+          }
+
+          function closeExpenseDialog() {
+            expenseDialog.value.close();
+          }
+
+          function submitExpenseDialog() {
+            const name = expenseDialogState.name.trim();
+            const amount = parseAmount(expenseDialogState.amount);
+            if (!name || amount <= 0) {
+              showToast('Fyll i namn och belopp.');
+              nextTick(() => expenseNameInput.value && expenseNameInput.value.focus());
+              return;
+            }
+
+            const month = currentMonthData.value;
+            if (expenseDialogState.mode === 'shared') {
+              const item = {
+                id: crypto.randomUUID(),
+                name,
+                amount,
+                recurring: Boolean(expenseDialogState.recurring),
+                sourceTemplateId: null
+              };
+
+              if (expenseDialogState.recurring) {
+                const template = {
+                  id: crypto.randomUUID(),
+                  name,
+                  amount,
+                  type: 'shared',
+                  person: null
+                };
+                data.value.recurringTemplates.unshift(template);
+                item.sourceTemplateId = template.id;
+              }
+
+              month.shared.unshift(item);
+            } else {
+              month.personal[expenseDialogState.person].unshift({
+                id: crypto.randomUUID(),
+                name,
+                amount,
+                recurring: false,
+                sourceTemplateId: null
+              });
+            }
+
+            closeExpenseDialog();
+          }
+
+          function recurringLabel(template) {
+            return `${template.name || 'Ny mall'} · ${formatCurrency(template.amount)}`;
+          }
+
+          function acceptRecurring(templateId, silent = false) {
+            const template = data.value.recurringTemplates.find((entry) => entry.id === templateId);
+            if (!template) {
+              return false;
+            }
+
+            const draft = recurringDrafts[templateId] || { name: template.name, amount: String(template.amount || '') };
+            const name = draft.name.trim();
+            const amount = parseAmount(draft.amount);
+            if (!name || amount <= 0) {
+              showToast('Fyll i namn och belopp för mallen.');
+              return false;
+            }
+
+            template.name = name;
+            template.amount = amount;
+            const month = currentMonthData.value;
+
+            if (template.type === 'shared') {
+              month.shared.unshift({
+                id: crypto.randomUUID(),
+                name,
+                amount,
+                recurring: true,
+                sourceTemplateId: template.id
+              });
+            } else {
+              month.personal[template.person].unshift({
+                id: crypto.randomUUID(),
+                name,
+                amount,
+                recurring: false,
+                sourceTemplateId: template.id
+              });
+            }
+
+            month.skippedRecurringIds = month.skippedRecurringIds.filter((id) => id !== template.id);
+
+            if (!silent) {
+              showToast('Återkommande utgift tillagd.');
+            }
+            return true;
+          }
+
+          function acceptAllRecurring(scope = 'all') {
+            const source = scope === 'personal' ? personalPendingRecurring.value : pendingRecurring.value;
+            const ids = source.map((template) => template.id);
+            let added = 0;
+            for (const id of ids) {
+              if (acceptRecurring(id, true)) {
+                added += 1;
+              }
+            }
+            if (added) {
+              showToast(`${added} återkommande utgifter lades till.`);
+            }
+          }
+
+          function skipRecurring(templateId) {
+            const month = currentMonthData.value;
+            if (!month.skippedRecurringIds.includes(templateId)) {
+              month.skippedRecurringIds.push(templateId);
+            }
+            showToast('Mallen hoppas över för den här månaden.');
+          }
+
+          async function shareLink() {
+            try {
+              const payload = await compressState(data.value);
+              const baseUrl = location.href.split('#')[0];
+              const link = `${baseUrl}#data=${payload}`;
+              if (link.length > SHARE_LIMIT) {
+                sharePanelOpen.value = true;
+                shareFeedback.value = 'Länken blev för lång. Använd “Kopiera data” eller “Importera data” längre ned.';
+                showToast('Länken blev för lång. Använd datafältet i stället.');
+                return;
+              }
+
+              if (navigator.share) {
+                try {
+                  await navigator.share({
+                    title: 'Utgifter',
+                    text: 'Här är vår senaste hushållsöversikt.',
+                    url: link
+                  });
+                  shareFeedback.value = 'Länken delades.';
+                  return;
+                } catch (error) {
+                  if (error && error.name === 'AbortError') {
+                    return;
+                  }
+                }
+              }
+
+              await copyText(link);
+              shareFeedback.value = 'Länken kopierades till urklipp.';
+              showToast('Länken kopierades.');
+            } catch (error) {
+              console.error('Kunde inte dela länk.', error);
+              shareFeedback.value = error.message || 'Det gick inte att skapa en delningslänk.';
+              showToast(shareFeedback.value);
+            }
+          }
+
+          async function copyCompressedData() {
+            try {
+              const payload = await compressState(data.value);
+              await copyText(payload);
+              sharePanelOpen.value = true;
+              shareFeedback.value = 'Komprimerad data kopierades.';
+              showToast('Data kopierades.');
+            } catch (error) {
+              console.error('Kunde inte kopiera data.', error);
+              shareFeedback.value = error.message || 'Kopiering misslyckades.';
+              showToast(shareFeedback.value);
+            }
+          }
+
+          async function importSharedData() {
+            const payload = extractPayload(importText.value);
+            if (!payload) {
+              showToast('Klistra in en länk eller komprimerad data först.');
+              return;
+            }
+
+            try {
+              data.value = await decompressState(payload);
+              currentMonth.value = preferredMonth(data.value);
+              importText.value = '';
+              sharePanelOpen.value = true;
+              shareFeedback.value = 'Data importerades.';
+              startupNotice.type = '';
+              startupNotice.text = '';
+              showToast('Data importerades.');
+            } catch (error) {
+              console.error('Kunde inte importera data.', error);
+              shareFeedback.value = 'Det gick inte att importera datan.';
+              showToast('Importen misslyckades.');
+            }
+          }
+
+          function exportJson() {
+            downloadText(
+              `utgifter-${currentMonth.value}.json`,
+              JSON.stringify(data.value, null, 2),
+              'application/json'
+            );
+            showToast('JSON exporterad.');
+          }
+
+          function promptClearMonth() {
+            confirmState.title = `Rensa ${monthLabel(currentMonth.value)}?`;
+            confirmState.text = 'Alla gemensamma och personliga utgifter för den valda månaden tas bort. Mallar för återkommande utgifter finns kvar.';
+            confirmState.action = () => {
+              data.value.months[currentMonth.value] = emptyMonth();
+              showRecurringList.value = true;
+              showToast('Månaden rensades.');
+            };
+            confirmDialog.value.showModal();
+          }
+
+          function closeConfirmDialog() {
+            confirmDialog.value.close();
+          }
+
+          function runConfirmAction() {
+            if (typeof confirmState.action === 'function') {
+              confirmState.action();
+            }
+            closeConfirmDialog();
+          }
+
+          return {
+            currentView,
+            currentMonth,
+            personalTab,
+            data,
+            monthOptions,
+            currentMonthData,
+            currentPersonalList,
+            summary,
+            differenceState,
+            startupNotice,
+            expenseDialog,
+            confirmDialog,
+            expenseDialogState,
+            confirmState,
+            editing,
+            toast,
+            recurringDrafts,
+            pendingRecurring,
+            personalPendingRecurring,
+            showRecurringList,
+            shareFeedback,
+            importText,
+            sharePanelOpen,
+            expenseNameInput,
+            expenseAmountInput,
+            formatCurrency,
+            monthLabel,
+            personName,
+            updateIncome,
+            selectAll,
+            recurringLabel,
+            isEditing,
+            startEdit,
+            cancelEdit,
+            saveEdit,
+            deleteExpense,
+            openExpenseDialog,
+            closeExpenseDialog,
+            submitExpenseDialog,
+            acceptRecurring,
+            acceptAllRecurring,
+            skipRecurring,
+            shareLink,
+            copyCompressedData,
+            importSharedData,
+            exportJson,
+            promptClearMonth,
+            closeConfirmDialog,
+            runConfirmAction,
+            runToastAction
+          };
+        }
+      }).mount('#app');
+
+      registerServiceWorker();
+    })();
+  </script>
+</body>
+</html>
