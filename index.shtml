@@ -1287,6 +1287,7 @@ const app = createApp({
       editingId, editName, editAmount, newExpense,
       toast, monthData, nameA, nameB, currentPersonalList,
       pendingRecurring, totals,
+      addSharedDialog, addPersonalDialog, confirmClearDialog, newExpenseNameInput,
       formatCurrency, monthLabel, save, changeMonth, selectAll,
       openAddShared, addShared, openAddPersonal, addPersonal,
       removeShared, removePersonal,
