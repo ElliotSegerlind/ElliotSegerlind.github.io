@@ -10,6 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318a058'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>💰</text></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48cmVjdCB3aWR0aD0nMTAwJyBoZWlnaHQ9JzEwMCcgcng9JzIwJyBmaWxsPSclMjMxOGEwNTgnLz48dGV4dCB4PSc1MCcgeT0nNjgnIGZvbnQtc2l6ZT0nNTAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9J3doaXRlJz7wn5KwPC90ZXh0Pjwvc3ZnPg==">
 <script>
+// Inline manifest as base64 data-URI
 const manifest = {
   name: "Utgifter",
   short_name: "Utgifter",
@@ -31,8 +32,9 @@ mLink.rel = 'manifest';
 mLink.href = URL.createObjectURL(mBlob);
 document.head.appendChild(mLink);
 
+// Service worker from Blob URL
 const swCode = `
-const CACHE_NAME = 'utgifter-v3';
+const CACHE_NAME = 'utgifter-v2';
 const ASSETS = [self.location.href];
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
@@ -236,7 +238,6 @@ dialog::backdrop{background:rgba(0,0,0,0.4)}
 .payment-item .pi-date{font-size:12px;color:var(--text3)}
 .payment-item .pi-note{font-size:13px;color:var(--text2)}
 .payment-item .pi-amount{font-weight:700;font-size:15px;color:var(--accent)}
-.payment-item .pi-delete{background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px 8px;margin-left:8px}
 .share-section{margin-bottom:16px}
 .share-section h3{font-size:14px;font-weight:600;margin-bottom:8px}
 .collapsible-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 0}
@@ -249,7 +250,7 @@ dialog::backdrop{background:rgba(0,0,0,0.4)}
 .confirm-box .confirm-actions{display:flex;gap:8px;justify-content:flex-end}
 .month-quick{font-size:13px;color:var(--text2);text-align:center;margin-bottom:12px}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-input[type=number]{-moz-appearance:textfield}
+input[type=number]{-moz-appearance:textbox}
 .ri-edit-row{display:flex;gap:6px;margin-top:4px}
 .ri-edit-row input{padding:4px 8px;font-size:13px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font)}
 .paidby-tag{font-size:11px;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--text3);cursor:pointer;-webkit-tap-highlight-color:transparent;border:none;font-family:var(--font)}
@@ -262,136 +263,6 @@ input[type=number]{-moz-appearance:textfield}
 .avatar-circle img{width:100%;height:100%;object-fit:cover}
 .avatar-circle .avatar-placeholder{font-size:24px;color:var(--text3)}
 .avatar-input{display:none}
-
-/* Sort & filter bar */
-.sort-bar{display:flex;gap:8px;align-items:center;margin-bottom:12px}
-.sort-bar select{flex:1;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);font-size:14px;color:var(--text);font-family:var(--font)}
-.sort-bar .reorder-btn{padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);font-size:14px;cursor:pointer;color:var(--text);font-family:var(--font)}
-.sort-bar .reorder-btn.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
-
-/* Expense date */
-.expense-date{font-size:11px;color:var(--text3)}
-
-/* Tags */
-.tag-pill{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:10px;font-size:11px;background:rgba(99,102,241,0.1);color:#6366f1}
-.tag-input-wrapper{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);min-height:38px;align-items:center;cursor:text}
-.tag-input-wrapper input{border:none;background:none;font-size:14px;color:var(--text);font-family:var(--font);flex:1;min-width:60px;padding:2px 0;outline:none}
-.tag-input-wrapper .tag-rm{cursor:pointer;font-size:10px;margin-left:2px;opacity:0.6}
-.tag-input-wrapper .tag-rm:hover{opacity:1}
-
-/* Custom split */
-.split-indicator{font-size:11px;padding:2px 7px;border-radius:10px;background:rgba(99,102,241,0.12);color:#6366f1}
-
-/* Comments */
-.comment-toggle{font-size:12px;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font);padding:2px 0}
-.comment-section{margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
-.comment-item{font-size:12px;color:var(--text2);margin-bottom:4px;padding:4px 8px;background:var(--bg3);border-radius:var(--radius-xs)}
-.comment-item .c-author{font-weight:600;color:var(--text)}
-.comment-item .c-time{font-size:10px;color:var(--text3);margin-left:6px}
-.comment-form{display:flex;gap:4px;margin-top:6px}
-.comment-form input{flex:1;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;color:var(--text);font-family:var(--font)}
-.comment-form button{padding:6px 10px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-xs);font-size:12px;cursor:pointer;font-family:var(--font)}
-
-/* Budget */
-.budget-item{margin-bottom:10px}
-.budget-info{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
-.budget-info .b-cat{font-weight:500}
-.budget-info .b-val{color:var(--text2)}
-.budget-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
-.budget-bar .b-fill{height:100%;border-radius:3px;transition:width .4s ease}
-.budget-bar .b-fill.ok{background:var(--accent)}
-.budget-bar .b-fill.warn{background:var(--warn)}
-.budget-bar .b-fill.over{background:var(--danger)}
-
-/* Savings goals */
-.goal-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
-.goal-item:last-child{border-bottom:none}
-.goal-emoji{font-size:24px}
-.goal-info{flex:1;min-width:0}
-.goal-name{font-size:14px;font-weight:500}
-.goal-ptext{font-size:12px;color:var(--text2)}
-.goal-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:4px}
-.goal-bar .g-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease}
-.goal-actions{display:flex;gap:4px}
-.goal-actions button{padding:4px 8px;font-size:12px;border:none;border-radius:var(--radius-xs);cursor:pointer;font-family:var(--font);background:var(--bg3);color:var(--text2)}
-
-/* Wishlist */
-.wish-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
-.wish-item:last-child{border-bottom:none}
-.wish-item.done{opacity:0.5}
-.wish-check{width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
-.wish-info{flex:1;min-width:0}
-.wish-name{font-size:14px;font-weight:500}
-.wish-name.checked{text-decoration:line-through}
-.wish-note{font-size:12px;color:var(--text2)}
-.wish-amount{font-size:14px;font-weight:600;color:var(--accent);white-space:nowrap}
-.wish-delete{background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px}
-
-/* Debt history */
-.debt-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
-.debt-item:last-child{border-bottom:none}
-.debt-item .d-month{color:var(--text2)}
-.debt-item .d-val{font-weight:600}
-.debt-item .d-val.positive{color:var(--danger)}
-.debt-item .d-val.zero{color:var(--accent)}
-
-/* Monthly report */
-.report-card{background:linear-gradient(135deg,#1a2e1f,#1a1f1c);color:#e8ece9;border-radius:16px;padding:24px;margin-bottom:12px}
-@media(prefers-color-scheme:light){.report-card{background:linear-gradient(135deg,#f0faf3,#e8f5ec);color:#1a1a1a}}
-.report-header{text-align:center;margin-bottom:16px}
-.report-header h3{font-size:20px;font-weight:700}
-.report-header .report-sub{font-size:14px;opacity:0.7}
-.report-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.1);font-size:14px}
-@media(prefers-color-scheme:light){.report-row{border-bottom-color:rgba(0,0,0,0.08)}}
-.report-row:last-child{border-bottom:none}
-.report-total{font-weight:700;font-size:18px;margin-top:10px;text-align:center}
-
-/* QR code */
-.qr-section{text-align:center;margin:16px 0}
-.qr-section img{max-width:200px;border-radius:8px;background:#fff;padding:8px}
-.qr-section .qr-note{font-size:12px;color:var(--text3);margin-top:8px}
-
-/* Reorder */
-.reorder-btns{display:flex;flex-direction:column;gap:2px;margin-left:8px;flex-shrink:0}
-.reorder-btns button{padding:2px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-size:12px;cursor:pointer;line-height:1;color:var(--text2)}
-
-/* Calc preview */
-.calc-preview{font-size:12px;color:var(--accent);margin-top:2px;font-weight:500}
-
-/* Notification toggle */
-.notif-toggle{display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;cursor:pointer}
-.notif-toggle label{font-size:14px;cursor:pointer}
-.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
-.toggle-switch input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--bg3);border-radius:12px;transition:.2s;border:1px solid var(--border)}
-.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:2px;bottom:2px;background:#fff;border-radius:50%;transition:.2s}
-.toggle-switch input:checked+.toggle-slider{background:var(--accent);border-color:var(--accent)}
-.toggle-switch input:checked+.toggle-slider::before{transform:translateX(20px)}
-
-/* Yearly */
-.year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.year-cell{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px;text-align:center}
-.year-cell .yc-month{font-size:11px;color:var(--text2);margin-bottom:2px}
-.year-cell .yc-val{font-size:14px;font-weight:700}
-
-/* Confetti */
-@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-
-/* Running balance */
-.running-balance{font-size:14px;color:var(--text2);text-align:center;margin:8px 0;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs)}
-.running-balance .rb-val{font-weight:700;color:var(--text)}
-
-/* Custom split slider area */
-.split-slider-row{display:flex;align-items:center;gap:8px;margin-top:4px}
-.split-slider-row input[type=range]{flex:1;accent-color:var(--accent)}
-.split-slider-row .split-pct{font-size:13px;font-weight:600;min-width:70px;text-align:center;color:var(--text2)}
-
-/* Budget edit */
-.budget-edit-list{max-height:300px;overflow-y:auto}
-.budget-edit-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
-.budget-edit-item:last-child{border-bottom:none}
-.budget-edit-item .be-cat{flex:1;font-size:13px}
-.budget-edit-item input{width:100px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);font-size:14px;color:var(--text);font-family:var(--font);text-align:right}
 </style>
 </head>
 <body>
@@ -457,11 +328,6 @@ input[type=number]{-moz-appearance:textfield}
       </template>
     </div>
 
-    <!-- Running balance across months -->
-    <div class="running-balance" v-if="runningBalance!==0">
-      Totalt skuldsaldo: <span class="rb-val" :style="{color:runningBalance>0?'var(--danger)':'var(--accent)'}">{{ runningBalance>0 ? data.persons.b.name+' är skyldig '+fmt(runningBalance) : 'Ingen total skuld' }}</span>
-    </div>
-
     <div class="month-quick" v-if="monthData.shared.length>0">
       {{ monthData.shared.length }} utgifter · totalt {{ fmt(totalShared) }}
     </div>
@@ -469,23 +335,6 @@ input[type=number]{-moz-appearance:textfield}
     <button class="btn btn-primary btn-block" @click="openPaymentDialog" style="margin-bottom:16px">
       💳 Registrera betalning
     </button>
-
-    <!-- Budget overview -->
-    <div class="card" v-if="budgetItems.length>0">
-      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-        <span>📊 Budget</span>
-        <button class="btn btn-sm btn-outline" @click="openBudgetDialog" style="padding:4px 8px;font-size:11px">Ändra</button>
-      </div>
-      <div class="budget-item" v-for="bi in budgetItems" :key="bi.id">
-        <div class="budget-info">
-          <span class="b-cat">{{ bi.emoji }} {{ bi.label }}</span>
-          <span class="b-val">{{ fmt(bi.spent) }} / {{ fmt(bi.limit) }}<template v-if="bi.pct>100"> ⚠️</template></span>
-        </div>
-        <div class="budget-bar">
-          <div class="b-fill" :class="bi.pct>100?'over':bi.pct>80?'warn':'ok'" :style="{width:Math.min(100,bi.pct)+'%'}"></div>
-        </div>
-      </div>
-    </div>
 
     <div class="card">
       <div class="card-title">Sammanfattning</div>
@@ -521,7 +370,6 @@ input[type=number]{-moz-appearance:textfield}
       </div>
     </div>
 
-    <!-- Payments with delete -->
     <div class="card" v-if="monthData.payments.length>0">
       <div class="card-title">Betalningar denna månad</div>
       <div class="payment-list">
@@ -531,83 +379,9 @@ input[type=number]{-moz-appearance:textfield}
             <div class="pi-note" v-if="py.note">{{ py.note }}</div>
           </div>
           <div class="pi-amount">{{ fmt(py.amount) }}</div>
-          <button class="pi-delete" @click="deletePayment(py.id)" title="Radera">🗑️</button>
         </div>
       </div>
     </div>
-
-    <!-- Notification toggle -->
-    <div class="notif-toggle" @click="toggleNotif">
-      <label>🔔 Påminnelse vid månadsslut</label>
-      <div class="toggle-switch">
-        <input type="checkbox" :checked="notifEnabled" @click.stop="toggleNotif">
-        <span class="toggle-slider"></span>
-      </div>
-    </div>
-
-    <!-- Historical debt view -->
-    <div class="card" v-if="debtHistory.length>0">
-      <div class="collapsible-header" @click="debtOpen=!debtOpen">
-        <span class="card-title" style="margin:0">📈 Historisk skuld</span>
-        <span class="arrow" :class="{open:debtOpen}">▼</span>
-      </div>
-      <div v-if="debtOpen">
-        <div class="debt-item" v-for="dh in debtHistory" :key="dh.month">
-          <span class="d-month">{{ dh.label }}</span>
-          <span class="d-val" :class="dh.balance>0?'positive':'zero'">{{ dh.balance>0?'+'+fmt(dh.balance):fmt(dh.balance) }}</span>
-          <span class="d-val" style="min-width:80px;text-align:right" :class="dh.running>0?'positive':'zero'">Σ {{ fmt(dh.running) }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Savings Goals -->
-    <div class="card">
-      <div class="collapsible-header" @click="savingsOpen=!savingsOpen">
-        <span class="card-title" style="margin:0">🎯 Sparande-mål</span>
-        <span class="arrow" :class="{open:savingsOpen}">▼</span>
-      </div>
-      <div v-if="savingsOpen">
-        <div class="goal-item" v-for="g in data.savingsGoals" :key="g.id">
-          <span class="goal-emoji">{{ g.emoji }}</span>
-          <div class="goal-info">
-            <div class="goal-name">{{ g.name }}</div>
-            <div class="goal-ptext">{{ fmt(g.saved) }} / {{ fmt(g.target) }} ({{ Math.round(g.saved/Math.max(1,g.target)*100) }}%)</div>
-            <div class="goal-bar"><div class="g-fill" :style="{width:Math.min(100,g.saved/Math.max(1,g.target)*100)+'%'}"></div></div>
-          </div>
-          <div class="goal-actions">
-            <button @click="addToGoal(g)">+💰</button>
-            <button @click="deleteGoal(g.id)">🗑️</button>
-          </div>
-        </div>
-        <div class="empty-state" v-if="data.savingsGoals.length===0" style="padding:16px"><p>Inga sparmål ännu</p></div>
-        <button class="btn btn-outline btn-sm btn-block" @click="openGoalDialog" style="margin-top:8px">+ Nytt sparmål</button>
-      </div>
-    </div>
-
-    <!-- Wishlist -->
-    <div class="card">
-      <div class="collapsible-header" @click="wishOpen=!wishOpen">
-        <span class="card-title" style="margin:0">🎁 Önskelista</span>
-        <span class="arrow" :class="{open:wishOpen}">▼</span>
-      </div>
-      <div v-if="wishOpen">
-        <div class="wish-item" :class="{done:w.done}" v-for="w in data.wishlist" :key="w.id">
-          <input type="checkbox" class="wish-check" :checked="w.done" @change="w.done=!w.done">
-          <div class="wish-info">
-            <div class="wish-name" :class="{checked:w.done}">{{ w.name }}</div>
-            <div class="wish-note" v-if="w.note">{{ w.note }}</div>
-            <div class="wish-note" v-if="w.addedBy">Tillagd av {{ w.addedBy }}</div>
-          </div>
-          <div class="wish-amount" v-if="w.amount">{{ fmt(w.amount) }}</div>
-          <button class="wish-delete" @click="deleteWish(w.id)">✕</button>
-        </div>
-        <div class="empty-state" v-if="data.wishlist.length===0" style="padding:16px"><p>Önskelistan är tom</p></div>
-        <button class="btn btn-outline btn-sm btn-block" @click="openWishDialog" style="margin-top:8px">+ Lägg till önskning</button>
-      </div>
-    </div>
-
-    <!-- Budget setup button if no budgets -->
-    <button class="btn btn-outline btn-block btn-sm" v-if="budgetItems.length===0" @click="openBudgetDialog" style="margin-bottom:12px">📊 Sätt budgetmål per kategori</button>
   </div>
 
   <!-- ============ SHARED ============ -->
@@ -615,18 +389,6 @@ input[type=number]{-moz-appearance:textfield}
     <div class="search-bar">
       <span class="search-icon">🔍</span>
       <input v-model="searchQuery" placeholder="Sök utgifter…">
-    </div>
-
-    <div class="sort-bar">
-      <select v-model="sortMode">
-        <option value="default">Sortering: Standard</option>
-        <option value="date">Datum (nyast först)</option>
-        <option value="amount-desc">Belopp (högst)</option>
-        <option value="amount-asc">Belopp (lägst)</option>
-        <option value="category">Kategori</option>
-        <option value="name">Namn (A-Ö)</option>
-      </select>
-      <button class="reorder-btn" :class="{active:reorderMode}" @click="reorderMode=!reorderMode" title="Flytta utgifter">↕️</button>
     </div>
 
     <!-- Recurring banner -->
@@ -652,62 +414,29 @@ input[type=number]{-moz-appearance:textfield}
       <button class="btn btn-primary btn-sm btn-block" style="margin-top:8px" @click="addAllRecurring('shared')" v-if="pendingRecurring('shared').length>1">Lägg till alla</button>
     </div>
 
-    <template v-if="sortedShared.length>0">
-      <div v-for="(exp,idx) in sortedShared" :key="exp.id" class="expense-item"
+    <template v-if="filteredShared.length>0">
+      <div v-for="(exp,idx) in filteredShared" :key="exp.id" class="expense-item"
            @touchstart="touchStart($event,exp)" @touchmove="touchMove($event,exp)" @touchend="touchEnd($event,exp)"
            :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
         <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30">
           <span>Radera</span>
         </div>
         <template v-if="editingId!==exp.id">
-          <div style="display:flex">
-            <div style="flex:1;min-width:0" @click="startEdit(exp,'shared')">
-              <div class="expense-header">
-                <div class="expense-name">{{ exp.name }}</div>
-                <div class="expense-amount">{{ fmt(exp.amount) }}</div>
-              </div>
-              <div class="expense-meta">
-                <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
-                <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
-                <button class="paidby-tag" :class="{'by-b':exp.paidBy==='b'}" @click.stop="togglePaidBy(exp)" :title="'Betald av '+(exp.paidBy==='b'?data.persons.b.name:data.persons.a.name)">💳 {{ exp.paidBy==='b'?data.persons.b.name:data.persons.a.name }}</button>
-                <span class="split-indicator" v-if="exp.customSplit!=null">{{ 100-exp.customSplit }}/{{ exp.customSplit }}</span>
-                <span class="expense-date" v-if="exp.date">📅 {{ exp.date }}</span>
-              </div>
-              <div class="expense-meta" v-if="exp.tags&&exp.tags.length>0" style="margin-top:4px">
-                <span class="tag-pill" v-for="tg in exp.tags" :key="tg">🏷️ {{ tg }}</span>
-              </div>
-              <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
-            </div>
-            <div class="reorder-btns" v-if="reorderMode">
-              <button @click="moveExpense('shared',exp.id,-1)" :disabled="idx===0">▲</button>
-              <button @click="moveExpense('shared',exp.id,1)" :disabled="idx===sortedShared.length-1">▼</button>
-            </div>
+          <div class="expense-header" @click="startEdit(exp)">
+            <div class="expense-name">{{ exp.name }}</div>
+            <div class="expense-amount">{{ fmt(exp.amount) }}</div>
           </div>
-          <!-- Comments toggle -->
-          <button class="comment-toggle" @click.stop="toggleComments(exp.id)">
-            💬 {{ (exp.comments||[]).length }} kommentarer
-          </button>
-          <div class="comment-section" v-if="openComments===exp.id">
-            <div class="comment-item" v-for="c in (exp.comments||[])" :key="c.id">
-              <span class="c-author">{{ c.author }}</span><span class="c-time">{{ formatCommentTime(c.ts) }}</span>
-              <div>{{ c.text }}</div>
-            </div>
-            <div class="comment-form">
-              <input v-model="commentText" placeholder="Skriv kommentar…" @keyup.enter="addComment(exp)">
-              <select v-model="commentAuthor" style="width:auto;padding:4px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text)">
-                <option value="a">{{ data.persons.a.name }}</option>
-                <option value="b">{{ data.persons.b.name }}</option>
-              </select>
-              <button @click="addComment(exp)">Skicka</button>
-            </div>
+          <div class="expense-meta">
+            <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
+            <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
+            <button class="paidby-tag" :class="{'by-b':exp.paidBy==='b'}" @click.stop="togglePaidBy(exp)" :title="'Betald av '+(exp.paidBy==='b'?data.persons.b.name:data.persons.a.name)">💳 {{ exp.paidBy==='b'?data.persons.b.name:data.persons.a.name }}</button>
           </div>
+          <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
         </template>
         <template v-else>
           <div class="edit-form">
-            <input v-model="editName" placeholder="Namn">
-            <input v-model="editAmount" placeholder="Belopp" @input="onAmountInput">
-            <div class="calc-preview" v-if="calcPreview">= {{ fmt(calcPreview) }}</div>
-            <input type="date" v-model="editDate">
+            <input v-model="editName" placeholder="Namn" ref="editNameInput">
+            <input v-model="editAmount" placeholder="Belopp" inputmode="numeric">
             <select v-model="editCategory">
               <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
             </select>
@@ -716,24 +445,6 @@ input[type=number]{-moz-appearance:textfield}
               <option value="a">💳 Betald av {{ data.persons.a.name }}</option>
               <option value="b">💳 Betald av {{ data.persons.b.name }}</option>
             </select>
-            <div>
-              <label style="font-size:12px;color:var(--text2)">Uppdelning ({{ data.persons.a.name }}/{{ data.persons.b.name }})</label>
-              <div class="split-slider-row">
-                <input type="range" min="0" max="100" v-model.number="editCustomSplit">
-                <span class="split-pct">{{ 100-editCustomSplit }}/{{ editCustomSplit }}</span>
-              </div>
-              <div class="check-group" style="margin-top:4px">
-                <input type="checkbox" :id="'cs-'+exp.id" :checked="editUseCustomSplit" @change="editUseCustomSplit=!editUseCustomSplit">
-                <label :for="'cs-'+exp.id" style="font-size:12px">Anpassad uppdelning</label>
-              </div>
-            </div>
-            <div>
-              <label style="font-size:12px;color:var(--text2)">Taggar (tryck Enter)</label>
-              <div class="tag-input-wrapper" @click="$event.target.querySelector&&$event.target.querySelector('input')?.focus()">
-                <span class="tag-pill" v-for="(tg,ti) in editTags" :key="ti">{{ tg }} <span class="tag-rm" @click="editTags.splice(ti,1)">✕</span></span>
-                <input @keydown.enter.prevent="addEditTag" @keydown.,.prevent="addEditTag" v-model="editTagInput" placeholder="Ny tagg…" style="font-size:14px">
-              </div>
-            </div>
             <div class="edit-actions">
               <button class="btn btn-primary btn-sm" @click="saveEdit('shared')">Spara</button>
               <button class="btn btn-outline btn-sm" @click="cancelEdit">Avbryt</button>
@@ -767,18 +478,6 @@ input[type=number]{-moz-appearance:textfield}
       <input v-model="searchQuery" placeholder="Sök utgifter…">
     </div>
 
-    <div class="sort-bar">
-      <select v-model="sortMode">
-        <option value="default">Sortering: Standard</option>
-        <option value="date">Datum (nyast först)</option>
-        <option value="amount-desc">Belopp (högst)</option>
-        <option value="amount-asc">Belopp (lägst)</option>
-        <option value="category">Kategori</option>
-        <option value="name">Namn (A-Ö)</option>
-      </select>
-      <button class="reorder-btn" :class="{active:reorderMode}" @click="reorderMode=!reorderMode" title="Flytta utgifter">↕️</button>
-    </div>
-
     <div class="recurring-banner" v-if="pendingRecurring('personal',personalTab).length>0">
       <h3>📦 Återkommande utgifter</h3>
       <div class="recurring-item" v-for="t in pendingRecurring('personal',personalTab)" :key="t.id">
@@ -801,70 +500,32 @@ input[type=number]{-moz-appearance:textfield}
       <button class="btn btn-primary btn-sm btn-block" style="margin-top:8px" @click="addAllRecurring('personal')" v-if="pendingRecurring('personal',personalTab).length>1">Lägg till alla</button>
     </div>
 
-    <template v-if="sortedPersonal.length>0">
-      <div v-for="(exp,idx) in sortedPersonal" :key="exp.id" class="expense-item"
+    <template v-if="filteredPersonal.length>0">
+      <div v-for="exp in filteredPersonal" :key="exp.id" class="expense-item"
            @touchstart="touchStart($event,exp)" @touchmove="touchMove($event,exp)" @touchend="touchEnd($event,exp)"
            :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
         <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30">
           <span>Radera</span>
         </div>
         <template v-if="editingId!==exp.id">
-          <div style="display:flex">
-            <div style="flex:1;min-width:0" @click="startEdit(exp,'personal')">
-              <div class="expense-header">
-                <div class="expense-name">{{ exp.name }}</div>
-                <div class="expense-amount">{{ fmt(exp.amount) }}</div>
-              </div>
-              <div class="expense-meta">
-                <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
-                <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
-                <span class="expense-date" v-if="exp.date">📅 {{ exp.date }}</span>
-              </div>
-              <div class="expense-meta" v-if="exp.tags&&exp.tags.length>0" style="margin-top:4px">
-                <span class="tag-pill" v-for="tg in exp.tags" :key="tg">🏷️ {{ tg }}</span>
-              </div>
-              <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
-            </div>
-            <div class="reorder-btns" v-if="reorderMode">
-              <button @click="moveExpense('personal',exp.id,-1)" :disabled="idx===0">▲</button>
-              <button @click="moveExpense('personal',exp.id,1)" :disabled="idx===sortedPersonal.length-1">▼</button>
-            </div>
+          <div class="expense-header" @click="startEdit(exp)">
+            <div class="expense-name">{{ exp.name }}</div>
+            <div class="expense-amount">{{ fmt(exp.amount) }}</div>
           </div>
-          <button class="comment-toggle" @click.stop="toggleComments(exp.id)">
-            💬 {{ (exp.comments||[]).length }} kommentarer
-          </button>
-          <div class="comment-section" v-if="openComments===exp.id">
-            <div class="comment-item" v-for="c in (exp.comments||[])" :key="c.id">
-              <span class="c-author">{{ c.author }}</span><span class="c-time">{{ formatCommentTime(c.ts) }}</span>
-              <div>{{ c.text }}</div>
-            </div>
-            <div class="comment-form">
-              <input v-model="commentText" placeholder="Skriv kommentar…" @keyup.enter="addComment(exp)">
-              <select v-model="commentAuthor" style="width:auto;padding:4px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text)">
-                <option value="a">{{ data.persons.a.name }}</option>
-                <option value="b">{{ data.persons.b.name }}</option>
-              </select>
-              <button @click="addComment(exp)">Skicka</button>
-            </div>
+          <div class="expense-meta">
+            <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
+            <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
           </div>
+          <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
         </template>
         <template v-else>
           <div class="edit-form">
-            <input v-model="editName" placeholder="Namn">
-            <input v-model="editAmount" placeholder="Belopp" @input="onAmountInput">
-            <div class="calc-preview" v-if="calcPreview">= {{ fmt(calcPreview) }}</div>
-            <input type="date" v-model="editDate">
+            <input v-model="editName" placeholder="Namn" ref="editNameInput">
+            <input v-model="editAmount" placeholder="Belopp" inputmode="numeric">
             <select v-model="editCategory">
               <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
             </select>
             <input v-model="editNote" placeholder="Anteckning (valfritt)">
-            <div>
-              <label style="font-size:12px;color:var(--text2)">Taggar (tryck Enter)</label>
-              <div class="tag-input-wrapper" @click="$event.target.querySelector&&$event.target.querySelector('input')?.focus()">
-                <span class="tag-pill" v-for="(tg,ti) in editTags" :key="ti">{{ tg }} <span class="tag-rm" @click="editTags.splice(ti,1)">✕</span></span>
-                <input @keydown.enter.prevent="addEditTag" @keydown.,.prevent="addEditTag" v-model="editTagInput" placeholder="Ny tagg…" style="font-size:14px">
-              </div>
-            </div>
             <div class="edit-actions">
               <button class="btn btn-primary btn-sm" @click="saveEdit('personal')">Spara</button>
               <button class="btn btn-outline btn-sm" @click="cancelEdit">Avbryt</button>
@@ -887,232 +548,133 @@ input[type=number]{-moz-appearance:textfield}
   </div>
 
   <!-- ============ STATISTICS ============ -->
-  <div class="view" v-if="view==='stats'" :key="'stats-'+currentMonth+statsMode">
-    <div class="segmented year-month-toggle">
-      <button :class="{active:statsMode==='month'}" @click="statsMode='month'">Månad</button>
-      <button :class="{active:statsMode==='year'}" @click="statsMode='year'">År</button>
-    </div>
-
-    <!-- Monthly Report button -->
-    <button class="btn btn-outline btn-block btn-sm" @click="showReport=!showReport" style="margin-bottom:12px">📸 {{ showReport?'Dölj':'Visa' }} månadsrapport</button>
-
-    <!-- Monthly Report Card -->
-    <div class="report-card" v-if="showReport">
-      <div class="report-header">
-        <h3>💰 Utgifter</h3>
-        <div class="report-sub">{{ formatMonthLabel(currentMonth) }}</div>
+  <div class="view" v-if="view==='stats'" :key="'stats-'+currentMonth">
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-val">{{ fmt(ytdTotal) }}</div>
+        <div class="kpi-lbl">Hittills i år</div>
       </div>
-      <div class="report-row"><span>Gemensamma utgifter</span><span style="font-weight:600">{{ fmt(totalShared) }}</span></div>
-      <div class="report-row"><span>{{ data.persons.a.name }}s del</span><span>{{ fmt(settlement.aShare) }}</span></div>
-      <div class="report-row"><span>{{ data.persons.b.name }}s del</span><span>{{ fmt(settlement.bShare) }}</span></div>
-      <div class="report-row"><span>{{ data.persons.a.name }} personligt</span><span>{{ fmt(personalTotal('a')) }}</span></div>
-      <div class="report-row"><span>{{ data.persons.b.name }} personligt</span><span>{{ fmt(personalTotal('b')) }}</span></div>
-      <div class="report-row" v-for="cb in catBreakdown.slice(0,5)" :key="cb.id"><span>{{ cb.emoji }} {{ cb.label }}</span><span>{{ fmt(cb.val) }} ({{ cb.pct }}%)</span></div>
-      <div class="report-total">
-        <template v-if="settlement.remaining>0">{{ data.persons.b.name }} → {{ data.persons.a.name }}: {{ fmt(settlement.remaining) }}</template>
-        <template v-else>✓ Ni ligger jämnt</template>
+      <div class="kpi">
+        <div class="kpi-val">{{ fmt(avgMonthly) }}</div>
+        <div class="kpi-lbl">Snitt/månad</div>
+      </div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-val">{{ highestMonth.label }}</div>
+        <div class="kpi-lbl">Dyraste: {{ fmt(highestMonth.val) }}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">{{ lowestMonth.label }}</div>
+        <div class="kpi-lbl">Billigaste: {{ fmt(lowestMonth.val) }}</div>
       </div>
     </div>
 
-    <!-- MONTHLY STATS -->
-    <template v-if="statsMode==='month'">
-      <div class="kpi-row">
-        <div class="kpi">
-          <div class="kpi-val">{{ fmt(ytdTotal) }}</div>
-          <div class="kpi-lbl">Hittills i år</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-val">{{ fmt(avgMonthly) }}</div>
-          <div class="kpi-lbl">Snitt/månad</div>
+    <div class="stat-card">
+      <h3>📊 Månadsöversikt (senaste 6 mån)</h3>
+      <div class="bar-chart">
+        <div class="bar-row" v-for="m in trendData" :key="m.month">
+          <div class="bar-label">{{ m.label }}</div>
+          <div class="bar-track">
+            <div class="bar-fill accent" :style="{width:m.pct+'%'}">{{ fmt(m.total) }}</div>
+          </div>
         </div>
       </div>
-      <div class="kpi-row">
-        <div class="kpi">
-          <div class="kpi-val">{{ highestMonth.label }}</div>
-          <div class="kpi-lbl">Dyraste: {{ fmt(highestMonth.val) }}</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-val">{{ lowestMonth.label }}</div>
-          <div class="kpi-lbl">Billigaste: {{ fmt(lowestMonth.val) }}</div>
-        </div>
-      </div>
+      <div class="empty-state" v-if="trendData.length===0" style="padding:16px"><p>Ingen data ännu</p></div>
+    </div>
 
-      <div class="stat-card">
-        <h3>📊 Månadsöversikt (senaste 6 mån)</h3>
-        <div class="bar-chart">
-          <div class="bar-row" v-for="m in trendData" :key="m.month">
-            <div class="bar-label">{{ m.label }}</div>
-            <div class="bar-track">
-              <div class="bar-fill accent" :style="{width:m.pct+'%'}">{{ fmt(m.total) }}</div>
-            </div>
+    <div class="stat-card">
+      <h3>🥧 Kategorier denna månad</h3>
+      <div v-if="catBreakdown.length>0">
+        <div class="donut" :style="{background:conicGradient}">
+          <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
+            <div class="donut-val">{{ catBreakdown.length }}</div>
+            <div class="donut-txt">kategorier</div>
           </div>
         </div>
-        <div class="empty-state" v-if="trendData.length===0" style="padding:16px"><p>Ingen data ännu</p></div>
+        <div class="cat-legend">
+          <div class="cat-legend-item" v-for="c in catBreakdown" :key="c.id">
+            <div class="dot" :style="{background:c.color}"></div>
+            {{ c.emoji }} {{ c.pct }}%
+          </div>
+        </div>
       </div>
+      <div class="empty-state" v-else style="padding:16px"><p>Inga utgifter denna månad</p></div>
+    </div>
 
-      <!-- Budget vs Actual -->
-      <div class="stat-card" v-if="budgetItems.length>0">
-        <h3>📊 Budget vs Faktiskt</h3>
-        <div class="budget-item" v-for="bi in budgetItems" :key="bi.id">
-          <div class="budget-info">
-            <span class="b-cat">{{ bi.emoji }} {{ bi.label }}</span>
-            <span class="b-val" :style="{color:bi.pct>100?'var(--danger)':bi.pct>80?'var(--warn)':'var(--accent)'}">{{ fmt(bi.spent) }} / {{ fmt(bi.limit) }}</span>
+    <div class="stat-card">
+      <h3>👥 Jämförelse denna månad</h3>
+      <div class="compare-bars">
+        <div class="compare-bar">
+          <div class="avatar-wrapper" @click="triggerAvatarUpload('a')">
+            <div class="avatar-circle">
+              <img v-if="avatars.a" :src="avatars.a" alt="">
+              <span v-else class="avatar-placeholder">📷</span>
+            </div>
           </div>
-          <div class="budget-bar">
-            <div class="b-fill" :class="bi.pct>100?'over':bi.pct>80?'warn':'ok'" :style="{width:Math.min(100,bi.pct)+'%'}"></div>
+          <div class="cb-val">{{ fmt(settlement.aShare + personalTotal('a')) }}</div>
+          <div class="cb-track" style="height:100px">
+            <div class="cb-fill accent" :style="{height:compareBarH('a')+'%'}"></div>
           </div>
+          <div class="cb-name">{{ data.persons.a.name }}</div>
+        </div>
+        <div class="compare-bar">
+          <div class="avatar-wrapper" @click="triggerAvatarUpload('b')">
+            <div class="avatar-circle">
+              <img v-if="avatars.b" :src="avatars.b" alt="">
+              <span v-else class="avatar-placeholder">📷</span>
+            </div>
+          </div>
+          <div class="cb-val">{{ fmt(settlement.bShare + personalTotal('b')) }}</div>
+          <div class="cb-track" style="height:100px">
+            <div class="cb-fill secondary" :style="{height:compareBarH('b')+'%'}"></div>
+          </div>
+          <div class="cb-name">{{ data.persons.b.name }}</div>
         </div>
       </div>
+      <input type="file" accept="image/*" class="avatar-input" ref="avatarInput" @change="handleAvatarUpload">
+    </div>
 
-      <div class="stat-card">
-        <h3>🥧 Kategorier denna månad</h3>
-        <div v-if="catBreakdown.length>0">
-          <div class="donut" :style="{background:conicGradient}">
-            <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
-              <div class="donut-val">{{ catBreakdown.length }}</div>
-              <div class="donut-txt">kategorier</div>
-            </div>
-          </div>
-          <div class="cat-legend">
-            <div class="cat-legend-item" v-for="c in catBreakdown" :key="c.id">
-              <div class="dot" :style="{background:c.color}"></div>
-              {{ c.emoji }} {{ c.pct }}%
-            </div>
+    <div class="stat-card">
+      <h3>🔄 Återkommande vs engång</h3>
+      <div v-if="recurringVsOnce.total>0">
+        <div class="donut" :style="{background:'conic-gradient(var(--accent) 0% '+recurringVsOnce.recurPct+'%, var(--bg3) '+recurringVsOnce.recurPct+'% 100%)'}">
+          <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
+            <div class="donut-val">{{ recurringVsOnce.recurPct }}%</div>
+            <div class="donut-txt">återkom.</div>
           </div>
         </div>
-        <div class="empty-state" v-else style="padding:16px"><p>Inga utgifter denna månad</p></div>
+        <div style="text-align:center;font-size:13px;color:var(--text2)">
+          Återkommande: {{ fmt(recurringVsOnce.recurAmt) }} · Engång: {{ fmt(recurringVsOnce.onceAmt) }}
+        </div>
       </div>
+      <div class="empty-state" v-else style="padding:16px"><p>Inga utgifter denna månad</p></div>
+    </div>
 
-      <div class="stat-card">
-        <h3>👥 Jämförelse denna månad</h3>
-        <div class="compare-bars">
-          <div class="compare-bar">
-            <div class="avatar-wrapper" @click="triggerAvatarUpload('a')">
-              <div class="avatar-circle">
-                <img v-if="avatars.a" :src="avatars.a" alt="">
-                <span v-else class="avatar-placeholder">📷</span>
-              </div>
-            </div>
-            <div class="cb-val">{{ fmt(settlement.aShare + personalTotal('a')) }}</div>
-            <div class="cb-track" style="height:100px">
-              <div class="cb-fill accent" :style="{height:compareBarH('a')+'%'}"></div>
-            </div>
-            <div class="cb-name">{{ data.persons.a.name }}</div>
-          </div>
-          <div class="compare-bar">
-            <div class="avatar-wrapper" @click="triggerAvatarUpload('b')">
-              <div class="avatar-circle">
-                <img v-if="avatars.b" :src="avatars.b" alt="">
-                <span v-else class="avatar-placeholder">📷</span>
-              </div>
-            </div>
-            <div class="cb-val">{{ fmt(settlement.bShare + personalTotal('b')) }}</div>
-            <div class="cb-track" style="height:100px">
-              <div class="cb-fill secondary" :style="{height:compareBarH('b')+'%'}"></div>
-            </div>
-            <div class="cb-name">{{ data.persons.b.name }}</div>
-          </div>
+    <div class="stat-card">
+      <h3>🏆 Största utgifter denna månad</h3>
+      <div class="top-list" v-if="topExpenses.length>0">
+        <div class="top-item" v-for="(exp,i) in topExpenses" :key="exp.id">
+          <span class="top-rank">{{ i+1 }}.</span>
+          <span class="top-name">{{ exp.name }}</span>
+          <span class="top-val">{{ fmt(exp.amount) }}</span>
         </div>
-        <input type="file" accept="image/*" class="avatar-input" ref="avatarInput" @change="handleAvatarUpload">
       </div>
+      <div class="empty-state" v-else style="padding:16px"><p>Inga utgifter denna månad</p></div>
+    </div>
 
-      <div class="stat-card">
-        <h3>🔄 Återkommande vs engång</h3>
-        <div v-if="recurringVsOnce.total>0">
-          <div class="donut" :style="{background:'conic-gradient(var(--accent) 0% '+recurringVsOnce.recurPct+'%, var(--bg3) '+recurringVsOnce.recurPct+'% 100%)'}">
-            <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
-              <div class="donut-val">{{ recurringVsOnce.recurPct }}%</div>
-              <div class="donut-txt">återkom.</div>
-            </div>
+    <div class="stat-card" v-if="allPayments.length>0">
+      <h3>💳 Betalningshistorik</h3>
+      <div class="payment-list">
+        <div class="payment-item" v-for="py in allPayments" :key="py.id">
+          <div class="pi-info">
+            <div class="pi-date">{{ py.monthLabel }} · {{ py.date }}</div>
+            <div class="pi-note" v-if="py.note">{{ py.note }}</div>
           </div>
-          <div style="text-align:center;font-size:13px;color:var(--text2)">
-            Återkommande: {{ fmt(recurringVsOnce.recurAmt) }} · Engång: {{ fmt(recurringVsOnce.onceAmt) }}
-          </div>
-        </div>
-        <div class="empty-state" v-else style="padding:16px"><p>Inga utgifter denna månad</p></div>
-      </div>
-
-      <div class="stat-card">
-        <h3>🏆 Största utgifter denna månad</h3>
-        <div class="top-list" v-if="topExpenses.length>0">
-          <div class="top-item" v-for="(exp,i) in topExpenses" :key="exp.id">
-            <span class="top-rank">{{ i+1 }}.</span>
-            <span class="top-name">{{ exp.name }}</span>
-            <span class="top-val">{{ fmt(exp.amount) }}</span>
-          </div>
-        </div>
-        <div class="empty-state" v-else style="padding:16px"><p>Inga utgifter denna månad</p></div>
-      </div>
-
-      <div class="stat-card" v-if="allPayments.length>0">
-        <h3>💳 Betalningshistorik</h3>
-        <div class="payment-list">
-          <div class="payment-item" v-for="py in allPayments" :key="py.id">
-            <div class="pi-info">
-              <div class="pi-date">{{ py.monthLabel }} · {{ py.date }}</div>
-              <div class="pi-note" v-if="py.note">{{ py.note }}</div>
-            </div>
-            <div class="pi-amount">{{ fmt(py.amount) }}</div>
-          </div>
+          <div class="pi-amount">{{ fmt(py.amount) }}</div>
         </div>
       </div>
-    </template>
-
-    <!-- YEARLY STATS -->
-    <template v-if="statsMode==='year'">
-      <div class="kpi-row">
-        <div class="kpi">
-          <div class="kpi-val">{{ fmt(yearlyTotal) }}</div>
-          <div class="kpi-lbl">Totalt {{ currentYear }}</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-val">{{ fmt(yearlyAvg) }}</div>
-          <div class="kpi-lbl">Snitt/månad {{ currentYear }}</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <h3>📅 Månadsöversikt {{ currentYear }}</h3>
-        <div class="year-grid">
-          <div class="year-cell" v-for="ym in yearMonths" :key="ym.key">
-            <div class="yc-month">{{ ym.label }}</div>
-            <div class="yc-val" :style="{color:ym.total>0?'var(--text)':'var(--text3)'}">{{ ym.total>0?fmt(ym.total):'-' }}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <h3>📊 Trend {{ currentYear }}</h3>
-        <div class="bar-chart">
-          <div class="bar-row" v-for="ym in yearMonths.filter(m=>m.total>0)" :key="ym.key">
-            <div class="bar-label">{{ ym.label }}</div>
-            <div class="bar-track">
-              <div class="bar-fill accent" :style="{width:ym.pct+'%'}">{{ fmt(ym.total) }}</div>
-            </div>
-          </div>
-        </div>
-        <div class="empty-state" v-if="yearMonths.every(m=>m.total===0)" style="padding:16px"><p>Ingen data för {{ currentYear }}</p></div>
-      </div>
-
-      <div class="stat-card">
-        <h3>🥧 Kategorier {{ currentYear }}</h3>
-        <div v-if="yearlyCatBreakdown.length>0">
-          <div class="donut" :style="{background:yearlyConicGradient}">
-            <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
-              <div class="donut-val">{{ yearlyCatBreakdown.length }}</div>
-              <div class="donut-txt">kategorier</div>
-            </div>
-          </div>
-          <div class="cat-legend">
-            <div class="cat-legend-item" v-for="c in yearlyCatBreakdown" :key="c.id">
-              <div class="dot" :style="{background:c.color}"></div>
-              {{ c.emoji }} {{ fmt(c.val) }} ({{ c.pct }}%)
-            </div>
-          </div>
-        </div>
-        <div class="empty-state" v-else style="padding:16px"><p>Ingen data för {{ currentYear }}</p></div>
-      </div>
-    </template>
+    </div>
   </div>
 
   <!-- ============ SHARE ============ -->
@@ -1120,15 +682,7 @@ input[type=number]{-moz-appearance:textfield}
     <div class="card">
       <div class="card-title">Dela data</div>
       <button class="btn btn-primary btn-block" @click="shareLink" style="margin-bottom:8px">📤 Dela länk</button>
-      <button class="btn btn-outline btn-block" @click="copyData" style="margin-bottom:8px">📋 Kopiera data</button>
-      <button class="btn btn-outline btn-block" @click="generateQR">📱 Visa QR-kod</button>
-    </div>
-
-    <!-- QR Code -->
-    <div class="qr-section" v-if="qrUrl">
-      <img :src="qrUrl" alt="QR-kod för delning" crossorigin="anonymous">
-      <div class="qr-note">Skanna för att importera data</div>
-      <button class="btn btn-sm btn-outline" @click="qrUrl=''" style="margin-top:8px">Dölj</button>
+      <button class="btn btn-outline btn-block" @click="copyData">📋 Kopiera data</button>
     </div>
 
     <div class="card">
@@ -1169,21 +723,13 @@ input[type=number]{-moz-appearance:textfield}
       <label>Namn</label>
       <input v-model="dialogName" placeholder="T.ex. Hyra" ref="dialogNameInput">
       <label>Belopp (kr)</label>
-      <input v-model="dialogAmount" placeholder="0 (eller t.ex. 5000+3200)" @input="onDialogAmountInput">
-      <div class="calc-preview" v-if="dialogCalcPreview">= {{ fmt(dialogCalcPreview) }}</div>
-      <label>Datum</label>
-      <input type="date" v-model="dialogDate">
+      <input v-model="dialogAmount" placeholder="0" inputmode="numeric">
       <label>Kategori</label>
       <select v-model="dialogCategory">
         <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
       </select>
       <label>Anteckning (valfritt)</label>
       <input v-model="dialogNote" placeholder="">
-      <label>Taggar (tryck Enter)</label>
-      <div class="tag-input-wrapper" @click="focusTagInput">
-        <span class="tag-pill" v-for="(tg,ti) in dialogTags" :key="ti">{{ tg }} <span class="tag-rm" @click="dialogTags.splice(ti,1)">✕</span></span>
-        <input ref="dialogTagInput" @keydown.enter.prevent="addDialogTag" @keydown.,.prevent="addDialogTag" v-model="dialogTagInput" placeholder="Ny tagg…" style="font-size:14px">
-      </div>
       <div class="check-group">
         <input type="checkbox" id="dlg-recur" v-model="dialogRecurring">
         <label for="dlg-recur">Återkommande varje månad</label>
@@ -1194,16 +740,6 @@ input[type=number]{-moz-appearance:textfield}
           <option value="a">{{ data.persons.a.name }}</option>
           <option value="b">{{ data.persons.b.name }}</option>
         </select>
-        <div class="check-group">
-          <input type="checkbox" id="dlg-custom-split" v-model="dialogUseCustomSplit">
-          <label for="dlg-custom-split">Anpassad uppdelning</label>
-        </div>
-        <div class="split-slider-row" v-if="dialogUseCustomSplit">
-          <span style="font-size:12px;color:var(--text2)">{{ data.persons.a.name }}</span>
-          <input type="range" min="0" max="100" v-model.number="dialogCustomSplit">
-          <span style="font-size:12px;color:var(--text2)">{{ data.persons.b.name }}</span>
-          <span class="split-pct">{{ 100-dialogCustomSplit }}/{{ dialogCustomSplit }}</span>
-        </div>
       </template>
       <div class="dialog-actions">
         <button class="btn btn-outline" @click="closeExpenseDialog">Avbryt</button>
@@ -1237,76 +773,6 @@ input[type=number]{-moz-appearance:textfield}
       <div class="dialog-actions">
         <button class="btn btn-outline" @click="$refs.largeAmountDialog.close();pendingLargeCallback=null">Avbryt</button>
         <button class="btn btn-primary" @click="confirmLargeAmount">Ja, fortsätt</button>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- Budget Dialog -->
-  <dialog ref="budgetDialog">
-    <div class="dialog-content">
-      <h2>📊 Budgetmål per kategori</h2>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Ange max-belopp per månad. Lämna tomt för ingen gräns.</p>
-      <div class="budget-edit-list">
-        <div class="budget-edit-item" v-for="c in categories" :key="c.id">
-          <span class="be-cat">{{ c.emoji }} {{ c.label }}</span>
-          <input type="text" inputmode="numeric" :value="budgetEditValues[c.id]||''" @input="budgetEditValues[c.id]=parseAmountSimple($event.target.value)" placeholder="0 kr">
-        </div>
-      </div>
-      <div class="dialog-actions">
-        <button class="btn btn-outline" @click="$refs.budgetDialog.close()">Avbryt</button>
-        <button class="btn btn-primary" @click="saveBudgets">Spara</button>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- Savings Goal Dialog -->
-  <dialog ref="goalDialog">
-    <div class="dialog-content">
-      <h2>🎯 Nytt sparmål</h2>
-      <label>Namn</label>
-      <input v-model="goalName" placeholder="T.ex. Semester">
-      <label>Emoji</label>
-      <input v-model="goalEmoji" placeholder="🏖️" style="max-width:80px">
-      <label>Målbelopp (kr)</label>
-      <input v-model="goalTarget" placeholder="0" inputmode="numeric">
-      <div class="dialog-actions">
-        <button class="btn btn-outline" @click="$refs.goalDialog.close()">Avbryt</button>
-        <button class="btn btn-primary" @click="saveGoal">Skapa</button>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- Add to Goal Dialog -->
-  <dialog ref="addGoalDialog">
-    <div class="dialog-content">
-      <h2>💰 Lägg till sparande</h2>
-      <label>Belopp (kr)</label>
-      <input v-model="addGoalAmount" placeholder="0" inputmode="numeric" ref="addGoalInput">
-      <div class="dialog-actions">
-        <button class="btn btn-outline" @click="$refs.addGoalDialog.close()">Avbryt</button>
-        <button class="btn btn-primary" @click="saveAddGoal">Lägg till</button>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- Wishlist Dialog -->
-  <dialog ref="wishDialog">
-    <div class="dialog-content">
-      <h2>🎁 Ny önskning</h2>
-      <label>Namn</label>
-      <input v-model="wishName" placeholder="T.ex. Ny soffa">
-      <label>Belopp (valfritt)</label>
-      <input v-model="wishAmount" placeholder="0" inputmode="numeric">
-      <label>Anteckning (valfritt)</label>
-      <input v-model="wishNote" placeholder="">
-      <label>Tillagd av</label>
-      <select v-model="wishAddedBy">
-        <option :value="data.persons.a.name">{{ data.persons.a.name }}</option>
-        <option :value="data.persons.b.name">{{ data.persons.b.name }}</option>
-      </select>
-      <div class="dialog-actions">
-        <button class="btn btn-outline" @click="$refs.wishDialog.close()">Avbryt</button>
-        <button class="btn btn-primary" @click="saveWish">Lägg till</button>
       </div>
     </div>
   </dialog>
@@ -1346,7 +812,6 @@ createApp({
     // ========== DATE ==========
     const now = new Date();
     const toMonthKey = d => d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0');
-    const todayStr = () => new Date().toISOString().slice(0,10);
     const currentMonth = ref(toMonthKey(now));
 
     const formatMonthLabel = m => {
@@ -1355,69 +820,12 @@ createApp({
       return d.toLocaleDateString('sv-SE',{year:'numeric',month:'long'});
     };
 
-    // ========== INLINE CALCULATOR ==========
-    const calcExpr = str => {
-      if (!str && str !== 0) return 0;
-      const s = String(str).replace(/\s/g,'');
-      // If it contains math operators, evaluate safely
-      if (/[+\-*/]/.test(s) && /\d/.test(s)) {
-        let pos = 0;
-        const clean = s.replace(/[^0-9+\-*/.]/g, '');
-        if (!clean) return 0;
-        const parseNum = () => {
-          let start = pos;
-          if (clean[pos] === '-' && (pos === 0 || '+-*/'.includes(clean[pos-1]))) pos++;
-          while (pos < clean.length && (clean[pos] >= '0' && clean[pos] <= '9' || clean[pos] === '.')) pos++;
-          const n = parseFloat(clean.slice(start, pos));
-          return isNaN(n) ? 0 : n;
-        };
-        const parseFactor = () => parseNum();
-        const parseTerm = () => {
-          let left = parseFactor();
-          while (pos < clean.length && (clean[pos] === '*' || clean[pos] === '/')) {
-            const op = clean[pos++];
-            const right = parseFactor();
-            left = op === '*' ? left * right : (right !== 0 ? left / right : 0);
-          }
-          return left;
-        };
-        const parseExpression = () => {
-          let left = parseTerm();
-          while (pos < clean.length && (clean[pos] === '+' || clean[pos] === '-')) {
-            const op = clean[pos++];
-            const right = parseTerm();
-            left = op === '+' ? left + right : left - right;
-          }
-          return left;
-        };
-        const result = Math.round(parseExpression());
-        return isNaN(result) ? 0 : Math.max(0, result);
-      }
-      // Plain number: strip non-digits
-      const cleaned = s.replace(/[^0-9]/g, '');
-      return parseInt(cleaned) || 0;
-    };
-
-    const parseAmountSimple = str => {
-      if (!str && str !== 0) return 0;
-      const cleaned = String(str).replace(/[^0-9]/g, '');
-      return parseInt(cleaned) || 0;
-    };
-
-    const hasCalcExpression = str => {
-      if (!str) return false;
-      return /\d\s*[+\-*/]\s*\d/.test(String(str));
-    };
-
     // ========== DATA ==========
     const defaultData = () => ({
       persons: { a: { name:'Elliot', income:0 }, b: { name:'Alis', income:0 } },
       splitMode: 'equal',
       months: {},
-      recurringTemplates: [],
-      budgets: {},
-      savingsGoals: [],
-      wishlist: []
+      recurringTemplates: []
     });
 
     const ensureMonth = (d, key) => {
@@ -1447,9 +855,7 @@ createApp({
           if (parsed.splitMode === 'equal' || parsed.splitMode === 'income') d.splitMode = parsed.splitMode;
           if (parsed.months && typeof parsed.months === 'object') d.months = parsed.months;
           if (Array.isArray(parsed.recurringTemplates)) d.recurringTemplates = parsed.recurringTemplates;
-          if (parsed.budgets && typeof parsed.budgets === 'object') d.budgets = parsed.budgets;
-          if (Array.isArray(parsed.savingsGoals)) d.savingsGoals = parsed.savingsGoals;
-          if (Array.isArray(parsed.wishlist)) d.wishlist = parsed.wishlist;
+          // Ensure all months are valid
           Object.keys(d.months).forEach(k => ensureMonth(d, k));
           return d;
         }
@@ -1475,9 +881,11 @@ createApp({
     const availableMonths = computed(() => {
       const keys = new Set(Object.keys(data.months));
       keys.add(currentMonth.value);
+      // add previous/next month
       const [y,m] = currentMonth.value.split('-').map(Number);
       const prev = new Date(y, m-2); keys.add(toMonthKey(prev));
       const next = new Date(y, m); keys.add(toMonthKey(next));
+      // also add current real month
       keys.add(toMonthKey(now));
       return [...keys].sort();
     });
@@ -1488,7 +896,7 @@ createApp({
       searchQuery.value = '';
     };
 
-    // ========== SETTLEMENT (with per-expense custom split) ==========
+    // ========== SETTLEMENT ==========
     const totalShared = computed(() => monthData.value.shared.reduce((s,e) => s + (parseInt(e.amount)||0), 0));
 
     const splitRatio = computed(() => {
@@ -1496,31 +904,27 @@ createApp({
       const a = data.persons.a.income || 0;
       const b = data.persons.b.income || 0;
       if (a === 0 && b === 0) return 0.5;
+      if (a === 0) return 0; // B pays 0% if only A has no income -> wait, spec says "if only one income is 0, other person pays 100%"
+      // "If only one income is 0: other person pays 100%"
+      // This is B's ratio. If A income is 0, B pays 100%. If B income is 0, B pays 0%.
       if (b === 0) return 0;
       if (a === 0) return 1;
       return b / (a + b);
     });
 
     const settlement = computed(() => {
-      const globalBRatio = splitRatio.value;
+      const bRatio = splitRatio.value;
+      const aRatio = 1 - bRatio;
       const shared = monthData.value.shared;
-      let bOwes = 0;
-      let aOwes = 0;
-      shared.forEach(e => {
-        const amt = parseInt(e.amount) || 0;
-        const bRatio = e.customSplit != null ? e.customSplit / 100 : globalBRatio;
-        const aRatio = 1 - bRatio;
-        if ((e.paidBy || 'a') === 'a') {
-          bOwes += amt * bRatio;
-        } else {
-          aOwes += amt * aRatio;
-        }
-      });
-      bOwes = Math.round(bOwes);
-      aOwes = Math.round(aOwes);
-      const total = totalShared.value;
-      const bShare = Math.max(0, bOwes - aOwes);
-      const aShare = total - bShare;
+      // A-paid expenses: B owes their share
+      const aPaidTotal = shared.filter(e => (e.paidBy || 'a') === 'a').reduce((s,e) => s + (parseInt(e.amount)||0), 0);
+      // B-paid expenses: B already paid full amount, so A owes A's share to B (offsets B's debt)
+      const bPaidTotal = shared.filter(e => e.paidBy === 'b').reduce((s,e) => s + (parseInt(e.amount)||0), 0);
+      const total = aPaidTotal + bPaidTotal;
+      const bOwesFromAPaid = Math.round(aPaidTotal * bRatio);
+      const aOwesBFromBPaid = Math.round(bPaidTotal * aRatio);
+      const bShare = Math.max(0, bOwesFromAPaid - aOwesBFromBPaid);
+      const aShare = total - bOwesFromAPaid + aOwesBFromBPaid;
       const totalPaid = monthData.value.payments.reduce((s,p) => s + (parseInt(p.amount)||0), 0);
       const remaining = Math.max(0, bShare - totalPaid);
       const paidPct = bShare > 0 ? Math.round((totalPaid / bShare) * 100) : 0;
@@ -1532,40 +936,12 @@ createApp({
       return arr.reduce((s,e) => s + (parseInt(e.amount)||0), 0);
     };
 
-    // ========== HISTORICAL DEBT / RUNNING BALANCE ==========
-    const getAllMonthKeys = () => Object.keys(data.months).sort();
-
-    const computeMonthSettlement = key => {
-      const m = data.months[key];
-      if (!m) return { bShare: 0, paid: 0 };
-      const globalBRatio = splitRatio.value;
-      let bOwes = 0, aOwes = 0;
-      (m.shared || []).forEach(e => {
-        const amt = parseInt(e.amount) || 0;
-        const bRatio = e.customSplit != null ? e.customSplit / 100 : globalBRatio;
-        if ((e.paidBy || 'a') === 'a') bOwes += amt * bRatio;
-        else aOwes += amt * (1 - bRatio);
-      });
-      const bShare = Math.max(0, Math.round(bOwes) - Math.round(aOwes));
-      const paid = (m.payments || []).reduce((s,p) => s + (parseInt(p.amount)||0), 0);
-      return { bShare, paid };
+    // ========== AMOUNT PARSING ==========
+    const parseAmount = str => {
+      if (!str && str !== 0) return 0;
+      const cleaned = String(str).replace(/[^0-9]/g, '');
+      return parseInt(cleaned) || 0;
     };
-
-    const debtHistory = computed(() => {
-      const keys = getAllMonthKeys();
-      let running = 0;
-      return keys.map(k => {
-        const s = computeMonthSettlement(k);
-        const balance = s.bShare - s.paid;
-        running += balance;
-        return { month: k, label: formatMonthLabel(k), balance, running };
-      });
-    });
-
-    const runningBalance = computed(() => {
-      const dh = debtHistory.value;
-      return dh.length > 0 ? dh[dh.length - 1].running : 0;
-    });
 
     // ========== NAV ==========
     const tabs = [
@@ -1576,73 +952,28 @@ createApp({
       { id:'share', icon:'📤', label:'Dela' }
     ];
     const view = ref('home');
-    const switchView = v => { view.value = v; editingId.value = null; searchQuery.value = ''; reorderMode.value = false; };
+    const switchView = v => { view.value = v; editingId.value = null; searchQuery.value = ''; };
 
     // ========== PERSON TAB ==========
     const personalTab = ref('a');
 
     // ========== INCOME ==========
-    const setIncome = (p, val) => { data.persons[p].income = parseAmountSimple(val); };
+    const setIncome = (p, val) => { data.persons[p].income = parseAmount(val); };
 
-    // ========== SEARCH & SORT ==========
+    // ========== SEARCH ==========
     const searchQuery = ref('');
-    const sortMode = ref('default');
-    const reorderMode = ref(false);
-
-    const applySort = (items) => {
-      if (sortMode.value === 'default') return items;
-      const sorted = [...items];
-      switch (sortMode.value) {
-        case 'date': return sorted.sort((a,b) => (b.date||'').localeCompare(a.date||''));
-        case 'amount-desc': return sorted.sort((a,b) => (parseInt(b.amount)||0) - (parseInt(a.amount)||0));
-        case 'amount-asc': return sorted.sort((a,b) => (parseInt(a.amount)||0) - (parseInt(b.amount)||0));
-        case 'category': return sorted.sort((a,b) => (a.category||'').localeCompare(b.category||''));
-        case 'name': return sorted.sort((a,b) => (a.name||'').localeCompare(b.name||'','sv'));
-        default: return sorted;
-      }
-    };
 
     const filteredShared = computed(() => {
       const q = searchQuery.value.toLowerCase();
       const items = monthData.value.shared;
-      if (!q) return items;
-      return items.filter(e => {
-        if (e.name.toLowerCase().includes(q)) return true;
-        if (e.tags && e.tags.some(t => t.toLowerCase().includes(q))) return true;
-        if (e.note && e.note.toLowerCase().includes(q)) return true;
-        return false;
-      });
+      return q ? items.filter(e => e.name.toLowerCase().includes(q)) : items;
     });
-
-    const sortedShared = computed(() => applySort(filteredShared.value));
 
     const filteredPersonal = computed(() => {
       const q = searchQuery.value.toLowerCase();
       const items = monthData.value.personal[personalTab.value] || [];
-      if (!q) return items;
-      return items.filter(e => {
-        if (e.name.toLowerCase().includes(q)) return true;
-        if (e.tags && e.tags.some(t => t.toLowerCase().includes(q))) return true;
-        if (e.note && e.note.toLowerCase().includes(q)) return true;
-        return false;
-      });
+      return q ? items.filter(e => e.name.toLowerCase().includes(q)) : items;
     });
-
-    const sortedPersonal = computed(() => applySort(filteredPersonal.value));
-
-    // ========== REORDER ==========
-    const moveExpense = (type, id, dir) => {
-      let arr;
-      if (type === 'shared') arr = monthData.value.shared;
-      else arr = monthData.value.personal[personalTab.value];
-      const idx = arr.findIndex(e => e.id === id);
-      if (idx < 0) return;
-      const newIdx = idx + dir;
-      if (newIdx < 0 || newIdx >= arr.length) return;
-      const temp = arr[idx];
-      arr[idx] = arr[newIdx];
-      arr[newIdx] = temp;
-    };
 
     // ========== EDITING ==========
     const editingId = ref(null);
@@ -1651,44 +982,19 @@ createApp({
     const editCategory = ref('ovrigt');
     const editNote = ref('');
     const editPaidBy = ref('a');
-    const editDate = ref('');
-    const editTags = ref([]);
-    const editTagInput = ref('');
-    const editCustomSplit = ref(50);
-    const editUseCustomSplit = ref(false);
-    const editType = ref('shared');
-    const calcPreview = ref(null);
 
-    const onAmountInput = () => {
-      const val = editAmount.value;
-      calcPreview.value = hasCalcExpression(val) ? calcExpr(val) : null;
-    };
-
-    const addEditTag = () => {
-      const tag = editTagInput.value.trim().replace(/,/g,'');
-      if (tag && !editTags.value.includes(tag)) editTags.value.push(tag);
-      editTagInput.value = '';
-    };
-
-    const startEdit = (exp, type) => {
+    const startEdit = exp => {
       editingId.value = exp.id;
       editName.value = exp.name;
       editAmount.value = String(exp.amount);
       editCategory.value = exp.category || 'ovrigt';
       editNote.value = exp.note || '';
       editPaidBy.value = exp.paidBy || 'a';
-      editDate.value = exp.date || '';
-      editTags.value = [...(exp.tags || [])];
-      editTagInput.value = '';
-      editCustomSplit.value = exp.customSplit != null ? exp.customSplit : Math.round(splitRatio.value * 100);
-      editUseCustomSplit.value = exp.customSplit != null;
-      editType.value = type || 'shared';
-      calcPreview.value = null;
     };
-    const cancelEdit = () => { editingId.value = null; calcPreview.value = null; };
+    const cancelEdit = () => { editingId.value = null; };
 
     const saveEdit = type => {
-      const amt = calcExpr(editAmount.value);
+      const amt = parseAmount(editAmount.value);
       if (!editName.value.trim() || amt <= 0) return;
 
       const doSave = () => {
@@ -1701,21 +1007,15 @@ createApp({
           exp.amount = amt;
           exp.category = editCategory.value;
           exp.note = editNote.value.trim();
-          exp.date = editDate.value;
-          exp.tags = [...editTags.value];
-          if (type === 'shared') {
-            exp.paidBy = editPaidBy.value;
-            exp.customSplit = editUseCustomSplit.value ? editCustomSplit.value : null;
-          }
+          if (type === 'shared') exp.paidBy = editPaidBy.value;
         }
         editingId.value = null;
-        calcPreview.value = null;
       };
 
       if (amt > 50000) {
         pendingLargeAmount.value = amt;
         pendingLargeCallback.value = doSave;
-        nextTick(() => { try { largeAmountDialog.value?.showModal(); } catch(e){} });
+        nextTick(() => { try { expenseRefs.largeAmountDialog?.showModal(); } catch(e){} });
       } else {
         doSave();
       }
@@ -1733,6 +1033,7 @@ createApp({
       const monthKey = currentMonth.value;
       const tabKey = personalTab.value;
       showToast('Utgift raderad', () => {
+        // undo
         let target;
         if (type === 'shared') {
           ensureMonth(data, monthKey);
@@ -1742,19 +1043,6 @@ createApp({
           target = data.months[monthKey].personal[tabKey];
         }
         target.splice(idx, 0, removed);
-      });
-    };
-
-    // ========== PAYMENT DELETE WITH UNDO ==========
-    const deletePayment = (id) => {
-      const arr = monthData.value.payments;
-      const idx = arr.findIndex(p => p.id === id);
-      if (idx < 0) return;
-      const removed = arr.splice(idx, 1)[0];
-      const monthKey = currentMonth.value;
-      showToast('Betalning raderad', () => {
-        ensureMonth(data, monthKey);
-        data.months[monthKey].payments.splice(idx, 0, removed);
       });
     };
 
@@ -1790,35 +1078,6 @@ createApp({
       touchState.swiping = false;
     };
 
-    // ========== COMMENTS ==========
-    const openComments = ref(null);
-    const commentText = ref('');
-    const commentAuthor = ref('a');
-
-    const toggleComments = id => {
-      openComments.value = openComments.value === id ? null : id;
-      commentText.value = '';
-    };
-
-    const formatCommentTime = ts => {
-      if (!ts) return '';
-      const d = new Date(ts);
-      return d.toLocaleDateString('sv-SE') + ' ' + d.toLocaleTimeString('sv-SE', {hour:'2-digit',minute:'2-digit'});
-    };
-
-    const addComment = exp => {
-      const text = commentText.value.trim();
-      if (!text) return;
-      if (!exp.comments) exp.comments = [];
-      exp.comments.push({
-        id: crypto.randomUUID(),
-        text,
-        author: data.persons[commentAuthor.value].name,
-        ts: Date.now()
-      });
-      commentText.value = '';
-    };
-
     // ========== DIALOG ==========
     const dialogMode = ref('shared');
     const dialogTitle = computed(() => dialogMode.value === 'shared' ? 'Ny gemensam utgift' : 'Ny personlig utgift');
@@ -1828,39 +1087,19 @@ createApp({
     const dialogNote = ref('');
     const dialogRecurring = ref(false);
     const dialogPaidBy = ref('a');
-    const dialogDate = ref(todayStr());
-    const dialogTags = ref([]);
-    const dialogTagInput = ref('');
-    const dialogUseCustomSplit = ref(false);
-    const dialogCustomSplit = ref(50);
-    const dialogCalcPreview = ref(null);
-
     const expenseDialog = ref(null);
     const dialogNameInput = ref(null);
-    const dialogTagInputRef = ref(null);
     const paymentDialog = ref(null);
     const largeAmountDialog = ref(null);
     const payAmountInput = ref(null);
-    const budgetDialog = ref(null);
-    const goalDialog = ref(null);
-    const addGoalDialog = ref(null);
-    const addGoalInput = ref(null);
-    const wishDialog = ref(null);
 
-    const onDialogAmountInput = () => {
-      const val = dialogAmount.value;
-      dialogCalcPreview.value = hasCalcExpression(val) ? calcExpr(val) : null;
-    };
-
-    const addDialogTag = () => {
-      const tag = dialogTagInput.value.trim().replace(/,/g,'');
-      if (tag && !dialogTags.value.includes(tag)) dialogTags.value.push(tag);
-      dialogTagInput.value = '';
-    };
-
-    const focusTagInput = () => {
-      nextTick(() => { dialogTagInputRef.value?.focus?.(); });
-    };
+    // Template refs store
+    const expenseRefs = {};
+    onMounted(() => {
+      expenseRefs.expenseDialog = expenseDialog.value;
+      expenseRefs.paymentDialog = paymentDialog.value;
+      expenseRefs.largeAmountDialog = largeAmountDialog.value;
+    });
 
     const openExpenseDialog = mode => {
       dialogMode.value = mode;
@@ -1870,12 +1109,6 @@ createApp({
       dialogNote.value = '';
       dialogRecurring.value = false;
       dialogPaidBy.value = 'a';
-      dialogDate.value = todayStr();
-      dialogTags.value = [];
-      dialogTagInput.value = '';
-      dialogUseCustomSplit.value = false;
-      dialogCustomSplit.value = Math.round(splitRatio.value * 100);
-      dialogCalcPreview.value = null;
       nextTick(() => {
         try { expenseDialog.value?.showModal(); } catch(e){}
         nextTick(() => { dialogNameInput.value?.focus?.(); });
@@ -1897,7 +1130,7 @@ createApp({
 
     const saveExpenseDialog = () => {
       const name = dialogName.value.trim();
-      const amt = calcExpr(dialogAmount.value);
+      const amt = parseAmount(dialogAmount.value);
       if (!name) { nextTick(() => dialogNameInput.value?.focus?.()); return; }
       if (amt <= 0) return;
 
@@ -1909,15 +1142,9 @@ createApp({
           category: dialogCategory.value,
           note: dialogNote.value.trim(),
           recurring: dialogRecurring.value,
-          sourceTemplateId: null,
-          date: dialogDate.value,
-          tags: [...dialogTags.value],
-          comments: []
+          sourceTemplateId: null
         };
-        if (dialogMode.value === 'shared') {
-          expense.paidBy = dialogPaidBy.value;
-          expense.customSplit = dialogUseCustomSplit.value ? dialogCustomSplit.value : null;
-        }
+        if (dialogMode.value === 'shared') expense.paidBy = dialogPaidBy.value;
 
         if (dialogMode.value === 'shared') {
           monthData.value.shared.push(expense);
@@ -1925,6 +1152,7 @@ createApp({
           monthData.value.personal[personalTab.value].push(expense);
         }
 
+        // Create recurring template if checked
         if (dialogRecurring.value) {
           const tmpl = {
             id: crypto.randomUUID(),
@@ -1969,6 +1197,7 @@ createApp({
         if (t.type !== type) return false;
         if (type === 'personal' && t.person !== person) return false;
         if (skipped.includes(t.id)) return false;
+        // Check if already added
         let arr = type === 'shared' ? md.shared : md.personal[person || 'a'];
         const exists = arr.some(e => e.sourceTemplateId === t.id || (e.name === t.name && e.amount === t.amount && e.recurring));
         return !exists;
@@ -1977,7 +1206,7 @@ createApp({
 
     const addFromTemplate = (t, type) => {
       const name = editingTemplateId.value === t.id ? editTemplateName.value.trim() || t.name : t.name;
-      const amount = editingTemplateId.value === t.id ? parseAmountSimple(editTemplateAmount.value) || t.amount : t.amount;
+      const amount = editingTemplateId.value === t.id ? parseAmount(editTemplateAmount.value) || t.amount : t.amount;
       editingTemplateId.value = null;
 
       const expense = {
@@ -1987,10 +1216,7 @@ createApp({
         category: t.category,
         note: '',
         recurring: true,
-        sourceTemplateId: t.id,
-        date: todayStr(),
-        tags: [],
-        comments: []
+        sourceTemplateId: t.id
       };
       if (type === 'shared') monthData.value.shared.push(expense);
       else monthData.value.personal[personalTab.value].push(expense);
@@ -2011,12 +1237,12 @@ createApp({
 
     // ========== PAYMENTS ==========
     const payAmount = ref('');
-    const payDate = ref(todayStr());
+    const payDate = ref(now.toISOString().slice(0,10));
     const payNote = ref('');
 
     const openPaymentDialog = () => {
       payAmount.value = '';
-      payDate.value = todayStr();
+      payDate.value = new Date().toISOString().slice(0,10);
       payNote.value = '';
       nextTick(() => {
         try { paymentDialog.value?.showModal(); } catch(e){}
@@ -2025,7 +1251,7 @@ createApp({
     };
 
     const savePayment = () => {
-      const amt = parseAmountSimple(payAmount.value);
+      const amt = parseAmount(payAmount.value);
       if (amt <= 0) return;
       monthData.value.payments.push({
         id: crypto.randomUUID(),
@@ -2035,7 +1261,6 @@ createApp({
       });
       paymentDialog.value?.close();
       showToast('Betalning registrerad');
-      checkConfetti();
     };
 
     // ========== TOAST ==========
@@ -2061,231 +1286,8 @@ createApp({
     const confirm = reactive({ show: false, title: '', text: '', ok: '', danger: false, action: null });
     const confirmAction = () => { if (confirm.action) confirm.action(); confirm.show = false; };
 
-    // ========== PAID BY TOGGLE ==========
-    const togglePaidBy = exp => {
-      exp.paidBy = (exp.paidBy || 'a') === 'a' ? 'b' : 'a';
-    };
-
-    // ========== CONFETTI ==========
-    const confettiShownKey = 'confetti-shown';
-    const getConfettiShown = () => {
-      try { return new Set(JSON.parse(localStorage.getItem(confettiShownKey) || '[]')); } catch(e) { return new Set(); }
-    };
-
-    const launchConfetti = () => {
-      const c = document.createElement('div');
-      c.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden';
-      document.body.appendChild(c);
-      const colors = ['#f44336','#e91e63','#9c27b0','#3f51b5','#2196f3','#4caf50','#ffeb3b','#ff9800','#00bcd4','#8bc34a'];
-      for (let i = 0; i < 80; i++) {
-        const el = document.createElement('div');
-        const size = 6 + Math.random() * 6;
-        el.style.cssText = 'position:absolute;width:'+size+'px;height:'+size+'px;background:'+colors[i%colors.length]+';left:'+Math.random()*100+'%;top:-20px;border-radius:'+(Math.random()>.5?'50%':'2px')+';animation:confettiFall '+(1.5+Math.random()*1.5)+'s ease-in forwards;animation-delay:'+Math.random()*0.5+'s';
-        c.appendChild(el);
-      }
-      setTimeout(() => c.remove(), 4000);
-    };
-
-    const checkConfetti = () => {
-      nextTick(() => {
-        const s = settlement.value;
-        if (s.bShare > 0 && s.remaining <= 0) {
-          const shown = getConfettiShown();
-          if (!shown.has(currentMonth.value)) {
-            shown.add(currentMonth.value);
-            try { localStorage.setItem(confettiShownKey, JSON.stringify([...shown])); } catch(e){}
-            launchConfetti();
-            showToast('🎉 Allt betalt för denna månad!');
-          }
-        }
-      });
-    };
-
-    // ========== NOTIFICATIONS ==========
-    const notifEnabled = ref(localStorage.getItem('notif-enabled') === 'true');
-
-    const toggleNotif = async () => {
-      if (!notifEnabled.value) {
-        if ('Notification' in window) {
-          const perm = await Notification.requestPermission();
-          if (perm === 'granted') {
-            notifEnabled.value = true;
-            localStorage.setItem('notif-enabled', 'true');
-            showToast('Påminnelser aktiverade');
-          } else {
-            showToast('Notifikationer blockerade av webbläsaren');
-          }
-        } else {
-          showToast('Notifikationer stöds inte');
-        }
-      } else {
-        notifEnabled.value = false;
-        localStorage.setItem('notif-enabled', 'false');
-        showToast('Påminnelser avaktiverade');
-      }
-    };
-
-    const checkNotification = () => {
-      if (!notifEnabled.value || !('Notification' in window) || Notification.permission !== 'granted') return;
-      const day = now.getDate();
-      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-      if (day < daysInMonth - 4) return;
-      const s = settlement.value;
-      if (s.remaining <= 0) return;
-      const notifKey = 'notif-shown';
-      const shown = new Set(JSON.parse(localStorage.getItem(notifKey) || '[]'));
-      if (shown.has(currentMonth.value)) return;
-      shown.add(currentMonth.value);
-      localStorage.setItem(notifKey, JSON.stringify([...shown]));
-      new Notification('💰 Utgifter - Påminnelse', {
-        body: data.persons.b.name + ' ska betala ' + fmt(s.remaining) + ' till ' + data.persons.a.name,
-        tag: 'expense-reminder'
-      });
-    };
-
-    // ========== BUDGET ==========
-    const budgetEditValues = reactive({});
-
-    const openBudgetDialog = () => {
-      categories.forEach(c => {
-        budgetEditValues[c.id] = data.budgets[c.id] || 0;
-      });
-      nextTick(() => { try { budgetDialog.value?.showModal(); } catch(e){} });
-    };
-
-    const saveBudgets = () => {
-      categories.forEach(c => {
-        const val = parseInt(budgetEditValues[c.id]) || 0;
-        if (val > 0) data.budgets[c.id] = val;
-        else delete data.budgets[c.id];
-      });
-      budgetDialog.value?.close();
-      showToast('Budget sparad');
-    };
-
-    const budgetItems = computed(() => {
-      const items = [];
-      const md = monthData.value;
-      const allExp = [...md.shared, ...(md.personal.a||[]), ...(md.personal.b||[])];
-      for (const [catId, limit] of Object.entries(data.budgets)) {
-        if (!limit) continue;
-        const spent = allExp.filter(e => (e.category||'ovrigt') === catId).reduce((s,e) => s + (parseInt(e.amount)||0), 0);
-        const cat = catMap[catId];
-        items.push({
-          id: catId,
-          emoji: cat?.emoji || '💰',
-          label: cat?.label || catId,
-          limit,
-          spent,
-          pct: Math.round(spent / limit * 100)
-        });
-      }
-      return items.sort((a,b) => b.pct - a.pct);
-    });
-
-    // ========== SAVINGS GOALS ==========
-    const goalName = ref('');
-    const goalEmoji = ref('🎯');
-    const goalTarget = ref('');
-    const addGoalAmount = ref('');
-    const activeGoalId = ref(null);
-
-    const openGoalDialog = () => {
-      goalName.value = '';
-      goalEmoji.value = '🎯';
-      goalTarget.value = '';
-      nextTick(() => { try { goalDialog.value?.showModal(); } catch(e){} });
-    };
-
-    const saveGoal = () => {
-      const name = goalName.value.trim();
-      const target = parseAmountSimple(goalTarget.value);
-      if (!name || target <= 0) return;
-      data.savingsGoals.push({
-        id: crypto.randomUUID(),
-        name,
-        emoji: goalEmoji.value || '🎯',
-        target,
-        saved: 0
-      });
-      goalDialog.value?.close();
-      showToast('Sparmål skapat');
-    };
-
-    const addToGoal = g => {
-      activeGoalId.value = g.id;
-      addGoalAmount.value = '';
-      nextTick(() => {
-        try { addGoalDialog.value?.showModal(); } catch(e){}
-        nextTick(() => { addGoalInput.value?.focus?.(); });
-      });
-    };
-
-    const saveAddGoal = () => {
-      const amt = parseAmountSimple(addGoalAmount.value);
-      if (amt <= 0) return;
-      const g = data.savingsGoals.find(g => g.id === activeGoalId.value);
-      if (g) {
-        g.saved = Math.min(g.target, g.saved + amt);
-        if (g.saved >= g.target) showToast('🎉 Sparmålet uppnått!');
-        else showToast(fmt(amt) + ' tillagt');
-      }
-      addGoalDialog.value?.close();
-    };
-
-    const deleteGoal = id => {
-      const idx = data.savingsGoals.findIndex(g => g.id === id);
-      if (idx >= 0) {
-        data.savingsGoals.splice(idx, 1);
-        showToast('Sparmål borttaget');
-      }
-    };
-
-    // ========== WISHLIST ==========
-    const wishName = ref('');
-    const wishAmount = ref('');
-    const wishNote = ref('');
-    const wishAddedBy = ref('');
-
-    const openWishDialog = () => {
-      wishName.value = '';
-      wishAmount.value = '';
-      wishNote.value = '';
-      wishAddedBy.value = data.persons.a.name;
-      nextTick(() => { try { wishDialog.value?.showModal(); } catch(e){} });
-    };
-
-    const saveWish = () => {
-      const name = wishName.value.trim();
-      if (!name) return;
-      data.wishlist.push({
-        id: crypto.randomUUID(),
-        name,
-        amount: parseAmountSimple(wishAmount.value),
-        note: wishNote.value.trim(),
-        addedBy: wishAddedBy.value,
-        done: false
-      });
-      wishDialog.value?.close();
-      showToast('Önskning tillagd');
-    };
-
-    const deleteWish = id => {
-      const idx = data.wishlist.findIndex(w => w.id === id);
-      if (idx >= 0) {
-        data.wishlist.splice(idx, 1);
-        showToast('Önskning borttagen');
-      }
-    };
-
-    // ========== COLLAPSIBLE SECTIONS ==========
-    const debtOpen = ref(false);
-    const savingsOpen = ref(false);
-    const wishOpen = ref(false);
-
     // ========== STATISTICS ==========
-    const statsMode = ref('month');
-    const showReport = ref(false);
+    const getAllMonthKeys = () => Object.keys(data.months).sort();
 
     const monthTotal = key => {
       const m = data.months[key];
@@ -2328,9 +1330,9 @@ createApp({
       const stops = catBreakdown.value.map(c => {
         const start = acc;
         acc += c.pct;
-        return c.color+' '+start+'% '+acc+'%';
+        return `${c.color} ${start}% ${acc}%`;
       });
-      return 'conic-gradient('+stops.join(',')+')';
+      return `conic-gradient(${stops.join(',')})`;
     });
 
     const topExpenses = computed(() => {
@@ -2394,66 +1396,9 @@ createApp({
       return result.reverse();
     });
 
-    // ========== YEARLY STATS ==========
-    const currentYear = computed(() => currentMonth.value.slice(0,4));
-
-    const yearMonths = computed(() => {
-      const y = currentYear.value;
-      const months = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
-      const maxVal = Math.max(1, ...Array.from({length:12},(_,i) => {
-        const key = y+'-'+(i+1).toString().padStart(2,'0');
-        return monthTotal(key);
-      }));
-      return Array.from({length:12},(_,i) => {
-        const key = y+'-'+(i+1).toString().padStart(2,'0');
-        const total = monthTotal(key);
-        return { key, label: months[i], total, pct: Math.round(total/maxVal*100) };
-      });
-    });
-
-    const yearlyTotal = computed(() => {
-      return yearMonths.value.reduce((s,m) => s + m.total, 0);
-    });
-
-    const yearlyAvg = computed(() => {
-      const mWithData = yearMonths.value.filter(m => m.total > 0);
-      return mWithData.length > 0 ? Math.round(yearlyTotal.value / mWithData.length) : 0;
-    });
-
-    const yearlyCatBreakdown = computed(() => {
-      const y = currentYear.value;
-      const totals = {};
-      getAllMonthKeys().filter(k => k.startsWith(y)).forEach(k => {
-        const m = data.months[k];
-        if (!m) return;
-        const allExp = [...(m.shared||[]), ...(m.personal?.a||[]), ...(m.personal?.b||[])];
-        allExp.forEach(e => {
-          const cat = e.category || 'ovrigt';
-          totals[cat] = (totals[cat] || 0) + (parseInt(e.amount)||0);
-        });
-      });
-      const grand = Object.values(totals).reduce((a,b)=>a+b,0) || 1;
-      return Object.entries(totals).sort((a,b)=>b[1]-a[1]).map(([id,val]) => ({
-        id, emoji: catEmoji(id), label: catLabel(id), color: catColor(id),
-        val, pct: Math.round(val/grand*100)
-      }));
-    });
-
-    const yearlyConicGradient = computed(() => {
-      if (yearlyCatBreakdown.value.length === 0) return 'var(--bg3)';
-      let acc = 0;
-      const stops = yearlyCatBreakdown.value.map(c => {
-        const start = acc;
-        acc += c.pct;
-        return c.color+' '+start+'% '+acc+'%';
-      });
-      return 'conic-gradient('+stops.join(',')+')';
-    });
-
     // ========== SHARE / SYNC ==========
     const importOpen = ref(false);
     const importText = ref('');
-    const qrUrl = ref('');
 
     const compressData = async () => {
       const payload = { ...JSON.parse(JSON.stringify(data)), avatars: { a: avatars.a, b: avatars.b } };
@@ -2501,20 +1446,6 @@ createApp({
         await navigator.clipboard.writeText(b64);
         showToast('Data kopierad!');
       } catch(e) { showToast('Fel: ' + e.message); }
-    };
-
-    const generateQR = async () => {
-      try {
-        const b64 = await compressData();
-        const url = location.origin + location.pathname + '#data=' + b64;
-        if (url.length > 2000) {
-          showToast('Data för stor för QR-kod (' + url.length + ' tecken). Använd länk istället.');
-          return;
-        }
-        qrUrl.value = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
-      } catch(e) {
-        showToast('Kunde inte skapa QR-kod');
-      }
     };
 
     const importFromText = async () => {
@@ -2566,11 +1497,11 @@ createApp({
       confirm.action = () => {
         const md = monthData.value;
         prevMonth.shared.forEach(e => {
-          md.shared.push({ ...e, id: crypto.randomUUID(), comments: [], date: todayStr() });
+          md.shared.push({ ...e, id: crypto.randomUUID() });
         });
         ['a','b'].forEach(p => {
           (prevMonth.personal[p]||[]).forEach(e => {
-            md.personal[p].push({ ...e, id: crypto.randomUUID(), comments: [], date: todayStr() });
+            md.personal[p].push({ ...e, id: crypto.randomUUID() });
           });
         });
         showToast('Utgifter kopierade!');
@@ -2587,6 +1518,11 @@ createApp({
         data.months[currentMonth.value] = { shared:[], personal:{ a:[], b:[] }, payments:[], skippedRecurringIds:[] };
         showToast('Månad rensad');
       };
+    };
+
+    // ========== PAID BY TOGGLE ==========
+    const togglePaidBy = exp => {
+      exp.paidBy = (exp.paidBy || 'a') === 'a' ? 'b' : 'a';
     };
 
     // ========== AVATARS ==========
@@ -2639,7 +1575,7 @@ createApp({
       e.target.value = '';
     };
 
-    // ========== HASH IMPORT + INIT ==========
+    // ========== HASH IMPORT ==========
     onMounted(async () => {
       if (location.hash.startsWith('#data=')) {
         try {
@@ -2658,10 +1594,6 @@ createApp({
           showToast('Data importerad från länk!');
         } catch(e) { showToast('Kunde inte importera data från länk'); }
       }
-      // Check confetti on load
-      checkConfetti();
-      // Check notifications
-      setTimeout(checkNotification, 2000);
     });
 
     return {
@@ -2669,48 +1601,22 @@ createApp({
       categories, catEmoji, catLabel, catStyle, fmt,
       view, tabs, switchView, personalTab,
       settlement, totalShared, splitRatio, personalTotal, setIncome,
-      searchQuery, filteredShared, sortedShared, filteredPersonal, sortedPersonal,
-      sortMode, reorderMode, moveExpense,
-      editingId, editName, editAmount, editCategory, editNote, editPaidBy, editDate,
-      editTags, editTagInput, addEditTag, editCustomSplit, editUseCustomSplit, editType,
-      calcPreview, onAmountInput,
+      searchQuery, filteredShared, filteredPersonal,
+      editingId, editName, editAmount, editCategory, editNote, editPaidBy,
       startEdit, cancelEdit, saveEdit, deleteExpense, togglePaidBy,
       touchStart, touchMove, touchEnd,
-      openComments, commentText, commentAuthor, toggleComments, addComment, formatCommentTime,
       dialogMode, dialogTitle, dialogName, dialogAmount, dialogCategory, dialogNote, dialogRecurring, dialogPaidBy,
-      dialogDate, dialogTags, dialogTagInput, addDialogTag, dialogUseCustomSplit, dialogCustomSplit,
-      dialogCalcPreview, onDialogAmountInput, focusTagInput,
       openExpenseDialog, closeExpenseDialog, saveExpenseDialog,
-      expenseDialog, dialogNameInput, dialogTagInput: dialogTagInputRef,
-      paymentDialog, payAmountInput, largeAmountDialog, budgetDialog, goalDialog, addGoalDialog, addGoalInput, wishDialog,
+      expenseDialog, dialogNameInput, paymentDialog, payAmountInput, largeAmountDialog,
       pendingLargeAmount, pendingLargeCallback, confirmLargeAmount,
       editingTemplateId, editTemplateName, editTemplateAmount,
       startEditTemplate, pendingRecurring, addFromTemplate, skipTemplate, addAllRecurring,
       payAmount, payDate, payNote, openPaymentDialog, savePayment,
-      deletePayment,
       toast, doUndo, confirm, confirmAction,
-      // Budget
-      budgetItems, budgetEditValues, openBudgetDialog, saveBudgets, parseAmountSimple,
-      // Savings Goals
-      savingsOpen, goalName, goalEmoji, goalTarget, addGoalAmount, activeGoalId,
-      openGoalDialog, saveGoal, addToGoal, saveAddGoal, deleteGoal,
-      // Wishlist
-      wishOpen, wishName, wishAmount, wishNote, wishAddedBy,
-      openWishDialog, saveWish, deleteWish,
-      // Debt history
-      debtOpen, debtHistory, runningBalance,
-      // Notifications
-      notifEnabled, toggleNotif,
-      // Stats
-      statsMode, showReport,
       trendData, catBreakdown, conicGradient, topExpenses, ytdTotal, avgMonthly,
       highestMonth, lowestMonth, recurringVsOnce, compareBarH, allPayments,
-      // Yearly
-      currentYear, yearMonths, yearlyTotal, yearlyAvg, yearlyCatBreakdown, yearlyConicGradient,
-      // Avatars
       avatars, avatarInput, triggerAvatarUpload, handleAvatarUpload,
-      // Share
-      importOpen, importText, qrUrl, shareLink, copyData, generateQR, importFromText, exportJSON,
+      importOpen, importText, shareLink, copyData, importFromText, exportJSON,
       copyPreviousMonth, clearMonth,
     };
   }
