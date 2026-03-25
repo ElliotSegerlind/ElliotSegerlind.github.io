@@ -352,6 +352,113 @@ input[type=number]{-moz-appearance:textfield}
 .budget-edit-item:last-child{border-bottom:none}
 .budget-edit-item .be-cat{flex:1;font-size:13px}
 .budget-edit-item input{width:100px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);font-size:14px;color:var(--text);font-family:var(--font);text-align:right}
+
+/* ===== NEW FEATURES CSS ===== */
+
+/* Context menu (long-press) */
+.ctx-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:900;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s}
+.ctx-menu{background:var(--bg2);border-radius:16px 16px 0 0;width:100%;max-width:420px;padding:8px 0 env(safe-area-inset-bottom,8px);box-shadow:0 -4px 24px var(--shadow)}
+.ctx-menu .ctx-item{display:flex;align-items:center;gap:12px;padding:14px 20px;font-size:15px;color:var(--text);cursor:pointer;transition:background .15s}
+.ctx-menu .ctx-item:active{background:var(--bg3)}
+.ctx-menu .ctx-item.danger{color:var(--danger)}
+.ctx-menu .ctx-cancel{text-align:center;padding:14px;font-weight:600;color:var(--text2);border-top:1px solid var(--border);cursor:pointer}
+
+/* Floating month summary */
+.floating-summary{position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;font-size:13px;margin:-16px -16px 12px;transition:opacity .2s}
+.floating-summary .fs-count{color:var(--text2)}
+.floating-summary .fs-total{font-weight:700;color:var(--accent)}
+
+/* Trend arrows */
+.trend-arrow{font-size:11px;font-weight:700;margin-left:4px;padding:2px 5px;border-radius:8px}
+.trend-arrow.up{color:#e53e3e;background:#fed7d7}
+.trend-arrow.down{color:#38a169;background:#c6f6d5}
+.trend-arrow.flat{color:var(--text3);background:var(--bg3)}
+@media(prefers-color-scheme:dark){
+.trend-arrow.up{color:#fc8181;background:rgba(254,215,215,.15)}
+.trend-arrow.down{color:#68d391;background:rgba(198,246,213,.15)}
+}
+
+/* Who-added stamp */
+.added-by{font-size:11px;color:var(--text3);margin-top:2px;font-style:italic}
+
+/* Settings panel */
+.settings-group{margin-bottom:16px}
+.settings-group h4{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-row .setting-label{font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px}
+.setting-row .setting-value{font-size:13px;color:var(--text2)}
+
+/* Accent color picker */
+.accent-colors{display:flex;gap:8px;flex-wrap:wrap}
+.accent-swatch{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s}
+.accent-swatch.active{border-color:var(--text);transform:scale(1.15)}
+.accent-swatch:active{transform:scale(.9)}
+
+/* Density toggle */
+.density-toggle .segmented{font-size:12px}
+body.density-compact .expense-item{padding:8px 12px}
+body.density-compact .expense-name{font-size:13px}
+body.density-compact .expense-amount{font-size:14px}
+body.density-compact .expense-meta{gap:4px;margin-top:2px}
+body.density-compact .cat-pill{font-size:10px;padding:1px 6px}
+body.density-compact .card{padding:12px}
+body.density-compact .comment-toggle{padding:4px 0;font-size:11px}
+
+/* Dark mode override */
+body.dark-override{color-scheme:dark}
+body.dark-override,:root.dark-override{--bg:#0a0a0a;--bg2:#141414;--bg3:#1e1e1e;--text:#f1f1f1;--text2:#a1a1a1;--text3:#666;--border:#2a2a2a;--shadow:rgba(0,0,0,.5);--accent-light:rgba(32,184,102,.12)}
+body.light-override{color-scheme:light}
+body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;--text:#1a1a1a;--text2:#666;--text3:#999;--border:#e0e0e0;--shadow:rgba(0,0,0,.06);--accent-light:rgba(24,160,88,.08)}
+
+/* Data size indicator */
+.data-size{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
+.data-size .ds-bar{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;max-width:120px}
+.data-size .ds-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s}
+
+/* Import diff / conflict resolution */
+.import-diff{max-height:400px;overflow-y:auto}
+.diff-section{margin-bottom:12px;border:1px solid var(--border);border-radius:var(--radius-xs);overflow:hidden}
+.diff-header{font-size:13px;font-weight:600;padding:8px 12px;background:var(--bg3);color:var(--text2)}
+.diff-row{display:flex;align-items:center;padding:8px 12px;font-size:13px;border-bottom:1px solid var(--border);gap:8px}
+.diff-row:last-child{border-bottom:none}
+.diff-row .old{color:var(--danger);text-decoration:line-through;flex:1}
+.diff-row .new{color:var(--accent);flex:1}
+.diff-row .arrow{color:var(--text3);font-size:11px}
+.diff-stat{display:flex;gap:12px;margin-bottom:12px;font-size:13px}
+.diff-stat span{padding:4px 8px;border-radius:var(--radius-xs)}
+.diff-stat .added{background:rgba(32,184,102,.12);color:var(--accent)}
+.diff-stat .removed{background:rgba(229,62,62,.12);color:var(--danger)}
+.diff-stat .changed{background:rgba(237,137,54,.12);color:var(--warn)}
+
+/* Last synced indicator */
+.sync-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);padding:3px 8px;background:var(--bg3);border-radius:12px;margin-bottom:8px}
+.sync-badge .sync-dot{width:6px;height:6px;border-radius:50%;background:#38a169}
+.sync-badge.stale .sync-dot{background:var(--warn)}
+
+/* Split history */
+.split-history{margin-top:8px}
+.split-history .sh-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border)}
+.split-history .sh-row:last-child{border-bottom:none}
+.split-history .sh-month{min-width:60px;color:var(--text2)}
+.split-history .sh-bar{flex:1;height:12px;background:var(--bg3);border-radius:6px;overflow:hidden;display:flex}
+.split-history .sh-a{background:var(--accent);height:100%;transition:width .3s}
+.split-history .sh-b{background:var(--cat-noje);height:100%}
+.split-history .sh-label{min-width:50px;text-align:right;font-size:11px;color:var(--text3)}
+
+/* Skeleton loading */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--border) 37%,var(--bg3) 63%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius-xs)}
+.skeleton-card{height:80px;margin-bottom:12px;border-radius:var(--radius)}
+.skeleton-bar{height:14px;margin-bottom:8px;width:60%;border-radius:4px}
+.skeleton-bar.short{width:40%}
+.skeleton-bar.wide{width:85%}
+
+/* Page transitions */
+.view-enter{animation:slideIn .25s ease-out}
+.view-enter-reverse{animation:slideInReverse .25s ease-out}
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInReverse{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
 </style>
 </head>
 <body>
@@ -382,8 +489,58 @@ input[type=number]{-moz-appearance:textfield}
     </div>
   </div>
 
+  <!-- Context menu (long-press) -->
+  <div class="ctx-overlay" v-if="ctxMenu.show" @click.self="ctxMenu.show=false">
+    <div class="ctx-menu">
+      <div class="ctx-item" @click="ctxEdit">✏️ Redigera</div>
+      <div class="ctx-item" @click="ctxDuplicate">📋 Duplicera</div>
+      <div class="ctx-item" @click="ctxMove">↔️ Flytta till {{ ctxMenu.type==='shared'?'personligt':'gemensamt' }}</div>
+      <div class="ctx-item danger" @click="ctxDelete">🗑️ Radera</div>
+      <div class="ctx-cancel" @click="ctxMenu.show=false">Avbryt</div>
+    </div>
+  </div>
+
+  <!-- Import diff dialog -->
+  <div class="confirm-overlay" v-if="importDiff.show" @click.self="importDiff.show=false">
+    <div class="confirm-box" style="max-width:380px;max-height:80vh;overflow-y:auto">
+      <h3>📥 Granska import</h3>
+      <div class="diff-stat">
+        <span class="added" v-if="importDiff.stats.added">+{{ importDiff.stats.added }} nya</span>
+        <span class="removed" v-if="importDiff.stats.removed">-{{ importDiff.stats.removed }} borttagna</span>
+        <span class="changed" v-if="importDiff.stats.changed">~{{ importDiff.stats.changed }} ändrade</span>
+      </div>
+      <div class="import-diff">
+        <div class="diff-row" v-for="(ch,i) in importDiff.changes" :key="i">
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:12px;color:var(--text2);margin-bottom:2px">{{ ch.area }}</div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <span class="old">{{ ch.old }}</span>
+              <span class="arrow">→</span>
+              <span class="new">{{ ch.new }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="confirm-actions" style="margin-top:12px">
+        <button class="btn btn-outline btn-sm" @click="importDiff.show=false">Avbryt</button>
+        <button class="btn btn-primary btn-sm" @click="confirmImport">Importera</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton loading -->
+  <template v-if="!appLoaded">
+    <div style="padding:16px">
+      <div class="skeleton skeleton-bar wide"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-bar short"></div>
+      <div class="skeleton skeleton-card"></div>
+    </div>
+  </template>
+
   <!-- ============ HOME ============ -->
-  <div class="view" v-if="view==='home'" :key="'home-'+currentMonth">
+  <div class="view" :class="viewTransition" v-if="appLoaded && view==='home'" :key="'home-'+currentMonth">
     <div class="person-grid">
       <div class="person-card" v-for="p in ['a','b']" :key="p">
         <label>{{ data.persons[p].name }}</label>
@@ -571,7 +728,13 @@ input[type=number]{-moz-appearance:textfield}
   </div>
 
   <!-- ============ SHARED ============ -->
-  <div class="view" v-if="view==='shared'" :key="'shared-'+currentMonth">
+  <div class="view" :class="viewTransition" v-if="appLoaded && view==='shared'" :key="'shared-'+currentMonth">
+    <!-- Floating month summary -->
+    <div class="floating-summary" v-if="sortedShared.length>2">
+      <span class="fs-count">{{ sortedShared.length }} utgifter</span>
+      <span class="fs-total">{{ fmt(sharedTotal) }}</span>
+    </div>
+
     <div class="search-bar">
       <span class="search-icon">🔍</span>
       <input v-model="searchQuery" placeholder="Sök utgifter…">
@@ -614,7 +777,7 @@ input[type=number]{-moz-appearance:textfield}
 
     <template v-if="sortedShared.length>0">
       <div v-for="(exp,idx) in sortedShared" :key="exp.id" class="expense-item"
-           @touchstart="touchStart($event,exp)" @touchmove="touchMove($event,exp)" @touchend="touchEnd($event,exp)"
+           @touchstart="touchStart($event,exp);onLongPressStart($event,exp,'shared')" @touchmove="touchMove($event,exp);onLongPressEnd()" @touchend="touchEnd($event,exp);onLongPressEnd()"
            :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
         <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30">
           <span>Radera</span>
@@ -637,6 +800,7 @@ input[type=number]{-moz-appearance:textfield}
                 <span class="tag-pill" v-for="tg in exp.tags" :key="tg">🏷️ {{ tg }}</span>
               </div>
               <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
+              <div class="added-by" v-if="exp.addedBy">Tillagd av {{ exp.addedBy }}</div>
             </div>
             <div class="reorder-btns" v-if="reorderMode">
               <button @click="moveExpense('shared',exp.id,-1)" :disabled="idx===0">▲</button>
@@ -704,22 +868,28 @@ input[type=number]{-moz-appearance:textfield}
       </div>
     </template>
     <div class="empty-state" v-else-if="!searchQuery">
-      <div class="empty-icon">📝</div>
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="margin-bottom:8px"><rect x="15" y="10" width="50" height="60" rx="6" fill="var(--bg3)" stroke="var(--border)" stroke-width="2"/><line x1="25" y1="25" x2="55" y2="25" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/><line x1="25" y1="35" x2="50" y2="35" stroke="var(--text3)" stroke-width="2" stroke-linecap="round"/><line x1="25" y1="45" x2="45" y2="45" stroke="var(--text3)" stroke-width="2" stroke-linecap="round"/><circle cx="58" cy="55" r="12" fill="var(--accent)" fill-opacity=".15" stroke="var(--accent)" stroke-width="2"/><line x1="54" y1="55" x2="62" y2="55" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/><line x1="58" y1="51" x2="58" y2="59" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>
       <p>Inga gemensamma utgifter denna månad.<br>Tryck på + för att lägga till!</p>
     </div>
     <div class="empty-state" v-else>
-      <div class="empty-icon">🔍</div>
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="margin-bottom:8px"><circle cx="26" cy="26" r="16" stroke="var(--text3)" stroke-width="2.5" fill="none"/><line x1="37" y1="37" x2="50" y2="50" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="26" x2="32" y2="26" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" opacity=".5"/></svg>
       <p>Inga träffar för "{{ searchQuery }}"</p>
     </div>
 
-    <button class="fab" @click="openExpenseDialog('shared')" title="Lägg till utgift">+</button>
+    <button class="fab" @click="haptic();openExpenseDialog('shared')" title="Lägg till utgift">+</button>
   </div>
 
   <!-- ============ PERSONAL ============ -->
-  <div class="view" v-if="view==='personal'" :key="'personal-'+currentMonth+personalTab">
+  <div class="view" :class="viewTransition" v-if="appLoaded && view==='personal'" :key="'personal-'+currentMonth+personalTab">
     <div class="segmented">
       <button :class="{active:personalTab==='a'}" @click="personalTab='a';searchQuery=''">{{ data.persons.a.name }}</button>
       <button :class="{active:personalTab==='b'}" @click="personalTab='b';searchQuery=''">{{ data.persons.b.name }}</button>
+    </div>
+
+    <!-- Floating month summary -->
+    <div class="floating-summary" v-if="sortedPersonal.length>2">
+      <span class="fs-count">{{ sortedPersonal.length }} utgifter</span>
+      <span class="fs-total">{{ fmt(personalListTotal) }}</span>
     </div>
 
     <div class="search-bar">
@@ -763,7 +933,7 @@ input[type=number]{-moz-appearance:textfield}
 
     <template v-if="sortedPersonal.length>0">
       <div v-for="(exp,idx) in sortedPersonal" :key="exp.id" class="expense-item"
-           @touchstart="touchStart($event,exp)" @touchmove="touchMove($event,exp)" @touchend="touchEnd($event,exp)"
+           @touchstart="touchStart($event,exp);onLongPressStart($event,exp,'personal')" @touchmove="touchMove($event,exp);onLongPressEnd()" @touchend="touchEnd($event,exp);onLongPressEnd()"
            :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
         <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30">
           <span>Radera</span>
@@ -784,6 +954,7 @@ input[type=number]{-moz-appearance:textfield}
                 <span class="tag-pill" v-for="tg in exp.tags" :key="tg">🏷️ {{ tg }}</span>
               </div>
               <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
+              <div class="added-by" v-if="exp.addedBy">Tillagd av {{ exp.addedBy }}</div>
             </div>
             <div class="reorder-btns" v-if="reorderMode">
               <button @click="moveExpense('personal',exp.id,-1)" :disabled="idx===0">▲</button>
@@ -835,19 +1006,19 @@ input[type=number]{-moz-appearance:textfield}
       </div>
     </template>
     <div class="empty-state" v-else-if="!searchQuery">
-      <div class="empty-icon">📝</div>
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="margin-bottom:8px"><circle cx="40" cy="30" r="14" fill="var(--bg3)" stroke="var(--border)" stroke-width="2"/><path d="M20 62c0-11 9-20 20-20s20 9 20 20" fill="var(--bg3)" stroke="var(--border)" stroke-width="2"/><circle cx="55" cy="55" r="12" fill="var(--accent)" fill-opacity=".15" stroke="var(--accent)" stroke-width="2"/><line x1="51" y1="55" x2="59" y2="55" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/><line x1="55" y1="51" x2="55" y2="59" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>
       <p>Inga personliga utgifter för {{ data.persons[personalTab].name }}.<br>Tryck på + för att lägga till!</p>
     </div>
     <div class="empty-state" v-else>
-      <div class="empty-icon">🔍</div>
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="margin-bottom:8px"><circle cx="26" cy="26" r="16" stroke="var(--text3)" stroke-width="2.5" fill="none"/><line x1="37" y1="37" x2="50" y2="50" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round"/></svg>
       <p>Inga träffar för "{{ searchQuery }}"</p>
     </div>
 
-    <button class="fab" @click="openExpenseDialog('personal')" title="Lägg till utgift">+</button>
+    <button class="fab" @click="haptic();openExpenseDialog('personal')" title="Lägg till utgift">+</button>
   </div>
 
   <!-- ============ STATISTICS ============ -->
-  <div class="view" v-if="view==='stats'" :key="'stats-'+currentMonth+statsMode">
+  <div class="view" :class="viewTransition" v-if="appLoaded && view==='stats'" :key="'stats-'+currentMonth+statsMode">
     <div class="segmented year-month-toggle">
       <button :class="{active:statsMode==='month'}" @click="statsMode='month'">Månad</button>
       <button :class="{active:statsMode==='year'}" @click="statsMode='year'">År</button>
@@ -937,6 +1108,9 @@ input[type=number]{-moz-appearance:textfield}
             <div class="cat-legend-item" v-for="c in catBreakdown" :key="c.id">
               <div class="dot" :style="{background:c.color}"></div>
               {{ c.emoji }} {{ c.pct }}%
+              <span v-if="getCatTrendInfo(c.id, c.val)" class="trend-arrow" :class="getCatTrendInfo(c.id, c.val).dir">
+                {{ getCatTrendInfo(c.id, c.val).dir==='up'?'↑':getCatTrendInfo(c.id, c.val).dir==='down'?'↓':'→' }}{{ getCatTrendInfo(c.id, c.val).pct }}%
+              </span>
             </div>
           </div>
         </div>
@@ -1076,7 +1250,13 @@ input[type=number]{-moz-appearance:textfield}
   </div>
 
   <!-- ============ SHARE ============ -->
-  <div class="view" v-if="view==='share'" :key="'share-'+currentMonth">
+  <div class="view" :class="viewTransition" v-if="appLoaded && view==='share'" :key="'share-'+currentMonth">
+    <!-- Last synced indicator -->
+    <div class="sync-badge" :class="{stale:syncStale}" v-if="syncAgo">
+      <span class="sync-dot"></span>
+      Senast synkad: {{ syncAgo }}
+    </div>
+
     <div class="card">
       <div class="card-title">Dela data</div>
       <button class="btn btn-primary btn-block" @click="shareLink" style="margin-bottom:8px">📤 Dela länk</button>
@@ -1098,7 +1278,7 @@ input[type=number]{-moz-appearance:textfield}
       </div>
       <div v-if="importOpen">
         <textarea v-model="importText" placeholder="Klistra in komprimerad data eller URL här…" style="margin-bottom:8px"></textarea>
-        <button class="btn btn-primary btn-block btn-sm" @click="importFromText">Importera</button>
+        <button class="btn btn-primary btn-block btn-sm" @click="importFromText">Importera & granska</button>
       </div>
     </div>
 
@@ -1112,6 +1292,62 @@ input[type=number]{-moz-appearance:textfield}
       <button class="btn btn-outline btn-block" @click="copyPreviousMonth" style="margin-bottom:8px">📋 Kopiera föregående månad</button>
       <button class="btn btn-danger btn-block" @click="clearMonth">🗑️ Rensa denna månad</button>
     </div>
+
+    <!-- Split History -->
+    <div class="card" v-if="splitHistory.length>1">
+      <div class="card-title">📊 Uppdelningshistorik</div>
+      <div class="split-history">
+        <div class="sh-row" v-for="sh in splitHistory" :key="sh.month">
+          <span class="sh-month">{{ sh.label }}</span>
+          <div class="sh-bar">
+            <div class="sh-a" :style="{width:sh.aPct+'%'}"></div>
+            <div class="sh-b" :style="{width:sh.bPct+'%'}"></div>
+          </div>
+          <span class="sh-label">{{ sh.aPct }}/{{ sh.bPct }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="card">
+      <div class="card-title">⚙️ Inställningar</div>
+
+      <div class="settings-group">
+        <h4>Utseende</h4>
+        <div class="setting-row">
+          <span class="setting-label">🎨 Accentfärg</span>
+          <div class="accent-colors">
+            <div v-for="c in accentColors" :key="c.id" class="accent-swatch" :class="{active:activeAccent===c.id}" :style="{background:c.color}" @click="applyAccent(c.id)"></div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">🌙 Mörkt läge</span>
+          <div class="segmented" style="font-size:12px;min-width:0">
+            <button :class="{active:darkModePref==='auto'}" @click="applyDarkMode('auto')" style="padding:4px 10px">Auto</button>
+            <button :class="{active:darkModePref==='light'}" @click="applyDarkMode('light')" style="padding:4px 10px">Ljust</button>
+            <button :class="{active:darkModePref==='dark'}" @click="applyDarkMode('dark')" style="padding:4px 10px">Mörkt</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">📐 Layouttäthet</span>
+          <div class="segmented" style="font-size:12px;min-width:0">
+            <button :class="{active:densityMode==='comfortable'}" @click="applyDensity('comfortable')" style="padding:4px 10px">Normal</button>
+            <button :class="{active:densityMode==='compact'}" @click="applyDensity('compact')" style="padding:4px 10px">Kompakt</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h4>Data</h4>
+        <div class="setting-row">
+          <span class="setting-label">💾 Lagringsutrymme</span>
+          <div class="data-size">
+            <span>{{ dataSize.label }}</span>
+            <div class="ds-bar"><div class="ds-fill" :style="{width:dataSize.pct+'%'}"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Bottom Nav -->
@@ -1123,13 +1359,13 @@ input[type=number]{-moz-appearance:textfield}
   </nav>
 
   <!-- Add/Edit Expense Dialog -->
-  <dialog ref="expenseDialog">
+  <dialog ref="expenseDialog" @cancel.prevent="closeExpenseDialog">
     <div class="dialog-content">
       <h2>{{ dialogTitle }}</h2>
       <label>Namn</label>
       <input v-model="dialogName" placeholder="T.ex. Hyra" ref="dialogNameInput">
       <label>Belopp (kr)</label>
-      <input v-model="dialogAmount" placeholder="0 (eller t.ex. 5000+3200)" @input="onDialogAmountInput">
+      <input :value="formatCurrencyInput(dialogAmount)" placeholder="0 (eller t.ex. 5000+3200)" @input="onDialogAmountFormat($event)">
       <div class="calc-preview" v-if="dialogCalcPreview">= {{ fmt(dialogCalcPreview) }}</div>
       <label>Datum</label>
       <input type="date" v-model="dialogDate">
@@ -1744,6 +1980,7 @@ createApp({
       if (touchState.id !== exp.id) return;
       if (exp._swipe && exp._swipe < -50) {
         const type = view.value === 'shared' ? 'shared' : 'personal';
+        haptic(15);
         deleteExpense(type, exp.id);
       }
       exp._swipe = 0;
@@ -1872,7 +2109,8 @@ createApp({
           sourceTemplateId: null,
           date: dialogDate.value,
           tags: [...dialogTags.value],
-          comments: []
+          comments: [],
+          addedBy: data.persons[dialogMode.value === 'shared' ? dialogPaidBy.value : personalTab.value].name
         };
         if (dialogMode.value === 'shared') {
           expense.paidBy = dialogPaidBy.value;
@@ -1899,6 +2137,7 @@ createApp({
         }
 
         expenseDialog.value?.close();
+        haptic();
         showToast('Utgift tillagd');
       };
 
@@ -2448,6 +2687,7 @@ createApp({
           await navigator.clipboard.writeText(url);
           showToast('Länk kopierad!');
         }
+        updateSyncTime();
       } catch(e) {
         showToast('Kunde inte dela: ' + e.message);
       }
@@ -2457,6 +2697,7 @@ createApp({
       try {
         const b64 = await compressData();
         await navigator.clipboard.writeText(b64);
+        updateSyncTime();
         showToast('Data kopierad!');
       } catch(e) { showToast('Fel: ' + e.message); }
     };
@@ -2651,8 +2892,365 @@ createApp({
       e.target.value = '';
     };
 
+    // ========== #1 DIALOG DIRTY CHECK ==========
+    const dialogDirty = computed(() => {
+      return !!(dialogName.value || dialogAmount.value || dialogNote.value || dialogTags.value.length > 0);
+    });
+
+    const safeCloseExpenseDialog = () => {
+      if (dialogDirty.value) {
+        confirm.show = true;
+        confirm.title = 'Stäng utan att spara?';
+        confirm.text = 'Du har osparade ändringar i formuläret. Vill du verkligen stänga?';
+        confirm.ok = 'Stäng';
+        confirm.danger = true;
+        confirm.action = () => { expenseDialog.value?.close(); };
+      } else {
+        expenseDialog.value?.close();
+      }
+    };
+
+    // ========== #2 HAPTIC FEEDBACK ==========
+    const haptic = (ms = 10) => {
+      try { navigator?.vibrate?.(ms); } catch(e) {}
+    };
+
+    // ========== #6 SKELETON LOADING ==========
+    const appLoaded = ref(false);
+
+    // ========== #7 PAGE TRANSITIONS ==========
+    const tabOrder = ['home','shared','personal','stats','share'];
+    const viewTransition = ref('');
+
+    const switchViewAnimated = v => {
+      const curIdx = tabOrder.indexOf(view.value);
+      const newIdx = tabOrder.indexOf(v);
+      viewTransition.value = newIdx >= curIdx ? 'view-enter' : 'view-enter-reverse';
+      view.value = v;
+      editingId.value = null;
+      searchQuery.value = '';
+      reorderMode.value = false;
+      haptic(5);
+    };
+
+    // ========== #8 LONG-PRESS CONTEXT MENU ==========
+    const ctxMenu = reactive({ show: false, exp: null, type: '' });
+    let longPressTimer = null;
+
+    const onLongPressStart = (e, exp, type) => {
+      if (editingId.value) return;
+      longPressTimer = setTimeout(() => {
+        ctxMenu.show = true;
+        ctxMenu.exp = exp;
+        ctxMenu.type = type;
+        haptic(20);
+      }, 500);
+    };
+
+    const onLongPressEnd = () => {
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    };
+
+    const ctxEdit = () => {
+      if (ctxMenu.exp) startEdit(ctxMenu.exp, ctxMenu.type);
+      ctxMenu.show = false;
+    };
+
+    const ctxDuplicate = () => {
+      if (!ctxMenu.exp) return;
+      const e = ctxMenu.exp;
+      const dup = { ...JSON.parse(JSON.stringify(e)), id: crypto.randomUUID(), comments: [] };
+      dup.name = e.name + ' (kopia)';
+      if (ctxMenu.type === 'shared') monthData.value.shared.push(dup);
+      else monthData.value.personal[personalTab.value].push(dup);
+      ctxMenu.show = false;
+      haptic();
+      showToast('Utgift duplicerad');
+    };
+
+    const ctxMove = () => {
+      if (!ctxMenu.exp) return;
+      const e = ctxMenu.exp;
+      if (ctxMenu.type === 'shared') {
+        const idx = monthData.value.shared.findIndex(x => x.id === e.id);
+        if (idx >= 0) {
+          const [removed] = monthData.value.shared.splice(idx, 1);
+          delete removed.paidBy;
+          delete removed.customSplit;
+          monthData.value.personal[personalTab.value].push(removed);
+        }
+      } else {
+        const arr = monthData.value.personal[personalTab.value];
+        const idx = arr.findIndex(x => x.id === e.id);
+        if (idx >= 0) {
+          const [removed] = arr.splice(idx, 1);
+          removed.paidBy = 'a';
+          monthData.value.shared.push(removed);
+        }
+      }
+      ctxMenu.show = false;
+      haptic();
+      showToast('Utgift flyttad');
+    };
+
+    const ctxDelete = () => {
+      if (!ctxMenu.exp) return;
+      deleteExpense(ctxMenu.type, ctxMenu.exp.id);
+      ctxMenu.show = false;
+      haptic(15);
+    };
+
+    // ========== #10 FLOATING MONTH SUMMARY ==========
+    const sharedTotal = computed(() => {
+      return monthData.value.shared.reduce((s, e) => s + (parseInt(e.amount) || 0), 0);
+    });
+
+    const personalListTotal = computed(() => {
+      const arr = monthData.value.personal[personalTab.value] || [];
+      return arr.reduce((s, e) => s + (parseInt(e.amount) || 0), 0);
+    });
+
+    // ========== #11 TREND ARROWS ON CATEGORIES ==========
+    const prevMonthKey = computed(() => {
+      const [y, m] = currentMonth.value.split('-').map(Number);
+      const d = new Date(y, m - 2);
+      return toMonthKey(d);
+    });
+
+    const catTrend = computed(() => {
+      const prev = data.months[prevMonthKey.value];
+      if (!prev) return {};
+      const prevTotals = {};
+      const allPrev = [...(prev.shared || []), ...(prev.personal?.a || []), ...(prev.personal?.b || [])];
+      allPrev.forEach(e => {
+        const cat = e.category || 'ovrigt';
+        prevTotals[cat] = (prevTotals[cat] || 0) + (parseInt(e.amount) || 0);
+      });
+      return prevTotals;
+    });
+
+    const getCatTrendInfo = (catId, currentVal) => {
+      const prevVal = catTrend.value[catId] || 0;
+      if (prevVal === 0 && currentVal === 0) return null;
+      if (prevVal === 0) return { dir: 'up', pct: 100 };
+      const change = Math.round(((currentVal - prevVal) / prevVal) * 100);
+      if (Math.abs(change) < 3) return { dir: 'flat', pct: 0 };
+      return { dir: change > 0 ? 'up' : 'down', pct: Math.abs(change) };
+    };
+
+    // ========== #15 SPLIT HISTORY VIEW ==========
+    const splitHistory = computed(() => {
+      const keys = getAllMonthKeys();
+      return keys.map(k => {
+        const m = data.months[k];
+        if (!m || !m.shared || m.shared.length === 0) return null;
+        const globalBRatio = splitRatio.value;
+        let total = 0, bTotal = 0;
+        m.shared.forEach(e => {
+          const amt = parseInt(e.amount) || 0;
+          total += amt;
+          const bRatio = e.customSplit != null ? e.customSplit / 100 : globalBRatio;
+          bTotal += amt * bRatio;
+        });
+        if (total === 0) return null;
+        const bPct = Math.round((bTotal / total) * 100);
+        return { month: k, label: formatMonthLabel(k).slice(0, 3), aPct: 100 - bPct, bPct };
+      }).filter(Boolean);
+    });
+
+    // ========== #16 LAST SYNCED INDICATOR ==========
+    const lastSynced = ref(localStorage.getItem('last-synced') || '');
+
+    const updateSyncTime = () => {
+      const now = new Date().toISOString();
+      lastSynced.value = now;
+      localStorage.setItem('last-synced', now);
+    };
+
+    const syncAgo = computed(() => {
+      if (!lastSynced.value) return null;
+      const diff = Date.now() - new Date(lastSynced.value).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'Just nu';
+      if (mins < 60) return mins + ' min sedan';
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return hours + ' tim sedan';
+      const days = Math.floor(hours / 24);
+      return days + ' dag' + (days > 1 ? 'ar' : '') + ' sedan';
+    });
+
+    const syncStale = computed(() => {
+      if (!lastSynced.value) return true;
+      return Date.now() - new Date(lastSynced.value).getTime() > 86400000; // 24h
+    });
+
+    // ========== #17 CONFLICT RESOLUTION ON IMPORT ==========
+    const importDiff = reactive({ show: false, stats: {}, changes: [], incoming: null });
+
+    const computeImportDiff = (incoming) => {
+      const curr = JSON.parse(JSON.stringify(data));
+      const changes = [];
+      const stats = { added: 0, removed: 0, changed: 0 };
+
+      // Compare persons
+      ['a', 'b'].forEach(p => {
+        if (incoming.persons?.[p]?.name !== curr.persons[p].name) {
+          changes.push({ area: 'Namn', old: curr.persons[p].name, new: incoming.persons[p].name });
+          stats.changed++;
+        }
+      });
+
+      // Compare months
+      const allKeys = new Set([...Object.keys(curr.months || {}), ...Object.keys(incoming.months || {})]);
+      allKeys.forEach(k => {
+        const cm = curr.months?.[k];
+        const im = incoming.months?.[k];
+        if (!cm && im) {
+          const count = (im.shared?.length || 0) + (im.personal?.a?.length || 0) + (im.personal?.b?.length || 0);
+          if (count > 0) { changes.push({ area: formatMonthLabel(k), old: '(tomt)', new: count + ' utgifter' }); stats.added += count; }
+        } else if (cm && im) {
+          const cCount = (cm.shared?.length || 0) + (cm.personal?.a?.length || 0) + (cm.personal?.b?.length || 0);
+          const iCount = (im.shared?.length || 0) + (im.personal?.a?.length || 0) + (im.personal?.b?.length || 0);
+          if (cCount !== iCount) {
+            changes.push({ area: formatMonthLabel(k), old: cCount + ' utgifter', new: iCount + ' utgifter' });
+            if (iCount > cCount) stats.added += iCount - cCount;
+            else stats.removed += cCount - iCount;
+          }
+        }
+      });
+
+      return { stats, changes };
+    };
+
+    const importWithDiff = async () => {
+      try {
+        let txt = importText.value.trim();
+        if (txt.includes('#data=')) txt = txt.split('#data=')[1];
+        if (!txt) { showToast('Inget data att importera'); return; }
+        const incoming = await decompressData(txt);
+        const diff = computeImportDiff(incoming);
+        if (diff.changes.length === 0) {
+          showToast('Ingen skillnad hittades');
+          return;
+        }
+        importDiff.stats = diff.stats;
+        importDiff.changes = diff.changes;
+        importDiff.incoming = incoming;
+        importDiff.show = true;
+      } catch (e) { showToast('Import misslyckades: Ogiltigt format'); }
+    };
+
+    const confirmImport = () => {
+      const incoming = importDiff.incoming;
+      if (incoming.avatars) {
+        if (incoming.avatars.a) avatars.a = incoming.avatars.a;
+        if (incoming.avatars.b) avatars.b = incoming.avatars.b;
+        saveAvatars();
+        delete incoming.avatars;
+      }
+      Object.assign(data, { ...defaultData(), ...incoming });
+      Object.keys(data.months).forEach(k => ensureMonth(data, k));
+      ensureMonth(data, currentMonth.value);
+      importDiff.show = false;
+      importText.value = '';
+      updateSyncTime();
+      showToast('Data importerad!');
+    };
+
+    // ========== #18 WHO-ADDED STAMP ==========
+    // addedBy is stored on each expense. We set it when creating from dialog.
+
+    // ========== #23 CURRENCY FORMATTING AS YOU TYPE ==========
+    const formatCurrencyInput = (val) => {
+      if (!val) return '';
+      const str = String(val);
+      // If it has math operators, don't format
+      if (/[+\-*/]/.test(str)) return str;
+      const digits = str.replace(/[^0-9]/g, '');
+      if (!digits) return '';
+      return parseInt(digits).toLocaleString('sv-SE');
+    };
+
+    const onDialogAmountFormat = (e) => {
+      const raw = e.target.value;
+      if (/[+\-*/]/.test(raw)) {
+        dialogAmount.value = raw;
+      } else {
+        const digits = raw.replace(/[^0-9]/g, '');
+        dialogAmount.value = digits;
+        if (digits) {
+          nextTick(() => { e.target.value = parseInt(digits).toLocaleString('sv-SE'); });
+        }
+      }
+      dialogCalcPreview.value = hasCalcExpression(raw) ? calcExpr(raw) : null;
+    };
+
+    // ========== #25 THEMED ACCENT COLORS ==========
+    const accentColors = [
+      { id: 'green', color: '#18a058', color2: '#20b866' },
+      { id: 'blue', color: '#2563eb', color2: '#3b82f6' },
+      { id: 'purple', color: '#7c3aed', color2: '#8b5cf6' },
+      { id: 'pink', color: '#db2777', color2: '#ec4899' },
+      { id: 'orange', color: '#ea580c', color2: '#f97316' },
+      { id: 'teal', color: '#0d9488', color2: '#14b8a6' },
+      { id: 'red', color: '#dc2626', color2: '#ef4444' },
+    ];
+
+    const activeAccent = ref(localStorage.getItem('accent-color') || 'green');
+
+    const applyAccent = (id) => {
+      activeAccent.value = id;
+      localStorage.setItem('accent-color', id);
+      const c = accentColors.find(x => x.id === id);
+      if (c) {
+        document.documentElement.style.setProperty('--accent', c.color);
+        document.documentElement.style.setProperty('--accent2', c.color2);
+        document.documentElement.style.setProperty('--accent-light', c.color + '14');
+      }
+    };
+
+    // ========== #26 COMPACT VS COMFORTABLE DENSITY ==========
+    const densityMode = ref(localStorage.getItem('density-mode') || 'comfortable');
+
+    const applyDensity = (mode) => {
+      densityMode.value = mode;
+      localStorage.setItem('density-mode', mode);
+      document.body.classList.toggle('density-compact', mode === 'compact');
+    };
+
+    // ========== #27 DARK MODE MANUAL TOGGLE ==========
+    const darkModePref = ref(localStorage.getItem('dark-mode') || 'auto');
+
+    const applyDarkMode = (mode) => {
+      darkModePref.value = mode;
+      localStorage.setItem('dark-mode', mode);
+      document.body.classList.remove('dark-override', 'light-override');
+      if (mode === 'dark') document.body.classList.add('dark-override');
+      else if (mode === 'light') document.body.classList.add('light-override');
+    };
+
+    // ========== #28 DATA SIZE INDICATOR ==========
+    const dataSize = computed(() => {
+      let total = 0;
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          total += (localStorage.getItem(key) || '').length * 2; // UTF-16
+        }
+      } catch (e) {}
+      const kb = (total / 1024).toFixed(1);
+      const maxKb = 5120; // 5 MB
+      const pct = Math.min(100, Math.round((total / 1024 / maxKb) * 100));
+      return { kb, maxKb, pct, label: kb + ' KB av ' + (maxKb / 1024).toFixed(0) + ' MB' };
+    });
+
     // ========== HASH IMPORT + INIT ==========
     onMounted(async () => {
+      // Apply saved settings
+      applyAccent(activeAccent.value);
+      applyDensity(densityMode.value);
+      applyDarkMode(darkModePref.value);
+
       if (location.hash.startsWith('#data=')) {
         try {
           const b64 = location.hash.slice(6);
@@ -2667,6 +3265,7 @@ createApp({
           Object.keys(data.months).forEach(k => ensureMonth(data, k));
           ensureMonth(data, currentMonth.value);
           history.replaceState(null, '', location.pathname);
+          updateSyncTime();
           showToast('Data importerad från länk!');
         } catch(e) { showToast('Kunde inte importera data från länk'); }
       }
@@ -2674,12 +3273,14 @@ createApp({
       checkConfetti();
       // Check notifications
       setTimeout(checkNotification, 2000);
+      // Mark app as loaded (hide skeleton)
+      setTimeout(() => { appLoaded.value = true; }, 300);
     });
 
     return {
       data, currentMonth, monthData, availableMonths, formatMonthLabel, onMonthChange,
       categories, catEmoji, catLabel, catStyle, fmt,
-      view, tabs, switchView, personalTab,
+      view, tabs, switchView: switchViewAnimated, personalTab, viewTransition,
       settlement, totalShared, splitRatio, personalTotal, setIncome,
       searchQuery, filteredShared, sortedShared, filteredPersonal, sortedPersonal,
       sortMode, reorderMode, moveExpense,
@@ -2692,7 +3293,7 @@ createApp({
       dialogMode, dialogTitle, dialogName, dialogAmount, dialogCategory, dialogNote, dialogRecurring, dialogPaidBy,
       dialogDate, dialogTags, dialogTagInput, addDialogTag, dialogUseCustomSplit, dialogCustomSplit,
       dialogCalcPreview, onDialogAmountInput, focusTagInput,
-      openExpenseDialog, closeExpenseDialog, saveExpenseDialog,
+      openExpenseDialog, closeExpenseDialog: safeCloseExpenseDialog, saveExpenseDialog,
       expenseDialog, dialogNameInput, dialogTagInputRef,
       paymentDialog, payAmountInput, largeAmountDialog, budgetDialog, goalDialog, addGoalDialog, addGoalInput, wishDialog,
       pendingLargeAmount, pendingLargeCallback, confirmLargeAmount,
@@ -2722,8 +3323,20 @@ createApp({
       // Avatars
       avatars, avatarInput, triggerAvatarUpload, handleAvatarUpload,
       // Share
-      importOpen, importText, qrUrl, shareLink, copyData, generateQR, importFromText, exportJSON,
+      importOpen, importText, qrUrl, shareLink, copyData, generateQR, importFromText: importWithDiff, exportJSON,
       copyPreviousMonth, clearMonth,
+      // NEW FEATURES
+      haptic, appLoaded, ctxMenu, onLongPressStart, onLongPressEnd,
+      ctxEdit, ctxDuplicate, ctxMove, ctxDelete,
+      sharedTotal, personalListTotal,
+      getCatTrendInfo, splitHistory,
+      lastSynced, syncAgo, syncStale, updateSyncTime,
+      importDiff, confirmImport,
+      onDialogAmountFormat, formatCurrencyInput,
+      accentColors, activeAccent, applyAccent,
+      densityMode, applyDensity,
+      darkModePref, applyDarkMode,
+      dataSize,
     };
   }
 }).mount('#app');
