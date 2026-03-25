@@ -9,6 +9,7 @@
 <title>Utgifter</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%2320b866'/><stop offset='100%25' stop-color='%23109648'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><circle cx='50' cy='44' r='22' fill='none' stroke='white' stroke-width='5' opacity='.9'/><path d='M50 28 v32 M42 40 h16' stroke='white' stroke-width='5' stroke-linecap='round'/><rect x='30' y='66' width='40' height='6' rx='3' fill='white' opacity='.5'/></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%2320b866'/><stop offset='100%25' stop-color='%23109648'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><circle cx='50' cy='44' r='22' fill='none' stroke='white' stroke-width='5' opacity='.9'/><path d='M50 28 v32 M42 40 h16' stroke='white' stroke-width='5' stroke-linecap='round'/><rect x='30' y='66' width='40' height='6' rx='3' fill='white' opacity='.5'/></svg>">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 <link rel="manifest" href="manifest.json">
 <script>
 if ('serviceWorker' in navigator) {
@@ -58,7 +59,7 @@ body{background:var(--bg);color:var(--text);min-height:100%;overflow-x:hidden;
   background:none;border:none;color:var(--text3);font-size:10px;font-family:var(--font);
   padding:4px 8px;min-width:56px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent}
 .bottom-nav button.active{color:var(--accent)}
-.bottom-nav button span.icon{font-size:22px;line-height:1}
+.bottom-nav button .icon{font-size:18px;line-height:1}
 .view{padding:16px;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
@@ -102,23 +103,31 @@ body{background:var(--bg);color:var(--text);min-height:100%;overflow-x:hidden;
   border-radius:var(--radius-sm);font-size:16px;color:var(--text);font-family:var(--font)}
 .search-bar .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px}
 .expense-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px;margin-bottom:8px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  padding:16px;margin-bottom:10px;box-shadow:var(--shadow);position:relative;overflow:hidden;
   transition:transform .15s;touch-action:pan-y}
-.expense-item .expense-header{display:flex;justify-content:space-between;align-items:flex-start}
-.expense-item .expense-name{font-weight:600;font-size:15px}
-.expense-item .expense-amount{font-weight:700;font-size:15px;color:var(--accent);white-space:nowrap}
-.expense-item .expense-meta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center}
-.cat-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:500}
-.tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:500;
+.expense-item .expense-header{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.expense-item .expense-name{font-weight:600;font-size:16px;line-height:1.3;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.expense-item .expense-amount{font-weight:700;font-size:17px;color:var(--accent);white-space:nowrap;flex-shrink:0;letter-spacing:-0.01em}
+.expense-item .expense-meta{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.expense-item .expense-meta-secondary{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.cat-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;letter-spacing:0.01em}
+.tag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:500;
   background:var(--bg3);color:var(--text2)}
 .tag.recurring{background:var(--accent-light);color:var(--accent)}
-.expense-note{font-size:12px;color:var(--text3);margin-top:4px}
+.expense-note{font-size:12px;color:var(--text3);margin-top:6px;line-height:1.4}
 .delete-bg{position:absolute;right:0;top:0;bottom:0;width:80px;background:var(--danger);
   display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
-.edit-form{display:flex;flex-direction:column;gap:8px}
-.edit-form input,.edit-form select{padding:8px;background:var(--bg3);border:1px solid var(--border);
+.edit-form{display:flex;flex-direction:column;gap:0}
+.edit-form input,.edit-form select{padding:10px 12px;background:var(--bg3);border:1px solid var(--border);
   border-radius:var(--radius-xs);font-size:16px;color:var(--text);font-family:var(--font)}
-.edit-form .edit-actions{display:flex;gap:8px}
+.edit-form .edit-row{display:flex;gap:8px}
+.edit-form .edit-row>*{flex:1;min-width:0}
+.edit-form .edit-section{padding-top:12px;margin-top:12px;border-top:1px solid var(--border)}
+.edit-form .edit-section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px}
+.edit-form .edit-fields{display:flex;flex-direction:column;gap:8px}
+.edit-form .edit-actions{display:flex;gap:8px;padding-top:14px;margin-top:14px;border-top:1px solid var(--border)}
+.edit-more-btn{font-size:13px;color:var(--accent);cursor:pointer;border:none;background:none;
+  font-family:var(--font);padding:8px 0 0;font-weight:500;text-align:left;-webkit-tap-highlight-color:transparent}
 .recurring-banner{background:var(--accent-light);border:1px solid rgba(24,160,88,0.2);
   border-radius:var(--radius);padding:14px;margin-bottom:12px}
 .recurring-banner h3{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:8px}
@@ -214,7 +223,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 input[type=number]{-moz-appearance:textfield}
 .ri-edit-row{display:flex;gap:6px;margin-top:4px}
 .ri-edit-row input{padding:4px 8px;font-size:13px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font)}
-.paidby-tag{font-size:11px;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--text3);cursor:pointer;-webkit-tap-highlight-color:transparent;border:none;font-family:var(--font)}
+.paidby-tag{font-size:11px;padding:3px 8px;border-radius:10px;background:var(--bg3);color:var(--text3);cursor:pointer;-webkit-tap-highlight-color:transparent;border:none;font-family:var(--font);font-weight:500}
 .paidby-tag.by-b{background:var(--warn-light);color:var(--warn)}
 .paidby-select{padding:4px 8px;font-size:13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font)}
 .avatar-wrapper{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
@@ -232,7 +241,7 @@ input[type=number]{-moz-appearance:textfield}
 .sort-bar .reorder-btn.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
 
 /* Expense date */
-.expense-date{font-size:11px;color:var(--text3)}
+.expense-date{font-size:11px;color:var(--text3);font-weight:400}
 
 /* Tags */
 .tag-pill{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:10px;font-size:11px;background:rgba(99,102,241,0.1);color:#6366f1}
@@ -245,8 +254,8 @@ input[type=number]{-moz-appearance:textfield}
 .split-indicator{font-size:11px;padding:2px 7px;border-radius:10px;background:rgba(99,102,241,0.12);color:#6366f1}
 
 /* Comments */
-.comment-toggle{font-size:12px;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font);padding:2px 0}
-.comment-section{margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.comment-toggle{font-size:12px;color:var(--text3);cursor:pointer;border:none;background:none;font-family:var(--font);padding:6px 0 0;-webkit-tap-highlight-color:transparent}
+.comment-section{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
 .comment-item{font-size:12px;color:var(--text2);margin-bottom:4px;padding:4px 8px;background:var(--bg3);border-radius:var(--radius-xs)}
 .comment-item .c-author{font-weight:600;color:var(--text)}
 .comment-item .c-time{font-size:10px;color:var(--text3);margin-left:6px}
@@ -269,6 +278,9 @@ input[type=number]{-moz-appearance:textfield}
 .goal-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
 .goal-item:last-child{border-bottom:none}
 .goal-emoji{font-size:24px}
+.ic-em{display:none}
+body.use-emojis .ic-em{display:inline}
+body.use-emojis .ic-fa{display:none}
 .goal-info{flex:1;min-width:0}
 .goal-name{font-size:14px;font-weight:500}
 .goal-ptext{font-size:12px;color:var(--text2)}
@@ -318,7 +330,7 @@ input[type=number]{-moz-appearance:textfield}
 .reorder-btns button{padding:2px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-size:12px;cursor:pointer;line-height:1;color:var(--text2)}
 
 /* Calc preview */
-.calc-preview{font-size:12px;color:var(--accent);margin-top:2px;font-weight:500}
+.calc-preview{font-size:12px;color:var(--accent);margin-top:-4px;margin-bottom:4px;font-weight:500}
 
 /* Notification toggle */
 .notif-toggle{display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;cursor:pointer}
@@ -381,7 +393,7 @@ input[type=number]{-moz-appearance:textfield}
 }
 
 /* Who-added stamp */
-.added-by{font-size:11px;color:var(--text3);margin-top:2px;font-style:italic}
+.added-by{font-size:11px;color:var(--text3);margin-top:4px;font-style:italic}
 
 /* Settings panel — redesigned */
 .settings-card{overflow:hidden}
@@ -396,7 +408,7 @@ input[type=number]{-moz-appearance:textfield}
   padding:12px 8px;border-radius:var(--radius-sm);border:2px solid var(--border);
   background:var(--bg3);cursor:pointer;transition:all .15s;font-size:12px;font-weight:500;
   color:var(--text2);font-family:var(--font)}
-.theme-option .theme-icon{font-size:22px}
+.theme-option .theme-icon{font-size:20px}
 .theme-option.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
 .theme-option:active{transform:scale(.97)}
 
@@ -426,15 +438,16 @@ body.density-compact #app{padding-top:44px;padding-bottom:calc(64px + env(safe-a
 body.density-compact .top-bar h1{font-size:15px}
 body.density-compact .bottom-nav{padding:4px 0 calc(4px + env(safe-area-inset-bottom,0px))}
 body.density-compact .bottom-nav button{font-size:9px;padding:2px 6px;min-width:48px}
-body.density-compact .bottom-nav button span.icon{font-size:18px}
+body.density-compact .bottom-nav button .icon{font-size:15px}
 body.density-compact .view{padding:10px}
 body.density-compact .card{padding:10px;margin-bottom:8px;border-radius:10px}
 body.density-compact .card-title{font-size:12px;margin-bottom:6px}
-body.density-compact .expense-item{padding:8px 10px;margin-bottom:6px;border-radius:10px}
-body.density-compact .expense-name{font-size:13px}
-body.density-compact .expense-amount{font-size:13px}
-body.density-compact .expense-meta{gap:4px;margin-top:2px}
-body.density-compact .cat-pill{font-size:10px;padding:1px 6px}
+body.density-compact .expense-item{padding:10px 12px;margin-bottom:6px;border-radius:10px}
+body.density-compact .expense-name{font-size:14px}
+body.density-compact .expense-amount{font-size:14px}
+body.density-compact .expense-meta{gap:5px;margin-top:5px}
+body.density-compact .expense-meta-secondary{gap:5px;margin-top:4px}
+body.density-compact .cat-pill{font-size:10px;padding:2px 8px}
 body.density-compact .settlement-card{padding:16px;border-radius:12px}
 body.density-compact .settlement-amount{font-size:22px}
 body.density-compact .settlement-sub{font-size:12px}
@@ -542,7 +555,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 <div id="app">
   <!-- Top Bar -->
   <div class="top-bar">
-    <h1>💰 Utgifter</h1>
+    <h1><i class="fa-solid fa-coins ic-fa"></i><span class="ic-em">💰</span> Utgifter</h1>
     <select v-model="currentMonth" @change="onMonthChange">
       <option v-for="m in availableMonths" :key="m" :value="m">{{ formatMonthLabel(m) }}</option>
     </select>
@@ -569,10 +582,10 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   <!-- Context menu (long-press) -->
   <div class="ctx-overlay" v-if="ctxMenu.show" @click.self="ctxMenu.show=false">
     <div class="ctx-menu">
-      <div class="ctx-item" @click="ctxEdit">✏️ Redigera</div>
-      <div class="ctx-item" @click="ctxDuplicate">📋 Duplicera</div>
-      <div class="ctx-item" @click="ctxMove">↔️ Flytta till {{ ctxMenu.type==='shared'?'personligt':'gemensamt' }}</div>
-      <div class="ctx-item danger" @click="ctxDelete">🗑️ Radera</div>
+      <div class="ctx-item" @click="ctxEdit"><i class="fa-solid fa-pen ic-fa"></i><span class="ic-em">✏️</span> Redigera</div>
+      <div class="ctx-item" @click="ctxDuplicate"><i class="fa-solid fa-copy ic-fa"></i><span class="ic-em">📋</span> Duplicera</div>
+      <div class="ctx-item" @click="ctxMove"><i class="fa-solid fa-arrow-right-arrow-left ic-fa"></i><span class="ic-em">↔️</span> Flytta till {{ ctxMenu.type==='shared'?'personligt':'gemensamt' }}</div>
+      <div class="ctx-item danger" @click="ctxDelete"><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span> Radera</div>
       <div class="ctx-cancel" @click="ctxMenu.show=false">Avbryt</div>
     </div>
   </div>
@@ -580,7 +593,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   <!-- Import diff dialog -->
   <div class="confirm-overlay" v-if="importDiff.show" @click.self="importDiff.show=false">
     <div class="confirm-box" style="max-width:380px;max-height:80vh;overflow-y:auto">
-      <h3>📥 Granska import</h3>
+      <h3><i class="fa-solid fa-inbox ic-fa"></i><span class="ic-em">📥</span> Granska import</h3>
       <div class="diff-stat">
         <span class="added" v-if="importDiff.stats.added">+{{ importDiff.stats.added }} nya</span>
         <span class="removed" v-if="importDiff.stats.removed">-{{ importDiff.stats.removed }} borttagna</span>
@@ -641,7 +654,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       <div class="settlement-amount">
         <template v-if="settlement.remaining>0">{{ data.persons.b.name }} ska betala {{ data.persons.a.name }} {{ fmt(settlement.remaining) }}</template>
         <template v-else-if="monthData.shared.length===0">Inga utgifter ännu</template>
-        <template v-else>Ni ligger jämnt! ✓</template>
+        <template v-else>Ni ligger jämnt! <i class="fa-solid fa-check ic-fa"></i><span class="ic-em">✅</span></template>
       </div>
       <template v-if="settlement.totalPaid>0">
         <div class="settlement-sub">Betalat {{ fmt(settlement.totalPaid) }} av {{ fmt(settlement.bShare) }}</div>
@@ -663,19 +676,19 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     </div>
 
     <button class="btn btn-primary btn-block" @click="openPaymentDialog" style="margin-bottom:16px">
-      💳 Registrera betalning
+      <i class="fa-solid fa-credit-card ic-fa"></i><span class="ic-em">💳</span> Registrera betalning
     </button>
 
     <!-- Budget overview -->
     <div class="card" v-if="!simpleMode && budgetItems.length>0">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-        <span>📊 Budget</span>
+        <span><i class="fa-solid fa-chart-bar ic-fa"></i><span class="ic-em">📊</span> Budget</span>
         <button class="btn btn-sm btn-outline" @click="openBudgetDialog" style="padding:4px 8px;font-size:11px">Ändra</button>
       </div>
       <div class="budget-item" v-for="bi in budgetItems" :key="bi.id">
         <div class="budget-info">
-          <span class="b-cat">{{ bi.emoji }} {{ bi.label }}</span>
-          <span class="b-val">{{ fmt(bi.spent) }} / {{ fmt(bi.limit) }}<template v-if="bi.pct>100"> ⚠️</template></span>
+          <span class="b-cat"><i class="ic-fa" :class="bi.icon"></i><span class="ic-em">{{ bi.emoji }}</span> {{ bi.label }}</span>
+          <span class="b-val">{{ fmt(bi.spent) }} / {{ fmt(bi.limit) }}<template v-if="bi.pct>100"> <i class="fa-solid fa-triangle-exclamation ic-fa"></i><span class="ic-em">⚠️</span></template></span>
         </div>
         <div class="budget-bar">
           <div class="b-fill" :class="bi.pct>100?'over':bi.pct>80?'warn':'ok'" :style="{width:Math.min(100,bi.pct)+'%'}"></div>
@@ -727,14 +740,14 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
             <div class="pi-note" v-if="py.note">{{ py.note }}</div>
           </div>
           <div class="pi-amount">{{ fmt(py.amount) }}</div>
-          <button class="pi-delete" @click="deletePayment(py.id)" title="Radera">🗑️</button>
+          <button class="pi-delete" @click="deletePayment(py.id)" title="Radera"><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span></button>
         </div>
       </div>
     </div>
 
     <!-- Notification toggle -->
     <div class="notif-toggle" v-if="!simpleMode" @click="toggleNotif">
-      <label>🔔 Påminnelse vid månadsslut</label>
+      <label><i class="fa-solid fa-bell ic-fa"></i><span class="ic-em">🔔</span> Påminnelse vid månadsslut</label>
       <div class="toggle-switch">
         <input type="checkbox" :checked="notifEnabled" @click.stop="toggleNotif">
         <span class="toggle-slider"></span>
@@ -744,8 +757,8 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     <!-- Historical debt view -->
     <div class="card" v-if="!simpleMode && debtHistory.length>0">
       <div class="collapsible-header" @click="debtOpen=!debtOpen">
-        <span class="card-title" style="margin:0">📈 Historisk skuld</span>
-        <span class="arrow" :class="{open:debtOpen}">▼</span>
+        <span class="card-title" style="margin:0"><i class="fa-solid fa-chart-line ic-fa"></i><span class="ic-em">📈</span> Historisk skuld</span>
+        <span class="arrow" :class="{open:debtOpen}"><i class="fa-solid fa-chevron-down ic-fa"></i><span class="ic-em">▼</span></span>
       </div>
       <div v-if="debtOpen">
         <div class="debt-item" v-for="dh in debtHistory" :key="dh.month">
@@ -759,8 +772,8 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     <!-- Savings Goals -->
     <div class="card" v-if="!simpleMode">
       <div class="collapsible-header" @click="savingsOpen=!savingsOpen">
-        <span class="card-title" style="margin:0">🎯 Sparande-mål</span>
-        <span class="arrow" :class="{open:savingsOpen}">▼</span>
+        <span class="card-title" style="margin:0"><i class="fa-solid fa-bullseye ic-fa"></i><span class="ic-em">🎯</span> Sparande-mål</span>
+        <span class="arrow" :class="{open:savingsOpen}"><i class="fa-solid fa-chevron-down ic-fa"></i><span class="ic-em">▼</span></span>
       </div>
       <div v-if="savingsOpen">
         <div class="goal-item" v-for="g in data.savingsGoals" :key="g.id">
@@ -771,8 +784,8 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
             <div class="goal-bar"><div class="g-fill" :style="{width:Math.min(100,g.saved/Math.max(1,g.target)*100)+'%'}"></div></div>
           </div>
           <div class="goal-actions">
-            <button @click="addToGoal(g)">+💰</button>
-            <button @click="deleteGoal(g.id)">🗑️</button>
+            <button @click="addToGoal(g)"><i class="fa-solid fa-plus ic-fa"></i><span class="ic-em">➕</span></button>
+            <button @click="deleteGoal(g.id)"><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span></button>
           </div>
         </div>
         <div class="empty-state" v-if="data.savingsGoals.length===0" style="padding:16px"><p>Inga sparmål ännu</p></div>
@@ -783,8 +796,8 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     <!-- Wishlist -->
     <div class="card" v-if="!simpleMode">
       <div class="collapsible-header" @click="wishOpen=!wishOpen">
-        <span class="card-title" style="margin:0">🎁 Önskelista</span>
-        <span class="arrow" :class="{open:wishOpen}">▼</span>
+        <span class="card-title" style="margin:0"><i class="fa-solid fa-gift ic-fa"></i><span class="ic-em">🎁</span> Önskelista</span>
+        <span class="arrow" :class="{open:wishOpen}"><i class="fa-solid fa-chevron-down ic-fa"></i><span class="ic-em">▼</span></span>
       </div>
       <div v-if="wishOpen">
         <div class="wish-item" :class="{done:w.done}" v-for="w in data.wishlist" :key="w.id">
@@ -803,7 +816,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     </div>
 
     <!-- Budget setup button if no budgets -->
-    <button class="btn btn-outline btn-block btn-sm" v-if="!simpleMode && budgetItems.length===0" @click="openBudgetDialog" style="margin-bottom:12px">📊 Sätt budgetmål per kategori</button>
+    <button class="btn btn-outline btn-block btn-sm" v-if="!simpleMode && budgetItems.length===0" @click="openBudgetDialog" style="margin-bottom:12px"><i class="fa-solid fa-chart-bar ic-fa"></i><span class="ic-em">📊</span> Sätt budgetmål per kategori</button>
   </div>
 
   <!-- ============ SHARED ============ -->
@@ -815,7 +828,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     </div>
 
     <div class="search-bar" v-if="!simpleMode">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"><i class="fa-solid fa-magnifying-glass ic-fa"></i><span class="ic-em">🔍</span></span>
       <input v-model="searchQuery" placeholder="Sök utgifter…">
     </div>
 
@@ -828,12 +841,12 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
         <option value="category">Kategori</option>
         <option value="name">Namn (A-Ö)</option>
       </select>
-      <button class="reorder-btn" :class="{active:reorderMode}" @click="reorderMode=!reorderMode" title="Flytta utgifter">↕️</button>
+      <button class="reorder-btn" :class="{active:reorderMode}" @click="reorderMode=!reorderMode" title="Flytta utgifter"><i class="fa-solid fa-arrows-up-down ic-fa"></i><span class="ic-em">↕️</span></button>
     </div>
 
     <!-- Recurring banner -->
     <div class="recurring-banner" v-if="!simpleMode && pendingRecurring('shared').length>0">
-      <h3>📦 Återkommande utgifter</h3>
+      <h3><i class="fa-solid fa-box ic-fa"></i><span class="ic-em">📦</span> Återkommande utgifter</h3>
       <div class="recurring-item" v-for="t in pendingRecurring('shared')" :key="t.id">
         <div class="ri-info">
           <div v-if="editingTemplateId!==t.id">
@@ -846,7 +859,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
           </div>
         </div>
         <div class="ri-actions">
-          <button v-if="editingTemplateId!==t.id" class="btn btn-sm btn-outline" @click="startEditTemplate(t)">✏️</button>
+          <button v-if="editingTemplateId!==t.id" class="btn btn-sm btn-outline" @click="startEditTemplate(t)"><i class="fa-solid fa-pen ic-fa"></i><span class="ic-em">✏️</span></button>
           <button class="btn btn-sm btn-primary" @click="addFromTemplate(t,'shared')">Lägg till</button>
           <button class="btn btn-sm btn-danger" @click="skipTemplate(t.id)">Hoppa</button>
         </div>
@@ -869,26 +882,27 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
                 <div class="expense-amount">{{ fmt(exp.amount) }}</div>
               </div>
               <div class="expense-meta">
-                <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
-                <span class="tag" :class="{recurring:exp.recurring}" v-if="!simpleMode">{{ exp.recurring?'Återkommande':'Engång' }}</span>
-                <button class="paidby-tag" v-if="!simpleMode" :class="{'by-b':exp.paidBy==='b'}" @click.stop="togglePaidBy(exp)" :title="'Betald av '+(exp.paidBy==='b'?data.persons.b.name:data.persons.a.name)">💳 {{ exp.paidBy==='b'?data.persons.b.name:data.persons.a.name }}</button>
-                <span class="split-indicator" v-if="!simpleMode && exp.customSplit!=null">{{ 100-exp.customSplit }}/{{ exp.customSplit }}</span>
-                <span class="expense-date" v-if="exp.date">📅 {{ exp.date }}</span>
+                <span class="cat-pill" :style="catStyle(exp.category)"><i class="ic-fa" :class="catIcon(exp.category)"></i><span class="ic-em">{{ catEmoji(exp.category) }}</span> {{ catLabel(exp.category) }}</span>
+                <span class="expense-date" v-if="exp.date"><i class="fa-solid fa-calendar ic-fa"></i><span class="ic-em">📅</span> {{ exp.date }}</span>
               </div>
-              <div class="expense-meta" v-if="!simpleMode && exp.tags&&exp.tags.length>0" style="margin-top:4px">
-                <span class="tag-pill" v-for="tg in exp.tags" :key="tg">🏷️ {{ tg }}</span>
+              <div class="expense-meta-secondary" v-if="!simpleMode && (exp.recurring || exp.paidBy || exp.customSplit!=null)">
+                <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
+                <button class="paidby-tag" :class="{'by-b':exp.paidBy==='b'}" @click.stop="togglePaidBy(exp)" :title="'Betald av '+(exp.paidBy==='b'?data.persons.b.name:data.persons.a.name)"><i class="fa-solid fa-credit-card ic-fa"></i><span class="ic-em">💳</span> {{ exp.paidBy==='b'?data.persons.b.name:data.persons.a.name }}</button>
+                <span class="split-indicator" v-if="exp.customSplit!=null">{{ 100-exp.customSplit }}/{{ exp.customSplit }}</span>
+              </div>
+              <div class="expense-meta-secondary" v-if="!simpleMode && exp.tags&&exp.tags.length>0">
+                <span class="tag-pill" v-for="tg in exp.tags" :key="tg"><i class="fa-solid fa-tag ic-fa"></i><span class="ic-em">🏷️</span> {{ tg }}</span>
               </div>
               <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
               <div class="added-by" v-if="!simpleMode && exp.addedBy">Tillagd av {{ exp.addedBy }}</div>
             </div>
             <div class="reorder-btns" v-if="!simpleMode && reorderMode">
-              <button @click="moveExpense('shared',exp.id,-1)" :disabled="idx===0">▲</button>
-              <button @click="moveExpense('shared',exp.id,1)" :disabled="idx===sortedShared.length-1">▼</button>
+              <button @click="moveExpense('shared',exp.id,-1)" :disabled="idx===0"><i class="fa-solid fa-chevron-up ic-fa"></i><span class="ic-em">▲</span></button>
+              <button @click="moveExpense('shared',exp.id,1)" :disabled="idx===sortedShared.length-1"><i class="fa-solid fa-chevron-down ic-fa"></i><span class="ic-em">▼</span></button>
             </div>
           </div>
-          <!-- Comments toggle -->
           <button class="comment-toggle" v-if="!simpleMode" @click.stop="toggleComments(exp.id)">
-            💬 {{ (exp.comments||[]).length }} kommentarer
+            <i class="fa-solid fa-comments ic-fa"></i><span class="ic-em">💬</span> {{ (exp.comments||[]).length }} kommentarer
           </button>
           <div class="comment-section" v-if="openComments===exp.id">
             <div class="comment-item" v-for="c in (exp.comments||[])" :key="c.id">
@@ -907,36 +921,77 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
         </template>
         <template v-else>
           <div class="edit-form">
-            <input v-model="editName" placeholder="Namn">
-            <input v-model="editAmount" placeholder="Belopp" @input="onAmountInput">
-            <div class="calc-preview" v-if="calcPreview">= {{ fmt(calcPreview) }}</div>
-            <input type="date" v-model="editDate">
-            <select v-model="editCategory">
-              <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
-            </select>
-            <input v-model="editNote" placeholder="Anteckning (valfritt)">
-            <select v-model="editPaidBy" class="paidby-select">
-              <option value="a">💳 Betald av {{ data.persons.a.name }}</option>
-              <option value="b">💳 Betald av {{ data.persons.b.name }}</option>
-            </select>
-            <div>
-              <label style="font-size:12px;color:var(--text2)">Uppdelning ({{ data.persons.a.name }}/{{ data.persons.b.name }})</label>
-              <div class="split-slider-row">
-                <input type="range" min="0" max="100" v-model.number="editCustomSplit">
-                <span class="split-pct">{{ 100-editCustomSplit }}/{{ editCustomSplit }}</span>
-              </div>
-              <div class="check-group" style="margin-top:4px">
-                <input type="checkbox" :id="'cs-'+exp.id" :checked="editUseCustomSplit" @change="editUseCustomSplit=!editUseCustomSplit">
-                <label :for="'cs-'+exp.id" style="font-size:12px">Anpassad uppdelning</label>
-              </div>
+            <!-- Core fields always visible -->
+            <div class="edit-fields">
+              <input v-model="editName" placeholder="Namn">
+              <input v-model="editAmount" placeholder="Belopp" @input="onAmountInput">
+              <div class="calc-preview" v-if="calcPreview">= {{ fmt(calcPreview) }}</div>
+              <template v-if="!simpleMode">
+                <div class="edit-row">
+                  <input type="date" v-model="editDate" style="flex:1">
+                  <select v-model="editCategory" style="flex:1">
+                    <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.label }}</option>
+                  </select>
+                </div>
+              </template>
+              <template v-else>
+                <select v-model="editCategory">
+                  <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.label }}</option>
+                </select>
+              </template>
             </div>
-            <div>
-              <label style="font-size:12px;color:var(--text2)">Taggar (tryck Enter)</label>
-              <div class="tag-input-wrapper" @click="$event.target.querySelector&&$event.target.querySelector('input')?.focus()">
-                <span class="tag-pill" v-for="(tg,ti) in editTags" :key="ti">{{ tg }} <span class="tag-rm" @click="editTags.splice(ti,1)">✕</span></span>
-                <input @keydown.enter.prevent="addEditTag" @keydown.,.prevent="addEditTag" v-model="editTagInput" placeholder="Ny tagg…" style="font-size:14px">
+
+            <!-- Simple mode: progressive disclosure -->
+            <template v-if="simpleMode">
+              <button class="edit-more-btn" @click="editShowMore=!editShowMore" type="button">
+                <i class="fa-solid" :class="editShowMore?'fa-chevron-up':'fa-chevron-down'" style="font-size:11px"></i>
+                {{ editShowMore ? 'Dölj detaljer' : 'Fler detaljer' }}
+              </button>
+              <div class="edit-fields" v-if="editShowMore">
+                <input type="date" v-model="editDate">
+                <input v-model="editNote" placeholder="Anteckning (valfritt)">
               </div>
-            </div>
+            </template>
+
+            <!-- Advanced mode: grouped sections -->
+            <template v-if="!simpleMode">
+              <div class="edit-section">
+                <div class="edit-section-title">Betalning</div>
+                <div class="edit-fields">
+                  <select v-model="editPaidBy" class="paidby-select">
+                    <option value="a">Betald av {{ data.persons.a.name }}</option>
+                    <option value="b">Betald av {{ data.persons.b.name }}</option>
+                  </select>
+                  <div>
+                    <div class="check-group">
+                      <input type="checkbox" :id="'cs-'+exp.id" :checked="editUseCustomSplit" @change="editUseCustomSplit=!editUseCustomSplit">
+                      <label :for="'cs-'+exp.id" style="font-size:12px">Anpassad uppdelning</label>
+                    </div>
+                    <template v-if="editUseCustomSplit">
+                      <label style="font-size:12px;color:var(--text2);margin-top:8px;display:block">Uppdelning ({{ data.persons.a.name }}/{{ data.persons.b.name }})</label>
+                      <div class="split-slider-row">
+                        <input type="range" min="0" max="100" v-model.number="editCustomSplit">
+                        <span class="split-pct">{{ 100-editCustomSplit }}/{{ editCustomSplit }}</span>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+              <div class="edit-section">
+                <div class="edit-section-title">Övrigt</div>
+                <div class="edit-fields">
+                  <input v-model="editNote" placeholder="Anteckning (valfritt)">
+                  <div>
+                    <label style="font-size:12px;color:var(--text2)">Taggar (tryck Enter)</label>
+                    <div class="tag-input-wrapper" @click="$event.target.querySelector&&$event.target.querySelector('input')?.focus()">
+                      <span class="tag-pill" v-for="(tg,ti) in editTags" :key="ti">{{ tg }} <span class="tag-rm" @click="editTags.splice(ti,1)">✕</span></span>
+                      <input @keydown.enter.prevent="addEditTag" @keydown.,.prevent="addEditTag" v-model="editTagInput" placeholder="Ny tagg…" style="font-size:14px">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
             <div class="edit-actions">
               <button class="btn btn-primary btn-sm" @click="saveEdit('shared')">Spara</button>
               <button class="btn btn-outline btn-sm" @click="cancelEdit">Avbryt</button>
@@ -972,7 +1027,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     </div>
 
     <div class="search-bar" v-if="!simpleMode">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"><i class="fa-solid fa-magnifying-glass ic-fa"></i><span class="ic-em">🔍</span></span>
       <input v-model="searchQuery" placeholder="Sök utgifter…">
     </div>
 
@@ -985,11 +1040,11 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
         <option value="category">Kategori</option>
         <option value="name">Namn (A-Ö)</option>
       </select>
-      <button class="reorder-btn" :class="{active:reorderMode}" @click="reorderMode=!reorderMode" title="Flytta utgifter">↕️</button>
+      <button class="reorder-btn" :class="{active:reorderMode}" @click="reorderMode=!reorderMode" title="Flytta utgifter"><i class="fa-solid fa-arrows-up-down ic-fa"></i><span class="ic-em">↕️</span></button>
     </div>
 
     <div class="recurring-banner" v-if="!simpleMode && pendingRecurring('personal',personalTab).length>0">
-      <h3>📦 Återkommande utgifter</h3>
+      <h3><i class="fa-solid fa-box ic-fa"></i><span class="ic-em">📦</span> Återkommande utgifter</h3>
       <div class="recurring-item" v-for="t in pendingRecurring('personal',personalTab)" :key="t.id">
         <div class="ri-info">
           <div v-if="editingTemplateId!==t.id">
@@ -1002,7 +1057,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
           </div>
         </div>
         <div class="ri-actions">
-          <button v-if="editingTemplateId!==t.id" class="btn btn-sm btn-outline" @click="startEditTemplate(t)">✏️</button>
+          <button v-if="editingTemplateId!==t.id" class="btn btn-sm btn-outline" @click="startEditTemplate(t)"><i class="fa-solid fa-pen ic-fa"></i><span class="ic-em">✏️</span></button>
           <button class="btn btn-sm btn-primary" @click="addFromTemplate(t,'personal')">Lägg till</button>
           <button class="btn btn-sm btn-danger" @click="skipTemplate(t.id)">Hoppa</button>
         </div>
@@ -1025,23 +1080,25 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
                 <div class="expense-amount">{{ fmt(exp.amount) }}</div>
               </div>
               <div class="expense-meta">
-                <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
-                <span class="tag" :class="{recurring:exp.recurring}" v-if="!simpleMode">{{ exp.recurring?'Återkommande':'Engång' }}</span>
-                <span class="expense-date" v-if="exp.date">📅 {{ exp.date }}</span>
+                <span class="cat-pill" :style="catStyle(exp.category)"><i class="ic-fa" :class="catIcon(exp.category)"></i><span class="ic-em">{{ catEmoji(exp.category) }}</span> {{ catLabel(exp.category) }}</span>
+                <span class="expense-date" v-if="exp.date"><i class="fa-solid fa-calendar ic-fa"></i><span class="ic-em">📅</span> {{ exp.date }}</span>
               </div>
-              <div class="expense-meta" v-if="!simpleMode && exp.tags&&exp.tags.length>0" style="margin-top:4px">
-                <span class="tag-pill" v-for="tg in exp.tags" :key="tg">🏷️ {{ tg }}</span>
+              <div class="expense-meta-secondary" v-if="!simpleMode && exp.recurring">
+                <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
+              </div>
+              <div class="expense-meta-secondary" v-if="!simpleMode && exp.tags&&exp.tags.length>0">
+                <span class="tag-pill" v-for="tg in exp.tags" :key="tg"><i class="fa-solid fa-tag ic-fa"></i><span class="ic-em">🏷️</span> {{ tg }}</span>
               </div>
               <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
               <div class="added-by" v-if="!simpleMode && exp.addedBy">Tillagd av {{ exp.addedBy }}</div>
             </div>
             <div class="reorder-btns" v-if="!simpleMode && reorderMode">
-              <button @click="moveExpense('personal',exp.id,-1)" :disabled="idx===0">▲</button>
-              <button @click="moveExpense('personal',exp.id,1)" :disabled="idx===sortedPersonal.length-1">▼</button>
+              <button @click="moveExpense('personal',exp.id,-1)" :disabled="idx===0"><i class="fa-solid fa-chevron-up ic-fa"></i><span class="ic-em">▲</span></button>
+              <button @click="moveExpense('personal',exp.id,1)" :disabled="idx===sortedPersonal.length-1"><i class="fa-solid fa-chevron-down ic-fa"></i><span class="ic-em">▼</span></button>
             </div>
           </div>
           <button class="comment-toggle" v-if="!simpleMode" @click.stop="toggleComments(exp.id)">
-            💬 {{ (exp.comments||[]).length }} kommentarer
+            <i class="fa-solid fa-comments ic-fa"></i><span class="ic-em">💬</span> {{ (exp.comments||[]).length }} kommentarer
           </button>
           <div class="comment-section" v-if="openComments===exp.id">
             <div class="comment-item" v-for="c in (exp.comments||[])" :key="c.id">
@@ -1060,21 +1117,55 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
         </template>
         <template v-else>
           <div class="edit-form">
-            <input v-model="editName" placeholder="Namn">
-            <input v-model="editAmount" placeholder="Belopp" @input="onAmountInput">
-            <div class="calc-preview" v-if="calcPreview">= {{ fmt(calcPreview) }}</div>
-            <input type="date" v-model="editDate">
-            <select v-model="editCategory">
-              <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
-            </select>
-            <input v-model="editNote" placeholder="Anteckning (valfritt)">
-            <div>
-              <label style="font-size:12px;color:var(--text2)">Taggar (tryck Enter)</label>
-              <div class="tag-input-wrapper" @click="$event.target.querySelector&&$event.target.querySelector('input')?.focus()">
-                <span class="tag-pill" v-for="(tg,ti) in editTags" :key="ti">{{ tg }} <span class="tag-rm" @click="editTags.splice(ti,1)">✕</span></span>
-                <input @keydown.enter.prevent="addEditTag" @keydown.,.prevent="addEditTag" v-model="editTagInput" placeholder="Ny tagg…" style="font-size:14px">
-              </div>
+            <!-- Core fields always visible -->
+            <div class="edit-fields">
+              <input v-model="editName" placeholder="Namn">
+              <input v-model="editAmount" placeholder="Belopp" @input="onAmountInput">
+              <div class="calc-preview" v-if="calcPreview">= {{ fmt(calcPreview) }}</div>
+              <template v-if="!simpleMode">
+                <div class="edit-row">
+                  <input type="date" v-model="editDate" style="flex:1">
+                  <select v-model="editCategory" style="flex:1">
+                    <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.label }}</option>
+                  </select>
+                </div>
+              </template>
+              <template v-else>
+                <select v-model="editCategory">
+                  <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.label }}</option>
+                </select>
+              </template>
             </div>
+
+            <!-- Simple mode: progressive disclosure -->
+            <template v-if="simpleMode">
+              <button class="edit-more-btn" @click="editShowMore=!editShowMore" type="button">
+                <i class="fa-solid" :class="editShowMore?'fa-chevron-up':'fa-chevron-down'" style="font-size:11px"></i>
+                {{ editShowMore ? 'Dölj detaljer' : 'Fler detaljer' }}
+              </button>
+              <div class="edit-fields" v-if="editShowMore">
+                <input type="date" v-model="editDate">
+                <input v-model="editNote" placeholder="Anteckning (valfritt)">
+              </div>
+            </template>
+
+            <!-- Advanced mode: tags/note section -->
+            <template v-if="!simpleMode">
+              <div class="edit-section">
+                <div class="edit-section-title">Övrigt</div>
+                <div class="edit-fields">
+                  <input v-model="editNote" placeholder="Anteckning (valfritt)">
+                  <div>
+                    <label style="font-size:12px;color:var(--text2)">Taggar (tryck Enter)</label>
+                    <div class="tag-input-wrapper" @click="$event.target.querySelector&&$event.target.querySelector('input')?.focus()">
+                      <span class="tag-pill" v-for="(tg,ti) in editTags" :key="ti">{{ tg }} <span class="tag-rm" @click="editTags.splice(ti,1)">✕</span></span>
+                      <input @keydown.enter.prevent="addEditTag" @keydown.,.prevent="addEditTag" v-model="editTagInput" placeholder="Ny tagg…" style="font-size:14px">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
             <div class="edit-actions">
               <button class="btn btn-primary btn-sm" @click="saveEdit('personal')">Spara</button>
               <button class="btn btn-outline btn-sm" @click="cancelEdit">Avbryt</button>
@@ -1104,12 +1195,12 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     </div>
 
     <!-- Monthly Report button -->
-    <button class="btn btn-outline btn-block btn-sm" @click="showReport=!showReport" style="margin-bottom:12px">📸 {{ showReport?'Dölj':'Visa' }} månadsrapport</button>
+    <button class="btn btn-outline btn-block btn-sm" @click="showReport=!showReport" style="margin-bottom:12px"><i class="fa-solid fa-camera ic-fa"></i><span class="ic-em">📸</span> {{ showReport?'Dölj':'Visa' }} månadsrapport</button>
 
     <!-- Monthly Report Card -->
     <div class="report-card" v-if="showReport">
       <div class="report-header">
-        <h3>💰 Utgifter</h3>
+        <h3><i class="fa-solid fa-coins ic-fa"></i><span class="ic-em">💰</span> Utgifter</h3>
         <div class="report-sub">{{ formatMonthLabel(currentMonth) }}</div>
       </div>
       <div class="report-row"><span>Gemensamma utgifter</span><span style="font-weight:600">{{ fmt(totalShared) }}</span></div>
@@ -1117,10 +1208,10 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       <div class="report-row"><span>{{ data.persons.b.name }}s del</span><span>{{ fmt(settlement.bShare) }}</span></div>
       <div class="report-row"><span>{{ data.persons.a.name }} personligt</span><span>{{ fmt(personalTotal('a')) }}</span></div>
       <div class="report-row"><span>{{ data.persons.b.name }} personligt</span><span>{{ fmt(personalTotal('b')) }}</span></div>
-      <div class="report-row" v-for="cb in catBreakdown.slice(0,5)" :key="cb.id"><span>{{ cb.emoji }} {{ cb.label }}</span><span>{{ fmt(cb.val) }} ({{ cb.pct }}%)</span></div>
+      <div class="report-row" v-for="cb in catBreakdown.slice(0,5)" :key="cb.id"><span><i class="ic-fa" :class="cb.icon"></i><span class="ic-em">{{ cb.emoji }}</span> {{ cb.label }}</span><span>{{ fmt(cb.val) }} ({{ cb.pct }}%)</span></div>
       <div class="report-total">
         <template v-if="settlement.remaining>0">{{ data.persons.b.name }} → {{ data.persons.a.name }}: {{ fmt(settlement.remaining) }}</template>
-        <template v-else>✓ Ni ligger jämnt</template>
+        <template v-else><i class="fa-solid fa-check ic-fa"></i><span class="ic-em">✅</span> Ni ligger jämnt</template>
       </div>
     </div>
 
@@ -1148,7 +1239,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <div class="stat-card">
-        <h3>📊 Månadsöversikt (senaste 6 mån)</h3>
+        <h3><i class="fa-solid fa-chart-line ic-fa"></i><span class="ic-em">📈</span> Månadsöversikt (senaste 6 mån)</h3>
         <div class="bar-chart">
           <div class="bar-row" v-for="m in trendData" :key="m.month">
             <div class="bar-label">{{ m.label }}</div>
@@ -1162,10 +1253,10 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
       <!-- Budget vs Actual -->
       <div class="stat-card" v-if="budgetItems.length>0">
-        <h3>📊 Budget vs Faktiskt</h3>
+        <h3><i class="fa-solid fa-chart-bar ic-fa"></i><span class="ic-em">📊</span> Budget vs Faktiskt</h3>
         <div class="budget-item" v-for="bi in budgetItems" :key="bi.id">
           <div class="budget-info">
-            <span class="b-cat">{{ bi.emoji }} {{ bi.label }}</span>
+            <span class="b-cat"><i class="ic-fa" :class="bi.icon"></i><span class="ic-em">{{ bi.emoji }}</span> {{ bi.label }}</span>
             <span class="b-val" :style="{color:bi.pct>100?'var(--danger)':bi.pct>80?'var(--warn)':'var(--accent)'}">{{ fmt(bi.spent) }} / {{ fmt(bi.limit) }}</span>
           </div>
           <div class="budget-bar">
@@ -1175,7 +1266,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <div class="stat-card">
-        <h3>🥧 Kategorier denna månad</h3>
+        <h3><i class="fa-solid fa-chart-pie ic-fa"></i><span class="ic-em">🥧</span> Kategorier denna månad</h3>
         <div v-if="catBreakdown.length>0">
           <div class="donut" :style="{background:conicGradient}">
             <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
@@ -1186,7 +1277,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
           <div class="cat-legend">
             <div class="cat-legend-item" v-for="c in catBreakdown" :key="c.id">
               <div class="dot" :style="{background:c.color}"></div>
-              {{ c.emoji }} {{ c.pct }}%
+              <i class="ic-fa" :class="c.icon"></i><span class="ic-em">{{ c.emoji }}</span> {{ c.pct }}%
               <span v-if="getCatTrendInfo(c.id, c.val)" class="trend-arrow" :class="getCatTrendInfo(c.id, c.val).dir">
                 {{ getCatTrendInfo(c.id, c.val).dir==='up'?'↑':getCatTrendInfo(c.id, c.val).dir==='down'?'↓':'→' }}{{ getCatTrendInfo(c.id, c.val).pct }}%
               </span>
@@ -1197,13 +1288,13 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <div class="stat-card">
-        <h3>👥 Jämförelse denna månad</h3>
+        <h3><i class="fa-solid fa-people-group ic-fa"></i><span class="ic-em">👥</span> Jämförelse denna månad</h3>
         <div class="compare-bars">
           <div class="compare-bar">
             <div class="avatar-wrapper" @click="triggerAvatarUpload('a')">
               <div class="avatar-circle">
                 <img v-if="avatars.a" :src="avatars.a" alt="">
-                <span v-else class="avatar-placeholder">📷</span>
+                <span v-else class="avatar-placeholder"><i class="fa-solid fa-camera ic-fa"></i><span class="ic-em">📷</span></span>
               </div>
             </div>
             <div class="cb-val">{{ fmt(settlement.aShare + personalTotal('a')) }}</div>
@@ -1216,7 +1307,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
             <div class="avatar-wrapper" @click="triggerAvatarUpload('b')">
               <div class="avatar-circle">
                 <img v-if="avatars.b" :src="avatars.b" alt="">
-                <span v-else class="avatar-placeholder">📷</span>
+                <span v-else class="avatar-placeholder"><i class="fa-solid fa-camera ic-fa"></i><span class="ic-em">📷</span></span>
               </div>
             </div>
             <div class="cb-val">{{ fmt(settlement.bShare + personalTotal('b')) }}</div>
@@ -1230,7 +1321,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <div class="stat-card">
-        <h3>🔄 Återkommande vs engång</h3>
+        <h3><i class="fa-solid fa-arrows-rotate ic-fa"></i><span class="ic-em">🔄</span> Återkommande vs engång</h3>
         <div v-if="recurringVsOnce.total>0">
           <div class="donut" :style="{background:'conic-gradient(var(--accent) 0% '+recurringVsOnce.recurPct+'%, var(--bg3) '+recurringVsOnce.recurPct+'% 100%)'}">
             <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
@@ -1246,7 +1337,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <div class="stat-card">
-        <h3>🏆 Största utgifter denna månad</h3>
+        <h3><i class="fa-solid fa-trophy ic-fa"></i><span class="ic-em">🏆</span> Största utgifter denna månad</h3>
         <div class="top-list" v-if="topExpenses.length>0">
           <div class="top-item" v-for="(exp,i) in topExpenses" :key="exp.id">
             <span class="top-rank">{{ i+1 }}.</span>
@@ -1258,7 +1349,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <div class="stat-card" v-if="allPayments.length>0">
-        <h3>💳 Betalningshistorik</h3>
+        <h3><i class="fa-solid fa-credit-card ic-fa"></i><span class="ic-em">💳</span> Betalningshistorik</h3>
         <div class="payment-list">
           <div class="payment-item" v-for="py in allPayments" :key="py.id">
             <div class="pi-info">
@@ -1285,7 +1376,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <div class="stat-card">
-        <h3>📅 Månadsöversikt {{ currentYear }}</h3>
+        <h3><i class="fa-solid fa-calendar ic-fa"></i><span class="ic-em">📅</span> Månadsöversikt {{ currentYear }}</h3>
         <div class="year-grid">
           <div class="year-cell" v-for="ym in yearMonths" :key="ym.key">
             <div class="yc-month">{{ ym.label }}</div>
@@ -1295,7 +1386,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <div class="stat-card">
-        <h3>📊 Trend {{ currentYear }}</h3>
+        <h3><i class="fa-solid fa-chart-line ic-fa"></i><span class="ic-em">📈</span> Trend {{ currentYear }}</h3>
         <div class="bar-chart">
           <div class="bar-row" v-for="ym in yearMonths.filter(m=>m.total>0)" :key="ym.key">
             <div class="bar-label">{{ ym.label }}</div>
@@ -1308,7 +1399,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <div class="stat-card">
-        <h3>🥧 Kategorier {{ currentYear }}</h3>
+        <h3><i class="fa-solid fa-chart-pie ic-fa"></i><span class="ic-em">🥧</span> Kategorier {{ currentYear }}</h3>
         <div v-if="yearlyCatBreakdown.length>0">
           <div class="donut" :style="{background:yearlyConicGradient}">
             <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
@@ -1319,7 +1410,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
           <div class="cat-legend">
             <div class="cat-legend-item" v-for="c in yearlyCatBreakdown" :key="c.id">
               <div class="dot" :style="{background:c.color}"></div>
-              {{ c.emoji }} {{ fmt(c.val) }} ({{ c.pct }}%)
+              <i class="ic-fa" :class="c.icon"></i><span class="ic-em">{{ c.emoji }}</span> {{ fmt(c.val) }} ({{ c.pct }}%)
             </div>
           </div>
         </div>
@@ -1328,19 +1419,20 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     </template>
   </div>
 
-  <!-- ============ SHARE ============ -->
+  <!-- ============ MORE ============ -->
   <div class="view" :class="viewTransition" v-if="appLoaded && view==='share'" :key="'share-'+currentMonth">
-    <!-- Last synced indicator -->
-    <div class="sync-badge" :class="{stale:syncStale}" v-if="!simpleMode && syncAgo">
-      <span class="sync-dot"></span>
-      Senast synkad: {{ syncAgo }}
-    </div>
 
+    <!-- Sharing -->
     <div class="card">
-      <div class="card-title">Dela data</div>
-      <button class="btn btn-primary btn-block" @click="shareLink" style="margin-bottom:8px">📤 Dela länk</button>
-      <button class="btn btn-outline btn-block" @click="copyData" style="margin-bottom:8px">📋 Kopiera data</button>
-      <button class="btn btn-outline btn-block" @click="generateQR">📱 Visa QR-kod</button>
+      <div class="card-title"><i class="fa-solid fa-share-from-square ic-fa"></i><span class="ic-em">📤</span> Dela data</div>
+      <!-- Last synced indicator -->
+      <div class="sync-badge" :class="{stale:syncStale}" v-if="!simpleMode && syncAgo" style="margin-bottom:8px">
+        <span class="sync-dot"></span>
+        Senast synkad: {{ syncAgo }}
+      </div>
+      <button class="btn btn-primary btn-block" @click="shareLink" style="margin-bottom:8px"><i class="fa-solid fa-share ic-fa"></i><span class="ic-em">📤</span> Dela länk</button>
+      <button class="btn btn-outline btn-block" @click="copyData" style="margin-bottom:8px"><i class="fa-solid fa-copy ic-fa"></i><span class="ic-em">📋</span> Kopiera data</button>
+      <button class="btn btn-outline btn-block" @click="generateQR"><i class="fa-solid fa-qrcode ic-fa"></i><span class="ic-em">📱</span> Visa QR-kod</button>
     </div>
 
     <!-- QR Code -->
@@ -1353,8 +1445,8 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     <template v-if="!simpleMode">
     <div class="card">
       <div class="collapsible-header" @click="importOpen=!importOpen">
-        <h3 style="font-size:14px;font-weight:600">📥 Importera data</h3>
-        <span class="arrow" :class="{open:importOpen}">▼</span>
+        <h3 style="font-size:14px;font-weight:600"><i class="fa-solid fa-inbox ic-fa"></i><span class="ic-em">📥</span> Importera data</h3>
+        <span class="arrow" :class="{open:importOpen}"><i class="fa-solid fa-chevron-down ic-fa"></i><span class="ic-em">▼</span></span>
       </div>
       <div v-if="importOpen">
         <textarea v-model="importText" placeholder="Klistra in komprimerad data eller URL här…" style="margin-bottom:8px"></textarea>
@@ -1364,18 +1456,18 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
     <div class="card">
       <div class="card-title">Exportera</div>
-      <button class="btn btn-outline btn-block" @click="exportJSON">📄 Exportera JSON</button>
+      <button class="btn btn-outline btn-block" @click="exportJSON"><i class="fa-solid fa-file-export ic-fa"></i><span class="ic-em">📄</span> Exportera JSON</button>
     </div>
 
     <div class="card">
       <div class="card-title">Verktyg</div>
-      <button class="btn btn-outline btn-block" @click="copyPreviousMonth" style="margin-bottom:8px">📋 Kopiera föregående månad</button>
-      <button class="btn btn-danger btn-block" @click="clearMonth">🗑️ Rensa denna månad</button>
+      <button class="btn btn-outline btn-block" @click="copyPreviousMonth" style="margin-bottom:8px"><i class="fa-solid fa-copy ic-fa"></i><span class="ic-em">📋</span> Kopiera föregående månad</button>
+      <button class="btn btn-danger btn-block" @click="clearMonth"><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span> Rensa denna månad</button>
     </div>
 
     <!-- Split History -->
     <div class="card" v-if="splitHistory.length>1">
-      <div class="card-title">📊 Uppdelningshistorik</div>
+      <div class="card-title"><i class="fa-solid fa-chart-bar ic-fa"></i><span class="ic-em">📊</span> Uppdelningshistorik</div>
       <div class="split-history">
         <div class="sh-row" v-for="sh in splitHistory" :key="sh.month">
           <span class="sh-month">{{ sh.label }}</span>
@@ -1391,17 +1483,17 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
     <!-- Settings -->
     <div class="card settings-card">
-      <div class="card-title">⚙️ Inställningar</div>
+      <div class="card-title"><i class="fa-solid fa-gear ic-fa"></i><span class="ic-em">⚙️</span> Inställningar</div>
 
       <!-- Simple mode toggle -->
       <div class="settings-section">
-        <div class="settings-section-title">✨ Läge</div>
+        <div class="settings-section-title"><i class="fa-solid fa-wand-magic-sparkles ic-fa"></i><span class="ic-em">✨</span> Läge</div>
         <div class="theme-picker">
           <button class="theme-option" :class="{active:simpleMode}" @click="toggleSimpleMode(true)">
-            <span class="theme-icon">🟢</span><span>Enkel</span>
+            <span class="theme-icon"><i class="fa-solid fa-circle ic-fa" style="color:#22c55e"></i><span class="ic-em">🟢</span></span><span>Enkel</span>
           </button>
           <button class="theme-option" :class="{active:!simpleMode}" @click="toggleSimpleMode(false)">
-            <span class="theme-icon">⚡</span><span>Avancerat</span>
+            <span class="theme-icon"><i class="fa-solid fa-bolt ic-fa"></i><span class="ic-em">⚡</span></span><span>Avancerat</span>
           </button>
         </div>
         <div style="font-size:12px;color:var(--text3);margin-top:6px">
@@ -1411,33 +1503,46 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
       <!-- Theme toggle -->
       <div class="settings-section">
-        <div class="settings-section-title">🌙 Tema</div>
+        <div class="settings-section-title"><i class="fa-solid fa-moon ic-fa"></i><span class="ic-em">🌙</span> Tema</div>
         <div class="theme-picker">
           <button class="theme-option" :class="{active:darkModePref==='auto'}" @click="applyDarkMode('auto')">
-            <span class="theme-icon">🔄</span><span>Auto</span>
+            <span class="theme-icon"><i class="fa-solid fa-arrows-rotate ic-fa"></i><span class="ic-em">🔄</span></span><span>Auto</span>
           </button>
           <button class="theme-option" :class="{active:darkModePref==='light'}" @click="applyDarkMode('light')">
-            <span class="theme-icon">☀️</span><span>Ljust</span>
+            <span class="theme-icon"><i class="fa-solid fa-sun ic-fa"></i><span class="ic-em">☀️</span></span><span>Ljust</span>
           </button>
           <button class="theme-option" :class="{active:darkModePref==='dark'}" @click="applyDarkMode('dark')">
-            <span class="theme-icon">🌙</span><span>Mörkt</span>
+            <span class="theme-icon"><i class="fa-solid fa-moon ic-fa"></i><span class="ic-em">🌙</span></span><span>Mörkt</span>
           </button>
         </div>
       </div>
 
       <!-- Accent color -->
       <div class="settings-section">
-        <div class="settings-section-title">🎨 Accentfärg</div>
+        <div class="settings-section-title"><i class="fa-solid fa-palette ic-fa"></i><span class="ic-em">🎨</span> Accentfärg</div>
         <div class="accent-colors">
           <div v-for="c in accentColors" :key="c.id" class="accent-swatch" :class="{active:activeAccent===c.id}" :style="{'--swatch-color':c.color}" @click="applyAccent(c.id)">
-            <span class="accent-check" v-if="activeAccent===c.id">✓</span>
+            <span class="accent-check" v-if="activeAccent===c.id"><i class="fa-solid fa-check"></i></span>
           </div>
+        </div>
+      </div>
+
+      <!-- Icon style -->
+      <div class="settings-section">
+        <div class="settings-section-title"><i class="fa-solid fa-icons ic-fa"></i><span class="ic-em">🔣</span> Ikonstil</div>
+        <div class="theme-picker">
+          <button class="theme-option" :class="{active:!useEmojis}" @click="applyIconStyle(false)">
+            <span class="theme-icon"><i class="fa-solid fa-font-awesome"></i></span><span>Ikoner</span>
+          </button>
+          <button class="theme-option" :class="{active:useEmojis}" @click="applyIconStyle(true)">
+            <span class="theme-icon">😊</span><span>Emojis</span>
+          </button>
         </div>
       </div>
 
       <!-- Density -->
       <div class="settings-section" v-if="!simpleMode">
-        <div class="settings-section-title">📐 Layouttäthet</div>
+        <div class="settings-section-title"><i class="fa-solid fa-ruler-combined ic-fa"></i><span class="ic-em">📐</span> Layouttäthet</div>
         <div class="density-picker">
           <button class="density-option" :class="{active:densityMode==='comfortable'}" @click="applyDensity('comfortable')">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="4" rx="1" fill="currentColor" opacity=".5"/><rect x="2" y="9" width="16" height="4" rx="1" fill="currentColor" opacity=".5"/><rect x="2" y="15" width="16" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
@@ -1452,19 +1557,20 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
       <!-- Data -->
       <div class="settings-section" v-if="!simpleMode">
-        <div class="settings-section-title">💾 Lagring</div>
+        <div class="settings-section-title"><i class="fa-solid fa-floppy-disk ic-fa"></i><span class="ic-em">💾</span> Lagring</div>
         <div class="data-size">
           <span>{{ dataSize.label }}</span>
           <div class="ds-bar"><div class="ds-fill" :style="{width:dataSize.pct+'%'}"></div></div>
         </div>
       </div>
     </div>
+
   </div>
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
     <button v-for="tab in tabs" :key="tab.id" v-show="!simpleMode || tab.id!=='stats'" :class="{active:view===tab.id}" @click="switchView(tab.id)">
-      <span class="icon">{{ tab.icon }}</span>
+      <i :class="[tab.icon, 'icon', 'ic-fa']"></i><span class="icon ic-em">{{ tab.emoji }}</span>
       {{ tab.label }}
     </button>
   </nav>
@@ -1482,7 +1588,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       <input type="date" v-model="dialogDate">
       <label>Kategori</label>
       <select v-model="dialogCategory">
-        <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
+        <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.label }}</option>
       </select>
       <label v-if="!simpleMode">Anteckning (valfritt)</label>
       <input v-if="!simpleMode" v-model="dialogNote" placeholder="">
@@ -1555,11 +1661,11 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   <!-- Budget Dialog -->
   <dialog ref="budgetDialog">
     <div class="dialog-content">
-      <h2>📊 Budgetmål per kategori</h2>
+      <h2><i class="fa-solid fa-chart-bar ic-fa"></i><span class="ic-em">📊</span> Budgetmål per kategori</h2>
       <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Ange max-belopp per månad. Lämna tomt för ingen gräns.</p>
       <div class="budget-edit-list">
         <div class="budget-edit-item" v-for="c in categories" :key="c.id">
-          <span class="be-cat">{{ c.emoji }} {{ c.label }}</span>
+          <span class="be-cat"><i class="ic-fa" :class="c.icon"></i><span class="ic-em">{{ c.emoji }}</span> {{ c.label }}</span>
           <input type="text" inputmode="numeric" :value="budgetEditValues[c.id]||''" @input="budgetEditValues[c.id]=parseAmountSimple($event.target.value)" placeholder="0 kr">
         </div>
       </div>
@@ -1573,7 +1679,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   <!-- Savings Goal Dialog -->
   <dialog ref="goalDialog">
     <div class="dialog-content">
-      <h2>🎯 Nytt sparmål</h2>
+      <h2><i class="fa-solid fa-bullseye ic-fa"></i><span class="ic-em">🎯</span> Nytt sparmål</h2>
       <label>Namn</label>
       <input v-model="goalName" placeholder="T.ex. Semester">
       <label>Emoji</label>
@@ -1590,7 +1696,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   <!-- Add to Goal Dialog -->
   <dialog ref="addGoalDialog">
     <div class="dialog-content">
-      <h2>💰 Lägg till sparande</h2>
+      <h2><i class="fa-solid fa-coins ic-fa"></i><span class="ic-em">💰</span> Lägg till sparande</h2>
       <label>Belopp (kr)</label>
       <input v-model="addGoalAmount" placeholder="0" inputmode="numeric" ref="addGoalInput">
       <div class="dialog-actions">
@@ -1603,7 +1709,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   <!-- Wishlist Dialog -->
   <dialog ref="wishDialog">
     <div class="dialog-content">
-      <h2>🎁 Ny önskning</h2>
+      <h2><i class="fa-solid fa-gift ic-fa"></i><span class="ic-em">🎁</span> Ny önskning</h2>
       <label>Namn</label>
       <input v-model="wishName" placeholder="T.ex. Ny soffa">
       <label>Belopp (valfritt)</label>
@@ -1632,19 +1738,20 @@ createApp({
   setup() {
     // ========== CATEGORIES ==========
     const categories = [
-      { id:'hyra', emoji:'🏠', label:'Hyra', color:'var(--cat-hyra)' },
-      { id:'el', emoji:'🔌', label:'El & Vatten', color:'var(--cat-el)' },
-      { id:'telefon', emoji:'📱', label:'Telefon & Internet', color:'var(--cat-telefon)' },
-      { id:'mat', emoji:'🛒', label:'Mat & Hushåll', color:'var(--cat-mat)' },
-      { id:'transport', emoji:'🚗', label:'Transport', color:'var(--cat-transport)' },
-      { id:'noje', emoji:'🎬', label:'Nöje', color:'var(--cat-noje)' },
-      { id:'klader', emoji:'👕', label:'Kläder', color:'var(--cat-klader)' },
-      { id:'halsa', emoji:'🏥', label:'Hälsa', color:'var(--cat-halsa)' },
-      { id:'pren', emoji:'📦', label:'Prenumerationer', color:'var(--cat-pren)' },
-      { id:'ovrigt', emoji:'💰', label:'Övrigt', color:'var(--cat-ovrigt)' }
+      { id:'hyra', icon:'fa-solid fa-house', emoji:'🏠', label:'Hyra', color:'var(--cat-hyra)' },
+      { id:'el', icon:'fa-solid fa-plug', emoji:'🔌', label:'El & Vatten', color:'var(--cat-el)' },
+      { id:'telefon', icon:'fa-solid fa-mobile-screen', emoji:'📱', label:'Telefon & Internet', color:'var(--cat-telefon)' },
+      { id:'mat', icon:'fa-solid fa-cart-shopping', emoji:'🛒', label:'Mat & Hushåll', color:'var(--cat-mat)' },
+      { id:'transport', icon:'fa-solid fa-car', emoji:'🚗', label:'Transport', color:'var(--cat-transport)' },
+      { id:'noje', icon:'fa-solid fa-film', emoji:'🎬', label:'Nöje', color:'var(--cat-noje)' },
+      { id:'klader', icon:'fa-solid fa-shirt', emoji:'👕', label:'Kläder', color:'var(--cat-klader)' },
+      { id:'halsa', icon:'fa-solid fa-hospital', emoji:'🏥', label:'Hälsa', color:'var(--cat-halsa)' },
+      { id:'pren', icon:'fa-solid fa-box', emoji:'📦', label:'Prenumerationer', color:'var(--cat-pren)' },
+      { id:'ovrigt', icon:'fa-solid fa-coins', emoji:'💰', label:'Övrigt', color:'var(--cat-ovrigt)' }
     ];
     const catMap = {};
     categories.forEach(c => catMap[c.id] = c);
+    const catIcon = id => catMap[id]?.icon || 'fa-solid fa-coins';
     const catEmoji = id => catMap[id]?.emoji || '💰';
     const catLabel = id => catMap[id]?.label || 'Övrigt';
     const catColor = id => catMap[id]?.color || 'var(--cat-ovrigt)';
@@ -1880,11 +1987,11 @@ createApp({
 
     // ========== NAV ==========
     const tabs = [
-      { id:'home', icon:'🏠', label:'Hem' },
-      { id:'shared', icon:'👥', label:'Gemensamt' },
-      { id:'personal', icon:'👤', label:'Personligt' },
-      { id:'stats', icon:'📊', label:'Statistik' },
-      { id:'share', icon:'📤', label:'Dela' }
+      { id:'home', icon:'fa-solid fa-house', emoji:'🏠', label:'Hem' },
+      { id:'shared', icon:'fa-solid fa-people-group', emoji:'👥', label:'Gemensamt' },
+      { id:'personal', icon:'fa-solid fa-user', emoji:'👤', label:'Personligt' },
+      { id:'stats', icon:'fa-solid fa-chart-bar', emoji:'📊', label:'Statistik' },
+      { id:'share', icon:'fa-solid fa-ellipsis', emoji:'⋯', label:'Mer' }
     ];
     const view = ref('home');
     const switchView = v => { view.value = v; editingId.value = null; searchQuery.value = ''; reorderMode.value = false; };
@@ -1968,6 +2075,7 @@ createApp({
     const editCustomSplit = ref(50);
     const editUseCustomSplit = ref(false);
     const editType = ref('shared');
+    const editShowMore = ref(false);
     const calcPreview = ref(null);
 
     const onAmountInput = () => {
@@ -1994,6 +2102,7 @@ createApp({
       editCustomSplit.value = exp.customSplit != null ? exp.customSplit : Math.round(splitRatio.value * 100);
       editUseCustomSplit.value = exp.customSplit != null;
       editType.value = type || 'shared';
+      editShowMore.value = false;
       calcPreview.value = null;
     };
     const cancelEdit = () => { editingId.value = null; calcPreview.value = null; };
@@ -2415,7 +2524,7 @@ createApp({
             shown.add(currentMonth.value);
             try { localStorage.setItem(confettiShownKey, JSON.stringify([...shown])); } catch(e){}
             launchConfetti();
-            showToast('🎉 Allt betalt för denna månad!');
+            showToast('Allt betalt för denna månad!');
           }
         }
       });
@@ -2455,9 +2564,9 @@ createApp({
       const msg = data.persons.b.name + ' ska betala ' + fmt(s.remaining) + ' till ' + data.persons.a.name;
       // Try native notification, fall back to in-app toast
       if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('💰 Utgifter - Påminnelse', { body: msg, tag: 'expense-reminder' });
+        new Notification('Utgifter - Påminnelse', { body: msg, tag: 'expense-reminder' });
       } else {
-        showToast('⏰ ' + msg);
+        showToast(msg);
       }
     };
 
@@ -2491,6 +2600,7 @@ createApp({
         const cat = catMap[catId];
         items.push({
           id: catId,
+          icon: cat?.icon || 'fa-solid fa-coins',
           emoji: cat?.emoji || '💰',
           label: cat?.label || catId,
           limit,
@@ -2545,7 +2655,7 @@ createApp({
       const g = data.savingsGoals.find(g => g.id === activeGoalId.value);
       if (g) {
         g.saved = Math.min(g.target, g.saved + amt);
-        if (g.saved >= g.target) showToast('🎉 Sparmålet uppnått!');
+        if (g.saved >= g.target) showToast('Sparmålet uppnått!');
         else showToast(fmt(amt) + ' tillagt');
       }
       addGoalDialog.value?.close();
@@ -2635,7 +2745,7 @@ createApp({
       });
       const grand = Object.values(totals).reduce((a,b)=>a+b,0) || 1;
       return Object.entries(totals).sort((a,b)=>b[1]-a[1]).map(([id,val]) => ({
-        id, emoji: catEmoji(id), label: catLabel(id), color: catColor(id),
+        id, icon: catIcon(id), emoji: catEmoji(id), label: catLabel(id), color: catColor(id),
         val, pct: Math.round(val/grand*100)
       }));
     });
@@ -2752,7 +2862,7 @@ createApp({
       });
       const grand = Object.values(totals).reduce((a,b)=>a+b,0) || 1;
       return Object.entries(totals).sort((a,b)=>b[1]-a[1]).map(([id,val]) => ({
-        id, emoji: catEmoji(id), label: catLabel(id), color: catColor(id),
+        id, icon: catIcon(id), emoji: catEmoji(id), label: catLabel(id), color: catColor(id),
         val, pct: Math.round(val/grand*100)
       }));
     });
@@ -3341,6 +3451,14 @@ createApp({
       if (val && view.value === 'stats') view.value = 'home';
     };
 
+    // ========== ICON STYLE (emojis vs FA icons) ==========
+    const useEmojis = ref(localStorage.getItem('use-emojis') === 'true');
+    const applyIconStyle = (val) => {
+      useEmojis.value = val;
+      localStorage.setItem('use-emojis', val ? 'true' : 'false');
+      document.body.classList.toggle('use-emojis', val);
+    };
+
     const applyDensity = (mode) => {
       densityMode.value = mode;
       localStorage.setItem('density-mode', mode);
@@ -3379,6 +3497,7 @@ createApp({
       applyAccent(activeAccent.value);
       applyDensity(densityMode.value);
       applyDarkMode(darkModePref.value);
+      applyIconStyle(useEmojis.value);
 
       if (location.hash.startsWith('#data=')) {
         try {
@@ -3408,14 +3527,14 @@ createApp({
 
     return {
       data, currentMonth, monthData, availableMonths, formatMonthLabel, onMonthChange,
-      categories, catEmoji, catLabel, catStyle, fmt,
+      categories, catIcon, catEmoji, catLabel, catStyle, fmt,
       view, tabs, switchView: switchViewAnimated, personalTab, viewTransition,
       settlement, totalShared, splitRatio, personalTotal, setIncome,
       searchQuery, filteredShared, sortedShared, filteredPersonal, sortedPersonal,
       sortMode, reorderMode, moveExpense,
       editingId, editName, editAmount, editCategory, editNote, editPaidBy, editDate,
       editTags, editTagInput, addEditTag, editCustomSplit, editUseCustomSplit, editType,
-      calcPreview, onAmountInput,
+      calcPreview, onAmountInput, editShowMore,
       startEdit, cancelEdit, saveEdit, deleteExpense, togglePaidBy,
       touchStart, touchMove, touchEnd,
       openComments, commentText, commentAuthor, toggleComments, addComment, formatCommentTime,
@@ -3466,6 +3585,7 @@ createApp({
       densityMode, applyDensity,
       darkModePref, applyDarkMode,
       simpleMode, toggleSimpleMode,
+      useEmojis, applyIconStyle,
       dataSize,
     };
   }
