@@ -143,7 +143,7 @@ body{background:var(--bg);color:var(--text);min-height:100%;overflow-x:hidden;
 .fab:active{transform:scale(0.92)}
 .search-bar{position:relative;margin-bottom:12px}
 .search-bar input{width:100%;padding:10px 14px 10px 38px;background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);font-size:14px;color:var(--text);font-family:var(--font)}
+  border-radius:var(--radius-sm);font-size:16px;color:var(--text);font-family:var(--font)}
 .search-bar .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px}
 .expense-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
   padding:14px;margin-bottom:8px;box-shadow:var(--shadow);position:relative;overflow:hidden;
@@ -161,7 +161,7 @@ body{background:var(--bg);color:var(--text);min-height:100%;overflow-x:hidden;
   display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
 .edit-form{display:flex;flex-direction:column;gap:8px}
 .edit-form input,.edit-form select{padding:8px;background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--radius-xs);font-size:14px;color:var(--text);font-family:var(--font)}
+  border-radius:var(--radius-xs);font-size:16px;color:var(--text);font-family:var(--font)}
 .edit-form .edit-actions{display:flex;gap:8px}
 .recurring-banner{background:var(--accent-light);border:1px solid rgba(24,160,88,0.2);
   border-radius:var(--radius);padding:14px;margin-bottom:12px}
@@ -185,7 +185,7 @@ dialog::backdrop{background:rgba(0,0,0,0.4)}
 .dialog-content label:first-of-type{margin-top:0}
 .dialog-content input,.dialog-content select,.dialog-content textarea{width:100%;padding:10px 12px;
   background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);
-  font-size:14px;color:var(--text);font-family:var(--font)}
+  font-size:16px;color:var(--text);font-family:var(--font)}
 .dialog-content textarea{resize:vertical;min-height:80px}
 .dialog-actions{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
 .check-group{display:flex;align-items:center;gap:8px;margin-top:12px}
@@ -1003,6 +1003,7 @@ createApp({
     // ========== SWIPE ==========
     const touchState = {};
     const touchStart = (e, exp) => {
+      if (e.touches.length !== 1) { touchState.id = null; return; }
       const t = e.touches[0];
       touchState.startX = t.clientX;
       touchState.startY = t.clientY;
@@ -1010,6 +1011,7 @@ createApp({
       touchState.swiping = false;
     };
     const touchMove = (e, exp) => {
+      if (e.touches.length !== 1) { touchState.id = null; exp._swipe = 0; return; }
       if (touchState.id !== exp.id) return;
       const t = e.touches[0];
       const dx = t.clientX - touchState.startX;
