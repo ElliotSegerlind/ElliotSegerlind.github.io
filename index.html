@@ -9,52 +9,10 @@
 <title>Utgifter</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%2320b866'/><stop offset='100%25' stop-color='%23109648'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><circle cx='50' cy='44' r='22' fill='none' stroke='white' stroke-width='5' opacity='.9'/><path d='M50 28 v32 M42 40 h16' stroke='white' stroke-width='5' stroke-linecap='round'/><rect x='30' y='66' width='40' height='6' rx='3' fill='white' opacity='.5'/></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%2320b866'/><stop offset='100%25' stop-color='%23109648'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><circle cx='50' cy='44' r='22' fill='none' stroke='white' stroke-width='5' opacity='.9'/><path d='M50 28 v32 M42 40 h16' stroke='white' stroke-width='5' stroke-linecap='round'/><rect x='30' y='66' width='40' height='6' rx='3' fill='white' opacity='.5'/></svg>">
+<link rel="manifest" href="manifest.json">
 <script>
-const manifest = {
-  name: "Utgifter",
-  short_name: "Utgifter",
-  description: "Dela utgifter mellan par",
-  start_url: ".",
-  display: "standalone",
-  background_color: "#f8faf9",
-  theme_color: "#18a058",
-  icons: [{
-    src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%2318a058'/><text x='256' y='350' font-size='260' text-anchor='middle' fill='white'>💰</text></svg>",
-    sizes: "512x512",
-    type: "image/svg+xml",
-    purpose: "any maskable"
-  }]
-};
-const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-const mLink = document.createElement('link');
-mLink.rel = 'manifest';
-mLink.href = URL.createObjectURL(mBlob);
-document.head.appendChild(mLink);
-
-const swCode = `
-const CACHE_NAME = 'utgifter-v3';
-const ASSETS = [self.location.href];
-self.addEventListener('install', e => { self.skipWaiting(); });
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-  )).then(() => self.clients.claim()));
-});
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
-      if(resp.status === 200) {
-        const c = resp.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(e.request, c));
-      }
-      return resp;
-    }).catch(() => new Response('Offline', {status:503})))
-  );
-});
-`;
 if ('serviceWorker' in navigator) {
-  const swBlob = new Blob([swCode], {type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
 </script>
 <style>
@@ -2108,18 +2066,13 @@ createApp({
 
     const toggleNotif = async () => {
       if (!notifEnabled.value) {
-        if ('Notification' in window) {
-          const perm = await Notification.requestPermission();
-          if (perm === 'granted') {
-            notifEnabled.value = true;
-            localStorage.setItem('notif-enabled', 'true');
-            showToast('Påminnelser aktiverade');
-          } else {
-            showToast('Notifikationer blockerade av webbläsaren');
-          }
-        } else {
-          showToast('Notifikationer stöds inte');
+        // Try browser notifications if available, but always enable in-app reminders
+        if ('Notification' in window && Notification.permission !== 'denied') {
+          try { await Notification.requestPermission(); } catch(e) {}
         }
+        notifEnabled.value = true;
+        localStorage.setItem('notif-enabled', 'true');
+        showToast('Påminnelser aktiverade');
       } else {
         notifEnabled.value = false;
         localStorage.setItem('notif-enabled', 'false');
@@ -2128,7 +2081,7 @@ createApp({
     };
 
     const checkNotification = () => {
-      if (!notifEnabled.value || !('Notification' in window) || Notification.permission !== 'granted') return;
+      if (!notifEnabled.value) return;
       const day = now.getDate();
       const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
       if (day < daysInMonth - 4) return;
@@ -2139,10 +2092,13 @@ createApp({
       if (shown.has(currentMonth.value)) return;
       shown.add(currentMonth.value);
       localStorage.setItem(notifKey, JSON.stringify([...shown]));
-      new Notification('💰 Utgifter - Påminnelse', {
-        body: data.persons.b.name + ' ska betala ' + fmt(s.remaining) + ' till ' + data.persons.a.name,
-        tag: 'expense-reminder'
-      });
+      const msg = data.persons.b.name + ' ska betala ' + fmt(s.remaining) + ' till ' + data.persons.a.name;
+      // Try native notification, fall back to in-app toast
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('💰 Utgifter - Påminnelse', { body: msg, tag: 'expense-reminder' });
+      } else {
+        showToast('⏰ ' + msg);
+      }
     };
 
     // ========== BUDGET ==========
@@ -2507,16 +2463,70 @@ createApp({
 
     const generateQR = async () => {
       try {
-        const b64 = await compressData();
+        // Strip avatars for QR to keep payload small
+        const payload = JSON.parse(JSON.stringify(data));
+        const json = JSON.stringify(payload);
+        const blob = new Blob([json]);
+        const cs = new CompressionStream('gzip');
+        const stream = blob.stream().pipeThrough(cs);
+        const compressed = await new Response(stream).arrayBuffer();
+        const bytes = new Uint8Array(compressed);
+        let binary = '';
+        bytes.forEach(b => binary += String.fromCharCode(b));
+        const b64 = btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
         const url = location.origin + location.pathname + '#data=' + b64;
-        if (url.length > 2000) {
+        if (url.length > 4296) {
           showToast('Data för stor för QR-kod (' + url.length + ' tecken). Använd länk istället.');
           return;
         }
-        qrUrl.value = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
+        // Generate QR locally via canvas
+        qrUrl.value = await renderQRCode(url);
       } catch(e) {
-        showToast('Kunde inte skapa QR-kod');
+        showToast('Kunde inte skapa QR-kod: ' + e.message);
       }
+    };
+
+    // Minimal QR code generator using canvas (supports up to ~4296 alphanumeric chars)
+    const renderQRCode = (text) => {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
+        script.onload = () => {
+          try {
+            // Auto-detect minimum QR version needed
+            let qr = null;
+            for (let typeNum = 1; typeNum <= 40; typeNum++) {
+              try {
+                qr = qrcode(typeNum, 'L');
+                qr.addData(text);
+                qr.make();
+                break;
+              } catch(e) { qr = null; }
+            }
+            if (!qr) { reject(new Error('Data too large')); return; }
+            const moduleCount = qr.getModuleCount();
+            const cellSize = Math.max(3, Math.floor(300 / moduleCount));
+            const size = moduleCount * cellSize + cellSize * 2;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+            ctx.fillStyle = '#000000';
+            for (let r = 0; r < moduleCount; r++) {
+              for (let c = 0; c < moduleCount; c++) {
+                if (qr.isDark(r, c)) {
+                  ctx.fillRect(c * cellSize + cellSize, r * cellSize + cellSize, cellSize, cellSize);
+                }
+              }
+            }
+            resolve(canvas.toDataURL('image/png'));
+          } catch(e) { reject(e); }
+        };
+        script.onerror = () => reject(new Error('Kunde inte ladda QR-bibliotek'));
+        document.head.appendChild(script);
+      });
     };
 
     const importFromText = async () => {
