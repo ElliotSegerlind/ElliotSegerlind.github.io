@@ -116,7 +116,7 @@ body{background:var(--bg);color:var(--text);min-height:100%;overflow-x:hidden;
 .tag.recurring{background:var(--accent-light);color:var(--accent)}
 .expense-note{font-size:12px;color:var(--text3);margin-top:6px;line-height:1.4}
 .delete-bg{position:absolute;right:0;top:0;bottom:0;width:80px;background:var(--danger);
-  display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
 .edit-form{display:flex;flex-direction:column;gap:0}
 .edit-form input,.edit-form select{padding:10px 12px;background:var(--bg3);border:1px solid var(--border);
   border-radius:var(--radius-xs);font-size:16px;color:var(--text);font-family:var(--font)}
@@ -505,6 +505,13 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 .data-size{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
 .data-size .ds-bar{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;max-width:120px}
 .data-size .ds-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s}
+.data-size.warning .ds-fill{background:linear-gradient(90deg,#f59e0b,#d97706)}
+.data-size.critical .ds-fill{background:linear-gradient(90deg,#ef4444,#dc2626)}
+.storage-actions{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.storage-actions button{font-size:12px;padding:6px 10px;border-radius:var(--radius-xs);border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer}
+.storage-actions button:active{opacity:.7}
+.storage-warning{font-size:11px;color:#f59e0b;margin-top:4px}
+.storage-critical{font-size:11px;color:#ef4444;margin-top:4px;font-weight:600}
 
 /* Import diff / conflict resolution */
 .import-diff{max-height:400px;overflow-y:auto}
@@ -549,6 +556,25 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 .view-enter-reverse{animation:slideInReverse .25s ease-out}
 @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
 @keyframes slideInReverse{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}
+  .view{animation:none}
+  .view-enter,.view-enter-reverse{animation:none}
+}
+
+/* Budget alert on cat pill */
+.cat-pill .budget-alert{font-size:9px;margin-left:2px}
+.cat-pill .budget-alert.warn{color:var(--warn)}
+.cat-pill .budget-alert.over{color:var(--danger)}
+
+/* Pinned quick-add bar */
+.pinned-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;align-items:center}
+.pinned-chip{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;
+  font-size:12px;font-weight:500;background:var(--accent-light);color:var(--accent);border:1px solid rgba(24,160,88,0.2);
+  cursor:pointer;font-family:var(--font);transition:transform .1s;-webkit-tap-highlight-color:transparent}
+.pinned-chip:active{transform:scale(0.95)}
 </style>
 </head>
 <body>
@@ -584,6 +610,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     <div class="ctx-menu">
       <div class="ctx-item" @click="ctxEdit"><i class="fa-solid fa-pen ic-fa"></i><span class="ic-em">✏️</span> Redigera</div>
       <div class="ctx-item" @click="ctxDuplicate"><i class="fa-solid fa-copy ic-fa"></i><span class="ic-em">📋</span> Duplicera</div>
+      <div class="ctx-item" @click="ctxPin"><i class="fa-solid fa-thumbtack ic-fa"></i><span class="ic-em">📌</span> Fäst som snabbval</div>
       <div class="ctx-item" @click="ctxMove"><i class="fa-solid fa-arrow-right-arrow-left ic-fa"></i><span class="ic-em">↔️</span> Flytta till {{ ctxMenu.type==='shared'?'personligt':'gemensamt' }}</div>
       <div class="ctx-item danger" @click="ctxDelete"><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span> Radera</div>
       <div class="ctx-cancel" @click="ctxMenu.show=false">Avbryt</div>
@@ -730,6 +757,23 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
     </div>
 
+    <!-- Monthly comparison -->
+    <div class="card" v-if="monthComparison && monthComparison.prevTotal>0">
+      <div class="card-title"><i class="fa-solid fa-arrow-trend-up ic-fa"></i><span class="ic-em">📈</span> Jämfört med {{ monthComparison.prevLabel }}</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="flex:1">
+          <div style="font-size:14px;color:var(--text2)">Förra: {{ fmt(monthComparison.prevTotal) }}</div>
+          <div style="font-size:14px;color:var(--text2)">Denna: {{ fmt(monthComparison.currTotal) }}</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:24px;font-weight:800" :style="{color:monthComparison.diff>0?'var(--danger)':'var(--accent)'}">
+            {{ monthComparison.diff>0?'+':'' }}{{ monthComparison.pct }}%
+          </div>
+          <div style="font-size:12px;color:var(--text3)">{{ monthComparison.diff>0?'mer':'mindre' }}</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Payments with delete -->
     <div class="card" v-if="monthData.payments.length>0">
       <div class="card-title">Betalningar denna månad</div>
@@ -788,7 +832,10 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
             <button @click="deleteGoal(g.id)"><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span></button>
           </div>
         </div>
-        <div class="empty-state" v-if="data.savingsGoals.length===0" style="padding:16px"><p>Inga sparmål ännu</p></div>
+        <div class="empty-state" v-if="data.savingsGoals.length===0" style="padding:16px">
+          <svg width="60" height="50" viewBox="0 0 60 50" fill="none" style="margin-bottom:6px"><circle cx="30" cy="22" r="16" fill="var(--bg3)" stroke="var(--border)" stroke-width="1.5"/><path d="M24 22 L28 26 L36 18" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/><rect x="18" y="40" width="24" height="3" rx="1.5" fill="var(--text3)" opacity=".2"/></svg>
+          <p>Inga sparmål ännu</p>
+        </div>
         <button class="btn btn-outline btn-sm btn-block" @click="openGoalDialog" style="margin-top:8px">+ Nytt sparmål</button>
       </div>
     </div>
@@ -810,7 +857,10 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
           <div class="wish-amount" v-if="w.amount">{{ fmt(w.amount) }}</div>
           <button class="wish-delete" @click="deleteWish(w.id)">✕</button>
         </div>
-        <div class="empty-state" v-if="data.wishlist.length===0" style="padding:16px"><p>Önskelistan är tom</p></div>
+        <div class="empty-state" v-if="data.wishlist.length===0" style="padding:16px">
+          <svg width="60" height="50" viewBox="0 0 60 50" fill="none" style="margin-bottom:6px"><rect x="15" y="8" width="30" height="28" rx="4" fill="var(--bg3)" stroke="var(--border)" stroke-width="1.5"/><path d="M22 18 l8 8 8-8" fill="var(--accent)" fill-opacity=".15"/><rect x="24" y="2" width="12" height="10" rx="2" fill="var(--accent)" fill-opacity=".1" stroke="var(--accent)" stroke-width="1" opacity=".5"/><rect x="20" y="42" width="20" height="3" rx="1.5" fill="var(--text3)" opacity=".2"/></svg>
+          <p>Önskelistan är tom</p>
+        </div>
         <button class="btn btn-outline btn-sm btn-block" @click="openWishDialog" style="margin-top:8px">+ Lägg till önskning</button>
       </div>
     </div>
@@ -844,6 +894,14 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       <button class="reorder-btn" :class="{active:reorderMode}" @click="reorderMode=!reorderMode" title="Flytta utgifter"><i class="fa-solid fa-arrows-up-down ic-fa"></i><span class="ic-em">↕️</span></button>
     </div>
 
+    <!-- Pinned quick-add -->
+    <div class="pinned-bar" v-if="data.pinnedExpenses && data.pinnedExpenses.filter(p=>p.type==='shared').length>0">
+      <span style="font-size:11px;color:var(--text3);margin-right:4px"><i class="fa-solid fa-thumbtack ic-fa"></i><span class="ic-em">📌</span></span>
+      <button class="pinned-chip" v-for="pin in data.pinnedExpenses.filter(p=>p.type==='shared')" :key="pin.id" @click="addFromPinned(pin)" @contextmenu.prevent="removePinned(pin.id)">
+        <i class="ic-fa" :class="catIcon(pin.category)"></i><span class="ic-em">{{ catEmoji(pin.category) }}</span> {{ pin.name }}
+      </button>
+    </div>
+
     <!-- Recurring banner -->
     <div class="recurring-banner" v-if="!simpleMode && pendingRecurring('shared').length>0">
       <h3><i class="fa-solid fa-box ic-fa"></i><span class="ic-em">📦</span> Återkommande utgifter</h3>
@@ -871,8 +929,8 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       <div v-for="(exp,idx) in sortedShared" :key="exp.id" class="expense-item"
            @touchstart="touchStart($event,exp);onLongPressStart($event,exp,'shared')" @touchmove="touchMove($event,exp);onLongPressEnd()" @touchend="touchEnd($event,exp);onLongPressEnd()"
            :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
-        <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30">
-          <span>Radera</span>
+        <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30" @click.stop="confirmSwipeDelete(exp)">
+          <span><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span> Radera</span>
         </div>
         <template v-if="editingId!==exp.id">
           <div style="display:flex">
@@ -882,7 +940,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
                 <div class="expense-amount">{{ fmt(exp.amount) }}</div>
               </div>
               <div class="expense-meta">
-                <span class="cat-pill" :style="catStyle(exp.category)"><i class="ic-fa" :class="catIcon(exp.category)"></i><span class="ic-em">{{ catEmoji(exp.category) }}</span> {{ catLabel(exp.category) }}</span>
+                <span class="cat-pill" :style="catStyle(exp.category)"><i class="ic-fa" :class="catIcon(exp.category)"></i><span class="ic-em">{{ catEmoji(exp.category) }}</span> {{ catLabel(exp.category) }}<span v-if="budgetAlert(exp.category)" class="budget-alert" :class="budgetAlert(exp.category)"> <i class="fa-solid fa-triangle-exclamation"></i></span></span>
                 <span class="expense-date" v-if="exp.date"><i class="fa-solid fa-calendar ic-fa"></i><span class="ic-em">📅</span> {{ exp.date }}</span>
               </div>
               <div class="expense-meta-secondary" v-if="!simpleMode && (exp.recurring || exp.paidBy || exp.customSplit!=null)">
@@ -1002,11 +1060,30 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
     </template>
     <div class="empty-state" v-else-if="!searchQuery">
-      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="margin-bottom:8px"><rect x="15" y="10" width="50" height="60" rx="6" fill="var(--bg3)" stroke="var(--border)" stroke-width="2"/><line x1="25" y1="25" x2="55" y2="25" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/><line x1="25" y1="35" x2="50" y2="35" stroke="var(--text3)" stroke-width="2" stroke-linecap="round"/><line x1="25" y1="45" x2="45" y2="45" stroke="var(--text3)" stroke-width="2" stroke-linecap="round"/><circle cx="58" cy="55" r="12" fill="var(--accent)" fill-opacity=".15" stroke="var(--accent)" stroke-width="2"/><line x1="54" y1="55" x2="62" y2="55" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/><line x1="58" y1="51" x2="58" y2="59" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>
-      <p>Inga gemensamma utgifter denna månad.<br>Tryck på + för att lägga till!</p>
+      <svg width="120" height="100" viewBox="0 0 120 100" fill="none" style="margin-bottom:12px">
+        <rect x="25" y="15" width="70" height="55" rx="8" fill="var(--bg3)" stroke="var(--border)" stroke-width="2"/>
+        <rect x="35" y="28" width="30" height="3" rx="1.5" fill="var(--accent)" opacity=".6"/>
+        <rect x="35" y="36" width="45" height="3" rx="1.5" fill="var(--text3)" opacity=".3"/>
+        <rect x="35" y="44" width="38" height="3" rx="1.5" fill="var(--text3)" opacity=".3"/>
+        <rect x="35" y="52" width="25" height="3" rx="1.5" fill="var(--text3)" opacity=".2"/>
+        <circle cx="85" cy="65" r="18" fill="var(--accent)" fill-opacity=".12" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="79" y1="65" x2="91" y2="65" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="85" y1="59" x2="85" y2="71" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="30" cy="75" r="6" fill="var(--accent)" fill-opacity=".08"/>
+        <circle cx="18" cy="60" r="4" fill="var(--warn)" fill-opacity=".1"/>
+        <circle cx="108" cy="30" r="5" fill="var(--accent)" fill-opacity=".1"/>
+      </svg>
+      <p style="font-size:15px;font-weight:500;color:var(--text2);margin-bottom:4px">Inga utgifter ännu</p>
+      <p>Tryck på <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:12px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;vertical-align:middle">+</span> för att lägga till!</p>
     </div>
     <div class="empty-state" v-else>
-      <svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="margin-bottom:8px"><circle cx="26" cy="26" r="16" stroke="var(--text3)" stroke-width="2.5" fill="none"/><line x1="37" y1="37" x2="50" y2="50" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="26" x2="32" y2="26" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" opacity=".5"/></svg>
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="margin-bottom:8px">
+        <circle cx="34" cy="34" r="20" stroke="var(--text3)" stroke-width="2.5" fill="var(--bg3)" fill-opacity=".5"/>
+        <line x1="48" y1="48" x2="64" y2="64" stroke="var(--text3)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="26" y1="34" x2="42" y2="34" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+        <line x1="28" y1="28" x2="40" y2="28" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+        <line x1="28" y1="40" x2="38" y2="40" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+      </svg>
       <p>Inga träffar för "{{ searchQuery }}"</p>
     </div>
 
@@ -1043,6 +1120,14 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       <button class="reorder-btn" :class="{active:reorderMode}" @click="reorderMode=!reorderMode" title="Flytta utgifter"><i class="fa-solid fa-arrows-up-down ic-fa"></i><span class="ic-em">↕️</span></button>
     </div>
 
+    <!-- Pinned quick-add (personal) -->
+    <div class="pinned-bar" v-if="data.pinnedExpenses && data.pinnedExpenses.filter(p=>p.type==='personal').length>0">
+      <span style="font-size:11px;color:var(--text3);margin-right:4px"><i class="fa-solid fa-thumbtack ic-fa"></i><span class="ic-em">📌</span></span>
+      <button class="pinned-chip" v-for="pin in data.pinnedExpenses.filter(p=>p.type==='personal')" :key="pin.id" @click="addFromPinned(pin)" @contextmenu.prevent="removePinned(pin.id)">
+        <i class="ic-fa" :class="catIcon(pin.category)"></i><span class="ic-em">{{ catEmoji(pin.category) }}</span> {{ pin.name }}
+      </button>
+    </div>
+
     <div class="recurring-banner" v-if="!simpleMode && pendingRecurring('personal',personalTab).length>0">
       <h3><i class="fa-solid fa-box ic-fa"></i><span class="ic-em">📦</span> Återkommande utgifter</h3>
       <div class="recurring-item" v-for="t in pendingRecurring('personal',personalTab)" :key="t.id">
@@ -1069,8 +1154,8 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       <div v-for="(exp,idx) in sortedPersonal" :key="exp.id" class="expense-item"
            @touchstart="touchStart($event,exp);onLongPressStart($event,exp,'personal')" @touchmove="touchMove($event,exp);onLongPressEnd()" @touchend="touchEnd($event,exp);onLongPressEnd()"
            :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
-        <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30">
-          <span>Radera</span>
+        <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30" @click.stop="confirmSwipeDelete(exp)">
+          <span><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span> Radera</span>
         </div>
         <template v-if="editingId!==exp.id">
           <div style="display:flex">
@@ -1080,7 +1165,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
                 <div class="expense-amount">{{ fmt(exp.amount) }}</div>
               </div>
               <div class="expense-meta">
-                <span class="cat-pill" :style="catStyle(exp.category)"><i class="ic-fa" :class="catIcon(exp.category)"></i><span class="ic-em">{{ catEmoji(exp.category) }}</span> {{ catLabel(exp.category) }}</span>
+                <span class="cat-pill" :style="catStyle(exp.category)"><i class="ic-fa" :class="catIcon(exp.category)"></i><span class="ic-em">{{ catEmoji(exp.category) }}</span> {{ catLabel(exp.category) }}<span v-if="budgetAlert(exp.category)" class="budget-alert" :class="budgetAlert(exp.category)"> <i class="fa-solid fa-triangle-exclamation"></i></span></span>
                 <span class="expense-date" v-if="exp.date"><i class="fa-solid fa-calendar ic-fa"></i><span class="ic-em">📅</span> {{ exp.date }}</span>
               </div>
               <div class="expense-meta-secondary" v-if="!simpleMode && exp.recurring">
@@ -1176,11 +1261,27 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
     </template>
     <div class="empty-state" v-else-if="!searchQuery">
-      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="margin-bottom:8px"><circle cx="40" cy="30" r="14" fill="var(--bg3)" stroke="var(--border)" stroke-width="2"/><path d="M20 62c0-11 9-20 20-20s20 9 20 20" fill="var(--bg3)" stroke="var(--border)" stroke-width="2"/><circle cx="55" cy="55" r="12" fill="var(--accent)" fill-opacity=".15" stroke="var(--accent)" stroke-width="2"/><line x1="51" y1="55" x2="59" y2="55" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/><line x1="55" y1="51" x2="55" y2="59" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>
-      <p>Inga personliga utgifter för {{ data.persons[personalTab].name }}.<br>Tryck på + för att lägga till!</p>
+      <svg width="120" height="100" viewBox="0 0 120 100" fill="none" style="margin-bottom:12px">
+        <circle cx="60" cy="35" r="18" fill="var(--bg3)" stroke="var(--border)" stroke-width="2"/>
+        <circle cx="54" cy="32" r="2" fill="var(--text3)"/>
+        <circle cx="66" cy="32" r="2" fill="var(--text3)"/>
+        <path d="M55 40 Q60 44 65 40" stroke="var(--text3)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M35 72 Q60 55 85 72" fill="var(--bg3)" stroke="var(--border)" stroke-width="2"/>
+        <circle cx="88" cy="68" r="16" fill="var(--accent)" fill-opacity=".12" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="82" y1="68" x2="94" y2="68" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="88" y1="62" x2="88" y2="74" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="25" cy="55" r="5" fill="var(--accent)" fill-opacity=".08"/>
+        <circle cx="100" cy="25" r="4" fill="var(--warn)" fill-opacity=".1"/>
+      </svg>
+      <p style="font-size:15px;font-weight:500;color:var(--text2);margin-bottom:4px">Inga personliga utgifter</p>
+      <p>{{ data.persons[personalTab].name }} har inga utgifter denna månad.<br>Tryck på <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:12px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;vertical-align:middle">+</span> för att lägga till!</p>
     </div>
     <div class="empty-state" v-else>
-      <svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="margin-bottom:8px"><circle cx="26" cy="26" r="16" stroke="var(--text3)" stroke-width="2.5" fill="none"/><line x1="37" y1="37" x2="50" y2="50" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="margin-bottom:8px">
+        <circle cx="34" cy="34" r="20" stroke="var(--text3)" stroke-width="2.5" fill="var(--bg3)" fill-opacity=".5"/>
+        <line x1="48" y1="48" x2="64" y2="64" stroke="var(--text3)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="26" y1="34" x2="42" y2="34" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+      </svg>
       <p>Inga träffar för "{{ searchQuery }}"</p>
     </div>
 
@@ -1456,7 +1557,8 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
     <div class="card">
       <div class="card-title">Exportera</div>
-      <button class="btn btn-outline btn-block" @click="exportJSON"><i class="fa-solid fa-file-export ic-fa"></i><span class="ic-em">📄</span> Exportera JSON</button>
+      <button class="btn btn-outline btn-block" @click="exportJSON" style="margin-bottom:8px"><i class="fa-solid fa-file-export ic-fa"></i><span class="ic-em">📄</span> Exportera JSON</button>
+      <button class="btn btn-outline btn-block" @click="exportCSV"><i class="fa-solid fa-file-csv ic-fa"></i><span class="ic-em">📊</span> Exportera CSV</button>
     </div>
 
     <div class="card">
@@ -1556,11 +1658,18 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
 
       <!-- Data -->
-      <div class="settings-section" v-if="!simpleMode">
+      <div class="settings-section">
         <div class="settings-section-title"><i class="fa-solid fa-floppy-disk ic-fa"></i><span class="ic-em">💾</span> Lagring</div>
-        <div class="data-size">
+        <div class="data-size" :class="dataSize.status">
           <span>{{ dataSize.label }}</span>
           <div class="ds-bar"><div class="ds-fill" :style="{width:dataSize.pct+'%'}"></div></div>
+        </div>
+        <div class="storage-warning" v-if="dataSize.status==='warning'">Lagringen börjar bli full. Arkivera gamla månader för att frigöra utrymme.</div>
+        <div class="storage-critical" v-if="dataSize.status==='critical'">Lagringen är nästan full! Data kan sluta sparas. Arkivera omedelbart.</div>
+        <div class="storage-actions" v-if="!simpleMode">
+          <button @click="archiveOldMonths" v-if="archivableMonths.length>0"><i class="fa-solid fa-box-archive ic-fa"></i><span class="ic-em">📦</span> Arkivera {{ archivableMonths.length }} gamla månader</button>
+          <button @click="restoreArchive" v-if="hasArchive"><i class="fa-solid fa-box-open ic-fa"></i><span class="ic-em">📂</span> Återställ arkiv</button>
+          <button @click="purgeComments"><i class="fa-solid fa-broom ic-fa"></i><span class="ic-em">🧹</span> Rensa alla kommentarer</button>
         </div>
       </div>
     </div>
@@ -1576,7 +1685,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </nav>
 
   <!-- Add/Edit Expense Dialog -->
-  <dialog ref="expenseDialog" @cancel.prevent="closeExpenseDialog">
+  <dialog ref="expenseDialog" @cancel.prevent="closeExpenseDialog" @click="($event.target===$refs.expenseDialog)&&closeExpenseDialog()">
     <div class="dialog-content">
       <h2>{{ dialogTitle }}</h2>
       <label>Namn</label>
@@ -1630,7 +1739,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </dialog>
 
   <!-- Payment Dialog -->
-  <dialog ref="paymentDialog">
+  <dialog ref="paymentDialog" @click="($event.target===$refs.paymentDialog)&&$refs.paymentDialog.close()">
     <div class="dialog-content">
       <h2>Registrera betalning</h2>
       <label>Belopp (kr)</label>
@@ -1647,7 +1756,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </dialog>
 
   <!-- Large amount confirm dialog -->
-  <dialog ref="largeAmountDialog">
+  <dialog ref="largeAmountDialog" @click="($event.target===$refs.largeAmountDialog)&&($refs.largeAmountDialog.close(),pendingLargeCallback=null)">
     <div class="dialog-content">
       <h2>Bekräfta belopp</h2>
       <p style="color:var(--text2);margin-bottom:16px">Beloppet {{ fmt(pendingLargeAmount) }} verkar ovanligt högt. Vill du fortsätta?</p>
@@ -1659,7 +1768,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </dialog>
 
   <!-- Budget Dialog -->
-  <dialog ref="budgetDialog">
+  <dialog ref="budgetDialog" @click="($event.target===$refs.budgetDialog)&&$refs.budgetDialog.close()">
     <div class="dialog-content">
       <h2><i class="fa-solid fa-chart-bar ic-fa"></i><span class="ic-em">📊</span> Budgetmål per kategori</h2>
       <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Ange max-belopp per månad. Lämna tomt för ingen gräns.</p>
@@ -1677,7 +1786,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </dialog>
 
   <!-- Savings Goal Dialog -->
-  <dialog ref="goalDialog">
+  <dialog ref="goalDialog" @click="($event.target===$refs.goalDialog)&&$refs.goalDialog.close()">
     <div class="dialog-content">
       <h2><i class="fa-solid fa-bullseye ic-fa"></i><span class="ic-em">🎯</span> Nytt sparmål</h2>
       <label>Namn</label>
@@ -1694,7 +1803,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </dialog>
 
   <!-- Add to Goal Dialog -->
-  <dialog ref="addGoalDialog">
+  <dialog ref="addGoalDialog" @click="($event.target===$refs.addGoalDialog)&&$refs.addGoalDialog.close()">
     <div class="dialog-content">
       <h2><i class="fa-solid fa-coins ic-fa"></i><span class="ic-em">💰</span> Lägg till sparande</h2>
       <label>Belopp (kr)</label>
@@ -1707,7 +1816,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </dialog>
 
   <!-- Wishlist Dialog -->
-  <dialog ref="wishDialog">
+  <dialog ref="wishDialog" @click="($event.target===$refs.wishDialog)&&$refs.wishDialog.close()">
     <div class="dialog-content">
       <h2><i class="fa-solid fa-gift ic-fa"></i><span class="ic-em">🎁</span> Ny önskning</h2>
       <label>Namn</label>
@@ -1835,7 +1944,8 @@ createApp({
       recurringTemplates: [],
       budgets: {},
       savingsGoals: [],
-      wishlist: []
+      wishlist: [],
+      pinnedExpenses: []
     });
 
     const ensureMonth = (d, key) => {
@@ -1868,6 +1978,7 @@ createApp({
           if (parsed.budgets && typeof parsed.budgets === 'object') d.budgets = parsed.budgets;
           if (Array.isArray(parsed.savingsGoals)) d.savingsGoals = parsed.savingsGoals;
           if (Array.isArray(parsed.wishlist)) d.wishlist = parsed.wishlist;
+          if (Array.isArray(parsed.pinnedExpenses)) d.pinnedExpenses = parsed.pinnedExpenses;
           Object.keys(d.months).forEach(k => ensureMonth(d, k));
           return d;
         }
@@ -1878,8 +1989,20 @@ createApp({
     const data = reactive(loadData());
     ensureMonth(data, currentMonth.value);
 
+    let saveTimer = null;
     const saveData = () => {
-      try { localStorage.setItem('expense-data', JSON.stringify(data)); } catch(e) { console.warn('Save failed', e); }
+      if (saveTimer) clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        try {
+          localStorage.setItem('expense-data', JSON.stringify(data));
+        } catch(e) {
+          if (e.name === 'QuotaExceededError' || e.code === 22) {
+            showToast('Lagringsutrymmet är fullt! Arkivera gamla månader under Mer > Lagring.');
+          } else {
+            console.warn('Save failed', e);
+          }
+        }
+      }, 400);
     };
 
     watch(() => data, saveData, { deep: true });
@@ -2150,6 +2273,7 @@ createApp({
       if (idx < 0) return;
       const removed = arr.splice(idx, 1)[0];
       editingId.value = null;
+      haptic(15);
       const monthKey = currentMonth.value;
       const tabKey = personalTab.value;
       showToast('Utgift raderad', () => {
@@ -2171,6 +2295,7 @@ createApp({
       const idx = arr.findIndex(p => p.id === id);
       if (idx < 0) return;
       const removed = arr.splice(idx, 1)[0];
+      haptic(15);
       const monthKey = currentMonth.value;
       showToast('Betalning raderad', () => {
         ensureMonth(data, monthKey);
@@ -2203,12 +2328,20 @@ createApp({
     const touchEnd = (e, exp) => {
       if (touchState.id !== exp.id) return;
       if (exp._swipe && exp._swipe < -50) {
-        const type = view.value === 'shared' ? 'shared' : 'personal';
+        // Lock swipe open to show delete button — user must tap delete area
+        exp._swipe = -80;
         haptic(15);
-        deleteExpense(type, exp.id);
+      } else {
+        exp._swipe = 0;
       }
-      exp._swipe = 0;
       touchState.swiping = false;
+    };
+
+    const confirmSwipeDelete = (exp) => {
+      const type = view.value === 'shared' ? 'shared' : 'personal';
+      haptic(15);
+      deleteExpense(type, exp.id);
+      exp._swipe = 0;
     };
 
     // ========== COMMENTS ==========
@@ -2458,6 +2591,7 @@ createApp({
         note: payNote.value.trim()
       });
       paymentDialog.value?.close();
+      haptic();
       showToast('Betalning registrerad');
       checkConfetti();
     };
@@ -2587,6 +2721,7 @@ createApp({
         else delete data.budgets[c.id];
       });
       budgetDialog.value?.close();
+      haptic();
       showToast('Budget sparad');
     };
 
@@ -2610,6 +2745,14 @@ createApp({
       }
       return items.sort((a,b) => b.pct - a.pct);
     });
+
+    const budgetAlert = (catId) => {
+      const bi = budgetItems.value.find(b => b.id === catId);
+      if (!bi) return null;
+      if (bi.pct > 100) return 'over';
+      if (bi.pct > 80) return 'warn';
+      return null;
+    };
 
     // ========== SAVINGS GOALS ==========
     const goalName = ref('');
@@ -2637,6 +2780,7 @@ createApp({
         saved: 0
       });
       goalDialog.value?.close();
+      haptic();
       showToast('Sparmål skapat');
     };
 
@@ -2655,6 +2799,7 @@ createApp({
       const g = data.savingsGoals.find(g => g.id === activeGoalId.value);
       if (g) {
         g.saved = Math.min(g.target, g.saved + amt);
+        haptic();
         if (g.saved >= g.target) showToast('Sparmålet uppnått!');
         else showToast(fmt(amt) + ' tillagt');
       }
@@ -2665,6 +2810,7 @@ createApp({
       const idx = data.savingsGoals.findIndex(g => g.id === id);
       if (idx >= 0) {
         data.savingsGoals.splice(idx, 1);
+        haptic(15);
         showToast('Sparmål borttaget');
       }
     };
@@ -2695,6 +2841,7 @@ createApp({
         done: false
       });
       wishDialog.value?.close();
+      haptic();
       showToast('Önskning tillagd');
     };
 
@@ -2702,6 +2849,7 @@ createApp({
       const idx = data.wishlist.findIndex(w => w.id === id);
       if (idx >= 0) {
         data.wishlist.splice(idx, 1);
+        haptic(15);
         showToast('Önskning borttagen');
       }
     };
@@ -2733,6 +2881,17 @@ createApp({
         total: monthTotal(k),
         pct: Math.round((monthTotal(k) / maxVal) * 100)
       }));
+    });
+
+    const monthComparison = computed(() => {
+      const [y, m] = currentMonth.value.split('-').map(Number);
+      const prevKey = toMonthKey(new Date(y, m - 2));
+      const currTotal = monthTotal(currentMonth.value);
+      const prevTotal = monthTotal(prevKey);
+      if (prevTotal === 0 && currTotal === 0) return null;
+      const diff = currTotal - prevTotal;
+      const pct = prevTotal > 0 ? Math.round((diff / prevTotal) * 100) : (currTotal > 0 ? 100 : 0);
+      return { prevKey, prevLabel: formatMonthLabel(prevKey), currTotal, prevTotal, diff, pct };
     });
 
     const catBreakdown = computed(() => {
@@ -3034,6 +3193,37 @@ createApp({
       showToast('JSON exporterad!');
     };
 
+    const exportCSV = () => {
+      const md = monthData.value;
+      const rows = [['Typ','Namn','Belopp','Kategori','Datum','Betald av','Anteckning','Taggar']];
+      const addRows = (list, type) => {
+        list.forEach(e => {
+          rows.push([
+            type,
+            '"' + (e.name || '').replace(/"/g, '""') + '"',
+            e.amount || 0,
+            catLabel(e.category || 'ovrigt'),
+            e.date || '',
+            e.paidBy === 'b' ? data.persons.b.name : data.persons.a.name,
+            '"' + (e.note || '').replace(/"/g, '""') + '"',
+            '"' + (e.tags || []).join(', ') + '"'
+          ]);
+        });
+      };
+      addRows(md.shared, 'Gemensam');
+      addRows(md.personal.a || [], data.persons.a.name);
+      addRows(md.personal.b || [], data.persons.b.name);
+      const csv = rows.map(r => r.join(';')).join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'utgifter-' + currentMonth.value + '.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('CSV exporterad!');
+    };
+
     const copyPreviousMonth = () => {
       const [y,m] = currentMonth.value.split('-').map(Number);
       const prev = toMonthKey(new Date(y, m-2));
@@ -3229,6 +3419,44 @@ createApp({
       deleteExpense(ctxMenu.type, ctxMenu.exp.id);
       ctxMenu.show = false;
       haptic(15);
+    };
+
+    const ctxPin = () => {
+      if (!ctxMenu.exp) return;
+      const e = ctxMenu.exp;
+      const pin = { id: crypto.randomUUID(), name: e.name, amount: e.amount, category: e.category || 'ovrigt', type: ctxMenu.type };
+      if (!data.pinnedExpenses) data.pinnedExpenses = [];
+      data.pinnedExpenses.push(pin);
+      ctxMenu.show = false;
+      haptic();
+      showToast('Utgift fäst för snabbinmatning');
+    };
+
+    const removePinned = (id) => {
+      const idx = (data.pinnedExpenses || []).findIndex(p => p.id === id);
+      if (idx >= 0) { data.pinnedExpenses.splice(idx, 1); haptic(15); showToast('Borttagen från fästa'); }
+    };
+
+    const addFromPinned = (pin) => {
+      const exp = {
+        id: crypto.randomUUID(),
+        name: pin.name,
+        amount: pin.amount,
+        category: pin.category,
+        date: todayStr(),
+        note: '',
+        tags: [],
+        recurring: false,
+        comments: []
+      };
+      if (pin.type === 'shared') {
+        exp.paidBy = 'a';
+        monthData.value.shared.push(exp);
+      } else {
+        monthData.value.personal[personalTab.value].push(exp);
+      }
+      haptic();
+      showToast(pin.name + ' tillagd');
     };
 
     // ========== #10 FLOATING MONTH SUMMARY ==========
@@ -3482,14 +3710,73 @@ createApp({
       try {
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
-          total += (localStorage.getItem(key) || '').length * 2; // UTF-16
+          total += (localStorage.getItem(key) || '').length * 2;
         }
       } catch (e) {}
       const kb = (total / 1024).toFixed(1);
-      const maxKb = 5120; // 5 MB
+      const maxKb = 5120;
       const pct = Math.min(100, Math.round((total / 1024 / maxKb) * 100));
-      return { kb, maxKb, pct, label: kb + ' KB av ' + (maxKb / 1024).toFixed(0) + ' MB' };
+      const status = pct >= 90 ? 'critical' : pct >= 70 ? 'warning' : 'ok';
+      return { kb, maxKb, pct, status, label: kb + ' KB av ' + (maxKb / 1024).toFixed(0) + ' MB' };
     });
+
+    const archivableMonths = computed(() => {
+      const keys = Object.keys(data.months).sort();
+      const cutoff = toMonthKey(new Date(now.getFullYear(), now.getMonth() - 6));
+      return keys.filter(k => k < cutoff && data.months[k] &&
+        (data.months[k].shared.length > 0 || data.months[k].personal.a.length > 0 || data.months[k].personal.b.length > 0 || data.months[k].payments.length > 0));
+    });
+
+    const archiveOldMonths = () => {
+      const months = archivableMonths.value;
+      if (months.length === 0) { showToast('Inga gamla månader att arkivera'); return; }
+      const archive = {};
+      months.forEach(k => { archive[k] = JSON.parse(JSON.stringify(data.months[k])); });
+      try {
+        const existing = localStorage.getItem('expense-archive');
+        const prev = existing ? JSON.parse(existing) : {};
+        Object.assign(prev, archive);
+        localStorage.setItem('expense-archive', JSON.stringify(prev));
+        months.forEach(k => {
+          data.months[k] = { shared:[], personal:{ a:[], b:[] }, payments:[], skippedRecurringIds:[] };
+        });
+        showToast(months.length + ' månader arkiverade', () => {
+          months.forEach(k => { data.months[k] = archive[k]; });
+          localStorage.removeItem('expense-archive');
+        });
+      } catch(e) {
+        showToast('Arkivering misslyckades');
+      }
+    };
+
+    const restoreArchive = () => {
+      try {
+        const raw = localStorage.getItem('expense-archive');
+        if (!raw) { showToast('Inget arkiv att återställa'); return; }
+        const archive = JSON.parse(raw);
+        const keys = Object.keys(archive);
+        keys.forEach(k => { data.months[k] = archive[k]; ensureMonth(data, k); });
+        localStorage.removeItem('expense-archive');
+        showToast(keys.length + ' månader återställda');
+      } catch(e) {
+        showToast('Återställning misslyckades');
+      }
+    };
+
+    const hasArchive = computed(() => {
+      try { return !!localStorage.getItem('expense-archive'); } catch(e) { return false; }
+    });
+
+    const purgeComments = () => {
+      let count = 0;
+      Object.values(data.months).forEach(m => {
+        [...m.shared, ...m.personal.a, ...m.personal.b].forEach(exp => {
+          if (exp.comments && exp.comments.length > 0) { count += exp.comments.length; exp.comments = []; }
+        });
+      });
+      if (count > 0) showToast(count + ' kommentarer raderade');
+      else showToast('Inga kommentarer att rensa');
+    };
 
     // ========== HASH IMPORT + INIT ==========
     onMounted(async () => {
@@ -3521,6 +3808,16 @@ createApp({
       checkConfetti();
       // Check notifications
       setTimeout(checkNotification, 2000);
+      // Handle quick-add shortcuts
+      if (location.hash.startsWith('#action=')) {
+        const action = location.hash.slice(8);
+        history.replaceState(null, '', location.pathname);
+        setTimeout(() => {
+          if (action === 'add-shared') { view.value = 'shared'; nextTick(() => openExpenseDialog('shared')); }
+          else if (action === 'add-personal') { view.value = 'personal'; nextTick(() => openExpenseDialog('personal')); }
+          else if (action === 'add-payment') { view.value = 'home'; nextTick(() => openPaymentDialog()); }
+        }, 400);
+      }
       // Mark app as loaded (hide skeleton)
       setTimeout(() => { appLoaded.value = true; }, 300);
     });
@@ -3536,7 +3833,7 @@ createApp({
       editTags, editTagInput, addEditTag, editCustomSplit, editUseCustomSplit, editType,
       calcPreview, onAmountInput, editShowMore,
       startEdit, cancelEdit, saveEdit, deleteExpense, togglePaidBy,
-      touchStart, touchMove, touchEnd,
+      touchStart, touchMove, touchEnd, confirmSwipeDelete,
       openComments, commentText, commentAuthor, toggleComments, addComment, formatCommentTime,
       dialogMode, dialogTitle, dialogName, dialogAmount, dialogCategory, dialogNote, dialogRecurring, dialogPaidBy,
       dialogDate, dialogTags, dialogTagInput, addDialogTag, dialogUseCustomSplit, dialogCustomSplit,
@@ -3551,7 +3848,7 @@ createApp({
       deletePayment,
       toast, doUndo, confirm, confirmAction, confirmDialog, closeConfirmDialog,
       // Budget
-      budgetItems, budgetEditValues, openBudgetDialog, saveBudgets, parseAmountSimple,
+      budgetItems, budgetAlert, budgetEditValues, openBudgetDialog, saveBudgets, parseAmountSimple,
       // Savings Goals
       savingsOpen, goalName, goalEmoji, goalTarget, addGoalAmount, activeGoalId,
       openGoalDialog, saveGoal, addToGoal, saveAddGoal, deleteGoal,
@@ -3564,18 +3861,19 @@ createApp({
       notifEnabled, toggleNotif,
       // Stats
       statsMode, showReport,
-      trendData, catBreakdown, conicGradient, topExpenses, ytdTotal, avgMonthly,
+      trendData, monthComparison, catBreakdown, conicGradient, topExpenses, ytdTotal, avgMonthly,
       highestMonth, lowestMonth, recurringVsOnce, compareBarH, allPayments,
       // Yearly
       currentYear, yearMonths, yearlyTotal, yearlyAvg, yearlyCatBreakdown, yearlyConicGradient,
       // Avatars
       avatars, avatarInput, triggerAvatarUpload, handleAvatarUpload,
       // Share
-      importOpen, importText, qrUrl, shareLink, copyData, generateQR, importFromText: importWithDiff, exportJSON,
+      importOpen, importText, qrUrl, shareLink, copyData, generateQR, importFromText: importWithDiff, exportJSON, exportCSV,
       copyPreviousMonth, clearMonth,
       // NEW FEATURES
       haptic, appLoaded, ctxMenu, onLongPressStart, onLongPressEnd,
-      ctxEdit, ctxDuplicate, ctxMove, ctxDelete,
+      ctxEdit, ctxDuplicate, ctxMove, ctxDelete, ctxPin,
+      addFromPinned, removePinned,
       sharedTotal, personalListTotal,
       getCatTrendInfo, splitHistory,
       lastSynced, syncAgo, syncStale, updateSyncTime,
@@ -3586,7 +3884,7 @@ createApp({
       darkModePref, applyDarkMode,
       simpleMode, toggleSimpleMode,
       useEmojis, applyIconStyle,
-      dataSize,
+      dataSize, archivableMonths, archiveOldMonths, restoreArchive, hasArchive, purgeComments,
     };
   }
 }).mount('#app');

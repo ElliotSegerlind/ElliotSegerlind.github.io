@@ -33,5 +33,26 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Lägg till gemensam utgift",
+      "short_name": "Ny utgift",
+      "url": "./index.html#action=add-shared",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Lägg till personlig utgift",
+      "short_name": "Personlig",
+      "url": "./index.html#action=add-personal",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Registrera betalning",
+      "short_name": "Betalning",
+      "url": "./index.html#action=add-payment",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["finance"]
 }
