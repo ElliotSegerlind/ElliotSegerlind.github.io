@@ -51,16 +51,15 @@ body{background:var(--bg);color:var(--text);min-height:100%;overflow-x:hidden;
 .top-bar select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);
   padding:4px 8px;font-size:14px;color:var(--text);font-family:var(--font)}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;
-  background:rgba(248,250,249,0.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border-top:1px solid var(--border);display:flex;justify-content:space-around;
-  padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));max-width:480px;margin:0 auto}
-@media(prefers-color-scheme:dark){.bottom-nav{background:rgba(15,18,16,0.82)}}
+  background:var(--bg);border-top:1px solid var(--border);display:flex;justify-content:space-around;
+  padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));max-width:480px;margin:0 auto;
+  transform:translateZ(0)}
 .bottom-nav button{display:flex;flex-direction:column;align-items:center;gap:2px;
   background:none;border:none;color:var(--text3);font-size:10px;font-family:var(--font);
   padding:4px 8px;min-width:56px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent}
 .bottom-nav button.active{color:var(--accent)}
 .bottom-nav button .icon{font-size:18px;line-height:1}
-.view{padding:16px;animation:fadeIn .2s ease}
+.view{padding:16px}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
   padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
@@ -486,7 +485,7 @@ body.density-compact .empty-state .empty-icon{font-size:36px}
 body.dark-override{color-scheme:dark}
 body.dark-override,:root.dark-override{--bg:#0a0a0a;--bg2:#141414;--bg3:#1e1e1e;--text:#f1f1f1;--text2:#a1a1a1;--text3:#666;--border:#2a2a2a;--shadow:0 1px 3px rgba(0,0,0,.3);--shadow-lg:0 4px 12px rgba(0,0,0,.4);--accent-light:rgba(32,184,102,.12)}
 body.dark-override .top-bar{background:rgba(10,10,10,0.85)}
-body.dark-override .bottom-nav{background:rgba(10,10,10,0.85)}
+body.dark-override .bottom-nav{background:#0a0a0a}
 
 /* Light mode override — polished, clean, subtly warm */
 body.light-override{color-scheme:light}
@@ -501,7 +500,7 @@ body.light-override{background:#f2f4f7;
   background-image:radial-gradient(ellipse at 0% 0%,rgba(24,160,88,0.03) 0%,transparent 50%),
   radial-gradient(ellipse at 100% 100%,rgba(99,102,241,0.02) 0%,transparent 50%)}
 body.light-override .top-bar{background:rgba(242,244,247,0.88);border-bottom-color:#d1d5db}
-body.light-override .bottom-nav{background:rgba(242,244,247,0.88);border-top-color:#d1d5db}
+body.light-override .bottom-nav{background:#f2f4f7;border-top-color:#d1d5db}
 body.light-override .card{border-color:#d1d5db;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
 body.light-override .expense-item{border-color:#d1d5db;box-shadow:0 1px 2px rgba(0,0,0,0.03)}
 body.light-override .settlement-card{box-shadow:0 4px 16px rgba(24,160,88,0.18)}
@@ -668,8 +667,9 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     </div>
   </template>
 
+  <template v-if="appLoaded">
   <!-- ============ HOME ============ -->
-  <div class="view" :class="viewTransition" v-if="appLoaded && view==='home'" :key="'home-'+currentMonth">
+  <div class="view" :class="viewTransition" v-show="view==='home'">
     <div class="person-grid">
       <div class="person-card" v-for="p in ['a','b']" :key="p">
         <label>{{ data.persons[p].name }}</label>
@@ -885,7 +885,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </div>
 
   <!-- ============ SHARED ============ -->
-  <div class="view" :class="viewTransition" v-if="appLoaded && view==='shared'" :key="'shared-'+currentMonth">
+  <div class="view" :class="viewTransition" v-show="view==='shared'">
     <!-- Floating month summary -->
     <div class="floating-summary" v-if="!simpleMode && sortedShared.length>2">
       <span class="fs-count">{{ sortedShared.length }} utgifter</span>
@@ -1108,7 +1108,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </div>
 
   <!-- ============ PERSONAL ============ -->
-  <div class="view" :class="viewTransition" v-if="appLoaded && view==='personal'" :key="'personal-'+currentMonth+personalTab">
+  <div class="view" :class="viewTransition" v-show="view==='personal'">
     <div class="segmented">
       <button :class="{active:personalTab==='a'}" @click="personalTab='a';searchQuery=''">{{ data.persons.a.name }}</button>
       <button :class="{active:personalTab==='b'}" @click="personalTab='b';searchQuery=''">{{ data.persons.b.name }}</button>
@@ -1308,7 +1308,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </div>
 
   <!-- ============ STATISTICS ============ -->
-  <div class="view" :class="viewTransition" v-if="appLoaded && view==='stats' && !simpleMode" :key="'stats-'+currentMonth+statsMode">
+  <div class="view" :class="viewTransition" v-show="view==='stats' && !simpleMode">
     <div class="segmented year-month-toggle">
       <button :class="{active:statsMode==='month'}" @click="statsMode='month'">Månad</button>
       <button :class="{active:statsMode==='year'}" @click="statsMode='year'">År</button>
@@ -1540,7 +1540,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   </div>
 
   <!-- ============ MORE ============ -->
-  <div class="view" :class="viewTransition" v-if="appLoaded && view==='share'" :key="'share-'+currentMonth">
+  <div class="view" :class="viewTransition" v-show="view==='share'">
 
     <!-- Sharing -->
     <div class="card">
@@ -1694,6 +1694,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
     </div>
 
   </div>
+  </template>
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
@@ -3468,14 +3469,16 @@ createApp({
     const viewTransition = ref('');
 
     const switchViewAnimated = v => {
+      if (v === view.value) return;
       const curIdx = tabOrder.indexOf(view.value);
       const newIdx = tabOrder.indexOf(v);
-      viewTransition.value = newIdx >= curIdx ? 'view-enter' : 'view-enter-reverse';
+      viewTransition.value = '';
       view.value = v;
       editingId.value = null;
       searchQuery.value = '';
       reorderMode.value = false;
       haptic(5);
+      nextTick(() => { viewTransition.value = newIdx >= curIdx ? 'view-enter' : 'view-enter-reverse'; });
     };
 
     // ========== #8 LONG-PRESS CONTEXT MENU ==========
