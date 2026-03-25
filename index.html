@@ -348,8 +348,18 @@ body.use-emojis .ic-fa{display:none}
 .year-cell .yc-month{font-size:11px;color:var(--text2);margin-bottom:2px}
 .year-cell .yc-val{font-size:14px;font-weight:700}
 
-/* Confetti */
+/* Confetti (emoji) */
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-120px) scale(1.4)}}
+@keyframes popBounce{0%{transform:scale(0);opacity:0}50%{transform:scale(1.15)}70%{transform:scale(0.95)}100%{transform:scale(1);opacity:1}}
+@keyframes sparkle{0%,100%{opacity:0;transform:scale(0) rotate(0deg)}50%{opacity:1;transform:scale(1) rotate(180deg)}}
+@keyframes gentlePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.float-hearts{position:fixed;pointer-events:none;z-index:998}
+.float-heart{position:absolute;animation:floatUp 1.2s ease-out forwards;font-size:20px}
+.love-banner{text-align:center;font-size:13px;color:var(--text3);padding:12px 0 4px;font-style:italic;animation:fadeIn .5s ease}
+.settled-cute{display:flex;flex-direction:column;align-items:center;gap:2px}
+.settled-cute .settled-emoji{font-size:32px;animation:gentlePulse 2s ease-in-out infinite}
+.bounce-in{animation:popBounce .35s ease-out}
 
 /* Running balance */
 .running-balance{font-size:14px;color:var(--text2);text-align:center;margin:8px 0;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs)}
@@ -562,6 +572,8 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
   *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}
   .view{animation:none}
   .view-enter,.view-enter-reverse{animation:none}
+  .settled-cute .settled-emoji{animation:none}
+  .bounce-in{animation:none}
 }
 
 /* Budget alert on cat pill */
@@ -681,7 +693,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       <div class="settlement-amount">
         <template v-if="settlement.remaining>0">{{ data.persons.b.name }} ska betala {{ data.persons.a.name }} {{ fmt(settlement.remaining) }}</template>
         <template v-else-if="monthData.shared.length===0">Inga utgifter ännu</template>
-        <template v-else>Ni ligger jämnt! <i class="fa-solid fa-check ic-fa"></i><span class="ic-em">✅</span></template>
+        <template v-else><div class="settled-cute"><span class="settled-emoji">{{ settledEmoji }}</span><span>{{ settledMessage }}</span></div></template>
       </div>
       <template v-if="settlement.totalPaid>0">
         <div class="settlement-sub">Betalat {{ fmt(settlement.totalPaid) }} av {{ fmt(settlement.bShare) }}</div>
@@ -848,7 +860,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       </div>
       <div v-if="wishOpen">
         <div class="wish-item" :class="{done:w.done}" v-for="w in data.wishlist" :key="w.id">
-          <input type="checkbox" class="wish-check" :checked="w.done" @change="w.done=!w.done">
+          <input type="checkbox" class="wish-check" :checked="w.done" @change="toggleWish(w)">
           <div class="wish-info">
             <div class="wish-name" :class="{checked:w.done}">{{ w.name }}</div>
             <div class="wish-note" v-if="w.note">{{ w.note }}</div>
@@ -867,6 +879,9 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
     <!-- Budget setup button if no budgets -->
     <button class="btn btn-outline btn-block btn-sm" v-if="!simpleMode && budgetItems.length===0" @click="openBudgetDialog" style="margin-bottom:12px"><i class="fa-solid fa-chart-bar ic-fa"></i><span class="ic-em">📊</span> Sätt budgetmål per kategori</button>
+
+    <!-- Love banner -->
+    <div class="love-banner" v-if="monthData.shared.length>0">{{ loveBanner }}</div>
   </div>
 
   <!-- ============ SHARED ============ -->
@@ -927,8 +942,10 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
     <template v-if="sortedShared.length>0">
       <div v-for="(exp,idx) in sortedShared" :key="exp.id" class="expense-item"
+           :class="{'bounce-in': exp._new}"
            @touchstart="touchStart($event,exp);onLongPressStart($event,exp,'shared')" @touchmove="touchMove($event,exp);onLongPressEnd()" @touchend="touchEnd($event,exp);onLongPressEnd()"
-           :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
+           :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}"
+           @animationend="exp._new=false">
         <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30" @click.stop="confirmSwipeDelete(exp)">
           <span><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span> Radera</span>
         </div>
@@ -1152,8 +1169,10 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
     <template v-if="sortedPersonal.length>0">
       <div v-for="(exp,idx) in sortedPersonal" :key="exp.id" class="expense-item"
+           :class="{'bounce-in': exp._new}"
            @touchstart="touchStart($event,exp);onLongPressStart($event,exp,'personal')" @touchmove="touchMove($event,exp);onLongPressEnd()" @touchend="touchEnd($event,exp);onLongPressEnd()"
-           :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
+           :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}"
+           @animationend="exp._new=false">
         <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30" @click.stop="confirmSwipeDelete(exp)">
           <span><i class="fa-solid fa-trash ic-fa"></i><span class="ic-em">🗑️</span> Radera</span>
         </div>
@@ -1750,7 +1769,7 @@ body.light-override .person-card{background:#fff;border-color:#d1d5db}
       <input v-model="payNote" placeholder="T.ex. Swish mars">
       <div class="dialog-actions">
         <button class="btn btn-outline" @click="$refs.paymentDialog.close()">Avbryt</button>
-        <button class="btn btn-primary" @click="savePayment">Spara</button>
+        <button class="btn btn-primary" @click="savePayment($event)">Spara</button>
       </div>
     </div>
   </dialog>
@@ -2296,6 +2315,8 @@ createApp({
       if (idx < 0) return;
       const removed = arr.splice(idx, 1)[0];
       haptic(15);
+      // Reset confetti flag so it can re-trigger if they pay again
+      resetConfettiForMonth();
       const monthKey = currentMonth.value;
       showToast('Betalning raderad', () => {
         ensureMonth(data, monthKey);
@@ -2468,7 +2489,8 @@ createApp({
           date: dialogDate.value,
           tags: [...dialogTags.value],
           comments: [],
-          addedBy: data.persons[dialogMode.value === 'shared' ? dialogPaidBy.value : personalTab.value].name
+          addedBy: data.persons[dialogMode.value === 'shared' ? dialogPaidBy.value : personalTab.value].name,
+          _new: true
         };
         if (dialogMode.value === 'shared') {
           expense.paidBy = dialogPaidBy.value;
@@ -2547,7 +2569,8 @@ createApp({
         sourceTemplateId: t.id,
         date: todayStr(),
         tags: [],
-        comments: []
+        comments: [],
+        _new: true
       };
       if (type === 'shared') monthData.value.shared.push(expense);
       else monthData.value.personal[personalTab.value].push(expense);
@@ -2581,7 +2604,7 @@ createApp({
       });
     };
 
-    const savePayment = () => {
+    const savePayment = (e) => {
       const amt = parseAmountSimple(payAmount.value);
       if (amt <= 0) return;
       monthData.value.payments.push({
@@ -2592,7 +2615,12 @@ createApp({
       });
       paymentDialog.value?.close();
       haptic();
-      showToast('Betalning registrerad');
+      // Float hearts from the button position
+      const rect = e?.target?.getBoundingClientRect?.();
+      if (rect) launchMiniHearts(rect.left + rect.width / 2, rect.top);
+      else launchMiniHearts(window.innerWidth / 2, window.innerHeight / 2);
+      showToast('Betalning registrerad 💕');
+      checkMilestone();
       checkConfetti();
     };
 
@@ -2629,24 +2657,78 @@ createApp({
       exp.paidBy = (exp.paidBy || 'a') === 'a' ? 'b' : 'a';
     };
 
-    // ========== CONFETTI ==========
+    // ========== CONFETTI & MICROINTERACTIONS ==========
     const confettiShownKey = 'confetti-shown';
     const getConfettiShown = () => {
       try { return new Set(JSON.parse(localStorage.getItem(confettiShownKey) || '[]')); } catch(e) { return new Set(); }
+    };
+    const resetConfettiForMonth = () => {
+      const shown = getConfettiShown();
+      if (shown.delete(currentMonth.value)) {
+        try { localStorage.setItem(confettiShownKey, JSON.stringify([...shown])); } catch(e){}
+      }
     };
 
     const launchConfetti = () => {
       const c = document.createElement('div');
       c.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden';
       document.body.appendChild(c);
-      const colors = ['#f44336','#e91e63','#9c27b0','#3f51b5','#2196f3','#4caf50','#ffeb3b','#ff9800','#00bcd4','#8bc34a'];
-      for (let i = 0; i < 80; i++) {
+      const emojis = ['❤️','🎉','✨','💕','🌟','🥳','💖','🎊','💫','⭐','🩷','💗'];
+      for (let i = 0; i < 60; i++) {
         const el = document.createElement('div');
-        const size = 6 + Math.random() * 6;
-        el.style.cssText = 'position:absolute;width:'+size+'px;height:'+size+'px;background:'+colors[i%colors.length]+';left:'+Math.random()*100+'%;top:-20px;border-radius:'+(Math.random()>.5?'50%':'2px')+';animation:confettiFall '+(1.5+Math.random()*1.5)+'s ease-in forwards;animation-delay:'+Math.random()*0.5+'s';
+        const size = 16 + Math.random() * 12;
+        el.textContent = emojis[i % emojis.length];
+        el.style.cssText = 'position:absolute;font-size:'+size+'px;left:'+Math.random()*100+'%;top:-30px;animation:confettiFall '+(1.5+Math.random()*1.5)+'s ease-in forwards;animation-delay:'+Math.random()*0.5+'s;line-height:1';
         c.appendChild(el);
       }
       setTimeout(() => c.remove(), 4000);
+    };
+
+    const launchMiniHearts = (x, y) => {
+      const c = document.createElement('div');
+      c.className = 'float-hearts';
+      c.style.left = x + 'px';
+      c.style.top = y + 'px';
+      document.body.appendChild(c);
+      const hearts = ['💕','❤️','💖','💗','🩷','✨'];
+      for (let i = 0; i < 6; i++) {
+        const el = document.createElement('div');
+        el.className = 'float-heart';
+        el.textContent = hearts[i % hearts.length];
+        el.style.left = (Math.random() * 60 - 30) + 'px';
+        el.style.animationDelay = (i * 0.1) + 's';
+        c.appendChild(el);
+      }
+      setTimeout(() => c.remove(), 1800);
+    };
+
+    const launchMiniBurst = (emoji, msg) => {
+      const c = document.createElement('div');
+      c.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden';
+      document.body.appendChild(c);
+      const items = typeof emoji === 'string' ? [emoji] : emoji;
+      for (let i = 0; i < 20; i++) {
+        const el = document.createElement('div');
+        el.textContent = items[i % items.length];
+        el.style.cssText = 'position:absolute;font-size:'+(14+Math.random()*10)+'px;left:'+(20+Math.random()*60)+'%;top:-20px;animation:confettiFall '+(1+Math.random()*1)+'s ease-in forwards;animation-delay:'+Math.random()*0.3+'s;line-height:1';
+        c.appendChild(el);
+      }
+      setTimeout(() => c.remove(), 2500);
+      if (msg) showToast(msg);
+    };
+
+    let lastPaidPct = 0;
+    const checkMilestone = () => {
+      const pct = settlement.value.paidPct;
+      const milestones = [25, 50, 75];
+      const msgs = ['En fjärdedel betald! 🌱', 'Halvvägs där! 🌟', 'Nästan klara! 💪'];
+      for (let i = milestones.length - 1; i >= 0; i--) {
+        if (pct >= milestones[i] && lastPaidPct < milestones[i] && pct < 100) {
+          launchMiniBurst(['✨','⭐','🌟'], msgs[i]);
+          break;
+        }
+      }
+      lastPaidPct = pct;
     };
 
     const checkConfetti = () => {
@@ -2658,10 +2740,48 @@ createApp({
             shown.add(currentMonth.value);
             try { localStorage.setItem(confettiShownKey, JSON.stringify([...shown])); } catch(e){}
             launchConfetti();
-            showToast('Allt betalt för denna månad!');
+            showToast('Allt betalt! Ni är bäst tillsammans! 💕');
           }
         }
       });
+    };
+
+    // Cute settled messages
+    const settledMessages = [
+      { emoji: '💕', text: 'Ni ligger jämnt!' },
+      { emoji: '🥰', text: 'Allt klart mellan er!' },
+      { emoji: '✨', text: 'Perfekt balans!' },
+      { emoji: '🤝', text: 'Helt i synk!' },
+      { emoji: '💖', text: 'Snyggt jobbat, team!' },
+      { emoji: '🌟', text: 'Inga skulder — bara kärlek!' },
+      { emoji: '🎉', text: 'Jämnt skansen!' },
+      { emoji: '💗', text: 'Bra jobbat ihop!' },
+    ];
+    const settledIdx = ref(Math.floor(Math.random() * settledMessages.length));
+    const settledMessage = computed(() => settledMessages[settledIdx.value].text);
+    const settledEmoji = computed(() => settledMessages[settledIdx.value].emoji);
+    watch(currentMonth, () => { settledIdx.value = Math.floor(Math.random() * settledMessages.length); });
+
+    // Love banner messages
+    const loveBanners = [
+      '💕 Ni klarar allt tillsammans',
+      '✨ Teamwork makes the dream work',
+      '🤗 Tack för att vi delar på det',
+      '💖 Bästa teamet',
+      '🌟 Tillsammans är allt lättare',
+      '🥰 Vi har koll på läget',
+      '💗 Ekonomi med kärlek',
+      '🫶 En för alla, alla för en',
+    ];
+    const loveBanner = computed(() => loveBanners[Math.floor(Date.now() / 86400000) % loveBanners.length]);
+
+    // Wishlist toggle with celebration
+    const toggleWish = (w) => {
+      w.done = !w.done;
+      if (w.done) {
+        haptic();
+        launchMiniBurst(['🎁','🎉','✨','💝'], 'Önskning uppfylld! 🎉');
+      }
     };
 
     // ========== NOTIFICATIONS ==========
@@ -2798,10 +2918,14 @@ createApp({
       if (amt <= 0) return;
       const g = data.savingsGoals.find(g => g.id === activeGoalId.value);
       if (g) {
+        const wasDone = g.saved >= g.target;
         g.saved = Math.min(g.target, g.saved + amt);
         haptic();
-        if (g.saved >= g.target) showToast('Sparmålet uppnått!');
-        else showToast(fmt(amt) + ' tillagt');
+        if (g.saved >= g.target && !wasDone) {
+          launchMiniBurst(['🏆','🎉','✨','💰','⭐','🥳'], 'Sparmålet uppnått! 🏆');
+        } else {
+          showToast(fmt(amt) + ' tillagt');
+        }
       }
       addGoalDialog.value?.close();
     };
@@ -3447,7 +3571,8 @@ createApp({
         note: '',
         tags: [],
         recurring: false,
-        comments: []
+        comments: [],
+        _new: true
       };
       if (pin.type === 'shared') {
         exp.paidBy = 'a';
@@ -3806,6 +3931,8 @@ createApp({
       }
       // Check confetti on load
       checkConfetti();
+      // Init milestone tracker
+      lastPaidPct = settlement.value.paidPct;
       // Check notifications
       setTimeout(checkNotification, 2000);
       // Handle quick-add shortcuts
@@ -3885,6 +4012,8 @@ createApp({
       simpleMode, toggleSimpleMode,
       useEmojis, applyIconStyle,
       dataSize, archivableMonths, archiveOldMonths, restoreArchive, hasArchive, purgeComments,
+      // Microinteractions
+      settledMessage, settledEmoji, loveBanner, toggleWish,
     };
   }
 }).mount('#app');
