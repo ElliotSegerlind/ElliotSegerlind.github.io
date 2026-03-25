@@ -2,511 +2,257 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Utgifter">
 <meta name="theme-color" content="#18a058">
-<title>Utgiftshanterare</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='20' width='100' height='100' fill='%2318a058'/><text x='50' y='72' font-size='60' text-anchor='middle' fill='white'>💰</text></svg>">
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVXRnaWZ0c2hhbnRlcmFyZSIsInNob3J0X25hbWUiOiJVdGdpZnRlciIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwic3RhcnRfdXJsIjoiLiIsInRoZW1lX2NvbG9yIjoiIzE4YTA1OCIsImJhY2tncm91bmRfY29sb3IiOiIjZjVmNWY1IiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbCw8c3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwMCAxMDAnPjxyZWN0IHJ4PScyMCcgd2lkdGg9JzEwMCcgaGVpZ2h0PScxMDAnIGZpbGw9JyUyMzE4YTA1OCcvPjx0ZXh0IHg9JzUwJyB5PSc3MicgZm9udC1zaXplPSc2MCcgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nd2hpdGUnPvCfkrA8L3RleHQ+PC9zdmc+Iiwic2l6ZXMiOiJhbnkiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
-<style>
-:root {
-  --bg: #f5f5f5;
-  --card: #ffffff;
-  --text: #1a1a1a;
-  --text-secondary: #666666;
-  --border: #e0e0e0;
-  --accent: #18a058;
-  --accent-light: #e8f5e9;
-  --danger: #e53935;
-  --danger-light: #ffebee;
-  --warning: #f9a825;
-  --warning-light: #fff8e1;
-  --shadow: 0 2px 8px rgba(0,0,0,0.08);
-  --radius: 12px;
-  --nav-height: 60px;
-  --top-height: 56px;
+<title>Utgifter</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318a058'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>💰</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48cmVjdCB3aWR0aD0nMTAwJyBoZWlnaHQ9JzEwMCcgcng9JzIwJyBmaWxsPSclMjMxOGEwNTgnLz48dGV4dCB4PSc1MCcgeT0nNjgnIGZvbnQtc2l6ZT0nNTAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9J3doaXRlJz7wn5KwPC90ZXh0Pjwvc3ZnPg==">
+<script>
+// Inline manifest as base64 data-URI
+const manifest = {
+  name: "Utgifter",
+  short_name: "Utgifter",
+  description: "Dela utgifter mellan par",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#f8faf9",
+  theme_color: "#18a058",
+  icons: [{
+    src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%2318a058'/><text x='256' y='350' font-size='260' text-anchor='middle' fill='white'>💰</text></svg>",
+    sizes: "512x512",
+    type: "image/svg+xml",
+    purpose: "any maskable"
+  }]
+};
+const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const mLink = document.createElement('link');
+mLink.rel = 'manifest';
+mLink.href = URL.createObjectURL(mBlob);
+document.head.appendChild(mLink);
+
+// Service worker from Blob URL
+const swCode = `
+const CACHE_NAME = 'utgifter-v2';
+const ASSETS = [self.location.href];
+self.addEventListener('install', e => { self.skipWaiting(); });
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(
+    keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+  )).then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
+      if(resp.status === 200) {
+        const c = resp.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(e.request, c));
+      }
+      return resp;
+    }).catch(() => new Response('Offline', {status:503})))
+  );
+});
+`;
+if ('serviceWorker' in navigator) {
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #121212;
-    --card: #1e1e1e;
-    --text: #e0e0e0;
-    --text-secondary: #999999;
-    --border: #333333;
-    --accent-light: #1b3a2a;
-    --danger-light: #3a1a1a;
-    --warning-light: #3a3018;
-    --shadow: 0 2px 8px rgba(0,0,0,0.3);
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8faf9;--bg2:#ffffff;--bg3:#f0f2f1;--text:#1a1a1a;--text2:#666;--text3:#999;
+  --border:#e5e7e6;--accent:#18a058;--accent2:#15803d;--accent-light:rgba(24,160,88,0.1);
+  --danger:#e53e3e;--danger-light:rgba(229,62,62,0.1);--warn:#dd6b20;--warn-light:rgba(221,107,32,0.1);
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg:0 4px 12px rgba(0,0,0,0.08);
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --cat-hyra:#6366f1;--cat-el:#f59e0b;--cat-telefon:#3b82f6;--cat-mat:#22c55e;
+  --cat-transport:#ef4444;--cat-noje:#a855f7;--cat-klader:#ec4899;--cat-halsa:#14b8a6;
+  --cat-pren:#f97316;--cat-ovrigt:#6b7280;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0f1210;--bg2:#1a1f1c;--bg3:#252b27;--text:#e8ece9;--text2:#a0a8a3;--text3:#6b756e;
+    --border:#2d3530;--accent:#20b866;--accent2:#2dd47a;--accent-light:rgba(32,184,102,0.12);
+    --danger:#fc8181;--danger-light:rgba(252,129,129,0.12);--warn:#f6ad55;--warn-light:rgba(246,173,85,0.12);
+    --shadow:0 1px 3px rgba(0,0,0,0.2);--shadow-lg:0 4px 12px rgba(0,0,0,0.3);
   }
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  -webkit-text-size-adjust: 100%;
-  overflow-x: hidden;
-}
-input, select, button, textarea {
-  font-family: inherit;
-  font-size: 16px;
-  color: var(--text);
-}
-input, textarea {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  width: 100%;
-  outline: none;
-  transition: border-color 0.2s;
-}
-input:focus, textarea:focus {
-  border-color: var(--accent);
-}
-input[inputmode="numeric"] {
-  text-align: right;
-}
-
-/* Top Bar */
-.top-bar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  height: var(--top-height);
-  box-shadow: var(--shadow);
-}
-.top-bar h1 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent);
-}
-.top-bar select {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 15px;
-  cursor: pointer;
-  min-width: 130px;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-/* Main Content */
-.main {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 16px 16px calc(var(--nav-height) + 24px) 16px;
-}
-
-/* Bottom Nav */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background: var(--card);
-  border-top: 1px solid var(--border);
-  display: flex;
-  height: var(--nav-height);
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-.nav-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  min-height: 44px;
-  transition: color 0.2s;
-  -webkit-tap-highlight-color: transparent;
-}
-.nav-btn.active { color: var(--accent); }
-.nav-btn span.icon { font-size: 22px; }
-.nav-btn span.label { font-size: 11px; font-weight: 500; }
-
-/* Cards */
-.card {
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-.card-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-}
-
-/* Segmented Control */
-.segmented {
-  display: flex;
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 3px;
-  gap: 3px;
-}
-.seg-btn {
-  flex: 1;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: all 0.2s;
-  min-height: 44px;
-  -webkit-tap-highlight-color: transparent;
-}
-.seg-btn.active {
-  background: var(--card);
-  color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
-
-/* Summary */
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  font-size: 14px;
-}
-.summary-row + .summary-row { border-top: 1px solid var(--border); }
-.summary-row .amount { font-weight: 600; color: var(--accent); white-space: nowrap; }
-.summary-row.total { font-weight: 700; font-size: 16px; }
-.summary-row.total .amount { font-size: 18px; }
-.diff-card {
-  text-align: center;
-  padding: 20px 16px;
-}
-.diff-label { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
-.diff-amount { font-size: 28px; font-weight: 800; }
-.diff-amount.green { color: var(--accent); }
-.diff-amount.red { color: var(--danger); }
-.diff-who { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-
-/* Expense list */
-.expense-list { display: flex; flex-direction: column; gap: 8px; }
-.expense-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  background: var(--bg);
-  border-radius: 8px;
-  gap: 8px;
-  min-height: 44px;
-  cursor: pointer;
-  transition: background 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.expense-item:active { background: var(--border); }
-.expense-item .name {
-  flex: 1;
-  font-weight: 500;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.expense-item .amount { font-weight: 600; color: var(--accent); white-space: nowrap; }
-.expense-item .recurring-badge {
-  font-size: 11px;
-  background: var(--accent-light);
-  color: var(--accent);
-  padding: 2px 6px;
-  border-radius: 4px;
-  white-space: nowrap;
-}
-.del-btn {
-  background: none;
-  border: none;
-  color: var(--danger);
-  font-size: 20px;
-  cursor: pointer;
-  min-width: 36px;
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  flex-shrink: 0;
-}
-.del-btn:active { background: var(--danger-light); }
-
-.empty-state {
-  text-align: center;
-  padding: 40px 16px;
-  color: var(--text-secondary);
-}
-.empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
-.empty-state p { font-size: 15px; }
-.empty-state .arrow { font-size: 24px; margin-top: 12px; }
-
-/* FAB */
-.fab {
-  position: fixed;
-  bottom: calc(var(--nav-height) + 20px + env(safe-area-inset-bottom));
-  right: max(16px, calc((100vw - 480px) / 2 + 16px));
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: white;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(24, 160, 88, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-  transition: transform 0.15s, box-shadow 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.fab:active { transform: scale(0.92); }
-
-/* Tab bar */
-.tabs {
-  display: flex;
-  border-bottom: 2px solid var(--border);
-  margin-bottom: 16px;
-  gap: 0;
-}
-.tab-btn {
-  flex: 1;
-  padding: 10px 8px;
-  border: none;
-  background: none;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  transition: all 0.2s;
-  min-height: 44px;
-  -webkit-tap-highlight-color: transparent;
-}
-.tab-btn.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-
-/* Dialog / Modal */
-dialog {
-  border: none;
-  border-radius: var(--radius);
-  padding: 24px;
-  max-width: 400px;
-  width: calc(100% - 32px);
-  background: var(--card);
-  color: var(--text);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
-}
-dialog::backdrop { background: rgba(0,0,0,0.5); }
-dialog h2 { font-size: 18px; margin-bottom: 16px; }
-.dialog-field { margin-bottom: 14px; }
-.dialog-field label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
-.dialog-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
-
-/* Buttons */
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  min-height: 44px;
-  transition: opacity 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-.btn:active { opacity: 0.7; }
-.btn-primary { background: var(--accent); color: white; }
-.btn-secondary { background: var(--bg); color: var(--text); }
-.btn-danger { background: var(--danger); color: white; }
-.btn-block { width: 100%; }
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
-/* Recurring banner */
-.recurring-banner {
-  background: var(--warning-light);
-  border: 1px solid var(--warning);
-  border-radius: var(--radius);
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.recurring-banner .banner-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-.recurring-banner .banner-text { font-size: 14px; font-weight: 500; flex: 1; }
-.recurring-banner .banner-actions { display: flex; gap: 6px; flex-shrink: 0; }
-.recurring-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px;
-  background: var(--card);
-  border-radius: 8px;
-  gap: 8px;
-}
-.recurring-item .ri-info { flex: 1; }
-.recurring-item .ri-name { font-weight: 500; font-size: 14px; }
-.recurring-item .ri-amount { font-size: 13px; color: var(--accent); }
-.recurring-item .ri-actions { display: flex; gap: 4px; }
-.btn-sm {
-  padding: 6px 10px;
-  font-size: 12px;
-  min-height: 32px;
-  border-radius: 6px;
-}
-
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: calc(var(--nav-height) + 16px + env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--text);
-  color: var(--card);
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  white-space: nowrap;
-  animation: toast-in 0.25s ease;
-}
-@keyframes toast-in {
-  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-.toast .undo-btn {
-  background: none;
-  border: none;
-  color: var(--accent);
-  font-weight: 700;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px 8px;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Share / Dela page */
-.share-section { margin-bottom: 16px; }
-.share-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
-.collapsible-header {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: var(--text-secondary);
-  padding: 8px 0;
-  -webkit-tap-highlight-color: transparent;
-}
-.collapsible-header .chevron { transition: transform 0.2s; }
-.collapsible-header.open .chevron { transform: rotate(90deg); }
-textarea {
-  width: 100%;
-  min-height: 80px;
-  resize: vertical;
-}
-
-/* Inline edit */
-.inline-edit {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  background: var(--bg);
-  border-radius: 8px;
-  border: 2px solid var(--accent);
-}
-.inline-edit input { flex: 1; }
-.inline-edit input:last-of-type { max-width: 110px; }
-
-/* Checkbox */
-.checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.checkbox-row input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--accent);
-}
-
-/* Person inputs */
-.person-inputs {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.person-group label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 2px; display: block; }
-.person-row { display: flex; gap: 8px; }
-.person-row input { flex: 1; }
-
-/* V2 iframe */
-.v2-frame {
-  width: 100%;
-  height: calc(100vh - var(--top-height) - var(--nav-height));
-  border: none;
-  display: block;
-}
-
-/* View transitions */
-.view-enter { animation: fade-in 0.2s ease; }
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+html{font-family:var(--font);font-size:16px;-webkit-text-size-adjust:100%;height:100%}
+body{background:var(--bg);color:var(--text);min-height:100%;overflow-x:hidden;
+  background-image:radial-gradient(ellipse at 0% 0%,rgba(24,160,88,0.04) 0%,transparent 50%),
+  radial-gradient(ellipse at 100% 100%,rgba(221,107,32,0.03) 0%,transparent 50%)}
+#app{max-width:480px;margin:0 auto;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));padding-top:56px;min-height:100vh}
+.top-bar{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;
+  background:rgba(248,250,249,0.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px}
+@media(prefers-color-scheme:dark){.top-bar{background:rgba(15,18,16,0.82)}}
+.top-bar h1{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+.top-bar select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);
+  padding:4px 8px;font-size:14px;color:var(--text);font-family:var(--font)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(248,250,249,0.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);display:flex;justify-content:space-around;
+  padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));max-width:480px;margin:0 auto}
+@media(prefers-color-scheme:dark){.bottom-nav{background:rgba(15,18,16,0.82)}}
+.bottom-nav button{display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:none;border:none;color:var(--text3);font-size:10px;font-family:var(--font);
+  padding:4px 8px;min-width:56px;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent}
+.bottom-nav button.active{color:var(--accent)}
+.bottom-nav button span.icon{font-size:22px;line-height:1}
+.view{padding:16px;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.settlement-card{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+  border:none;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow-lg);text-align:center}
+.settlement-card.balanced{background:linear-gradient(135deg,var(--accent),#2dd47a)}
+.settlement-card.debt{background:linear-gradient(135deg,#e85d3a,#dd6b20)}
+.settlement-amount{font-size:28px;font-weight:800;letter-spacing:-0.5px;margin:8px 0}
+.settlement-sub{font-size:14px;opacity:0.9}
+.progress-bar{height:8px;background:rgba(255,255,255,0.25);border-radius:4px;margin:12px 0 8px;overflow:hidden}
+.progress-bar .fill{height:100%;background:#fff;border-radius:4px;transition:width .4s ease}
+.person-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:380px){.person-grid{grid-template-columns:1fr}}
+.person-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.person-card label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px}
+.person-card input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);
+  padding:8px;font-size:14px;color:var(--text);font-family:var(--font)}
+.segmented{display:flex;background:var(--bg3);border-radius:var(--radius-sm);padding:3px;margin-bottom:16px;border:1px solid var(--border)}
+.segmented button{flex:1;padding:8px 12px;border:none;background:none;border-radius:var(--radius-xs);
+  font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .2s;font-family:var(--font)}
+.segmented button.active{background:var(--bg2);color:var(--text);box-shadow:var(--shadow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;
+  border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;
+  font-family:var(--font);transition:transform .1s,opacity .1s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(0.98)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:0.9}
+.btn-outline{background:var(--accent-light);color:var(--accent);border:1px solid var(--accent)}
+.btn-danger{background:var(--danger-light);color:var(--danger)}
+.btn-block{width:100%;justify-content:center}
+.btn-sm{padding:6px 12px;font-size:13px}
+.fab{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px));right:max(16px,calc(50% - 224px));
+  width:56px;height:56px;border-radius:28px;background:var(--accent);color:#fff;border:none;
+  font-size:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(24,160,88,0.35);
+  cursor:pointer;z-index:50;transition:transform .15s}
+.fab:active{transform:scale(0.92)}
+.search-bar{position:relative;margin-bottom:12px}
+.search-bar input{width:100%;padding:10px 14px 10px 38px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);font-size:14px;color:var(--text);font-family:var(--font)}
+.search-bar .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px}
+.expense-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;margin-bottom:8px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  transition:transform .15s;touch-action:pan-y}
+.expense-item .expense-header{display:flex;justify-content:space-between;align-items:flex-start}
+.expense-item .expense-name{font-weight:600;font-size:15px}
+.expense-item .expense-amount{font-weight:700;font-size:15px;color:var(--accent);white-space:nowrap}
+.expense-item .expense-meta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.cat-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:500}
+.tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:500;
+  background:var(--bg3);color:var(--text2)}
+.tag.recurring{background:var(--accent-light);color:var(--accent)}
+.expense-note{font-size:12px;color:var(--text3);margin-top:4px}
+.delete-bg{position:absolute;right:0;top:0;bottom:0;width:80px;background:var(--danger);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
+.edit-form{display:flex;flex-direction:column;gap:8px}
+.edit-form input,.edit-form select{padding:8px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--radius-xs);font-size:14px;color:var(--text);font-family:var(--font)}
+.edit-form .edit-actions{display:flex;gap:8px}
+.recurring-banner{background:var(--accent-light);border:1px solid rgba(24,160,88,0.2);
+  border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.recurring-banner h3{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:8px}
+.recurring-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;
+  border-bottom:1px solid rgba(24,160,88,0.1)}
+.recurring-item:last-child{border-bottom:none}
+.recurring-item .ri-info{flex:1}
+.recurring-item .ri-name{font-size:14px;font-weight:500}
+.recurring-item .ri-amount{font-size:13px;color:var(--text2)}
+.recurring-item .ri-actions{display:flex;gap:6px}
+.empty-state{text-align:center;padding:48px 24px;color:var(--text3)}
+.empty-state .empty-icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px;line-height:1.5}
+dialog{border:none;border-radius:var(--radius);padding:0;background:var(--bg2);color:var(--text);
+  max-width:calc(100vw - 32px);width:400px;box-shadow:var(--shadow-lg)}
+dialog::backdrop{background:rgba(0,0,0,0.4)}
+.dialog-content{padding:24px}
+.dialog-content h2{font-size:18px;font-weight:700;margin-bottom:16px;letter-spacing:-0.3px}
+.dialog-content label{display:block;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:4px;margin-top:12px}
+.dialog-content label:first-of-type{margin-top:0}
+.dialog-content input,.dialog-content select,.dialog-content textarea{width:100%;padding:10px 12px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);
+  font-size:14px;color:var(--text);font-family:var(--font)}
+.dialog-content textarea{resize:vertical;min-height:80px}
+.dialog-actions{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+.check-group{display:flex;align-items:center;gap:8px;margin-top:12px}
+.check-group input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+.check-group label{margin:0;font-size:14px;color:var(--text)}
+.toast{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);
+  background:var(--text);color:var(--bg);padding:12px 20px;border-radius:var(--radius-sm);
+  font-size:14px;font-weight:500;z-index:200;display:flex;align-items:center;gap:12px;
+  box-shadow:var(--shadow-lg);animation:toastIn .25s ease}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast button{background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;font-size:14px;font-family:var(--font)}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-top:8px}
+.summary-cell{background:var(--bg2);padding:12px;text-align:center}
+.summary-cell .val{font-size:16px;font-weight:700;color:var(--text)}
+.summary-cell .lbl{font-size:11px;color:var(--text2);margin-top:2px}
+.summary-full{grid-column:1/-1}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.stat-card h3{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px}
+.bar-chart .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-chart .bar-label{font-size:12px;color:var(--text2);width:50px;text-align:right;flex-shrink:0}
+.bar-chart .bar-track{flex:1;height:24px;background:var(--bg3);border-radius:4px;overflow:hidden;position:relative}
+.bar-chart .bar-fill{height:100%;border-radius:4px;transition:width .4s ease;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:600;color:#fff;min-width:fit-content}
+.bar-chart .bar-fill.accent{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.bar-chart .bar-fill.secondary{background:linear-gradient(90deg,#6366f1,#818cf8)}
+.donut{width:120px;height:120px;border-radius:50%;margin:0 auto 12px;position:relative}
+.donut-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-label .donut-val{font-size:20px;font-weight:700}
+.donut-label .donut-txt{font-size:11px;color:var(--text2)}
+.cat-legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.cat-legend-item{display:flex;align-items:center;gap:4px;font-size:12px}
+.cat-legend-item .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.compare-bars{display:flex;gap:12px;align-items:flex-end;justify-content:center;margin:12px 0}
+.compare-bar{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:120px}
+.compare-bar .cb-track{width:100%;background:var(--bg3);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;min-height:20px}
+.compare-bar .cb-fill{border-radius:6px;transition:height .4s ease}
+.compare-bar .cb-name{font-size:12px;color:var(--text2)}
+.compare-bar .cb-val{font-size:13px;font-weight:700}
+.top-list .top-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.top-list .top-item:last-child{border-bottom:none}
+.top-list .top-rank{font-weight:700;color:var(--accent);width:24px}
+.top-list .top-name{flex:1;font-size:14px}
+.top-list .top-val{font-weight:600;font-size:14px}
+.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.kpi .kpi-val{font-size:20px;font-weight:800;color:var(--accent)}
+.kpi .kpi-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+.payment-list .payment-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.payment-item:last-child{border-bottom:none}
+.payment-item .pi-info{flex:1}
+.payment-item .pi-date{font-size:12px;color:var(--text3)}
+.payment-item .pi-note{font-size:13px;color:var(--text2)}
+.payment-item .pi-amount{font-weight:700;font-size:15px;color:var(--accent)}
+.share-section{margin-bottom:16px}
+.share-section h3{font-size:14px;font-weight:600;margin-bottom:8px}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 0}
+.collapsible-header .arrow{transition:transform .2s}
+.collapsible-header .arrow.open{transform:rotate(180deg)}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:250;display:flex;align-items:center;justify-content:center;padding:16px}
+.confirm-box{background:var(--bg2);border-radius:var(--radius);padding:24px;max-width:340px;width:100%;box-shadow:var(--shadow-lg)}
+.confirm-box h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.confirm-box p{font-size:14px;color:var(--text2);margin-bottom:16px}
+.confirm-box .confirm-actions{display:flex;gap:8px;justify-content:flex-end}
+.month-quick{font-size:13px;color:var(--text2);text-align:center;margin-bottom:12px}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textbox}
+.ri-edit-row{display:flex;gap:6px;margin-top:4px}
+.ri-edit-row input{padding:4px 8px;font-size:13px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font)}
 </style>
 </head>
 <body>
@@ -514,276 +260,485 @@ textarea {
   <!-- Top Bar -->
   <div class="top-bar">
     <h1>💰 Utgifter</h1>
-    <select :value="currentMonth" @change="changeMonth($event.target.value)">
-      <option v-for="m in monthOptions" :key="m.value" :value="m.value">{{ m.label }}</option>
+    <select v-model="currentMonth" @change="onMonthChange">
+      <option v-for="m in availableMonths" :key="m" :value="m">{{ formatMonthLabel(m) }}</option>
     </select>
   </div>
 
-  <!-- Main Content -->
-  <div class="main">
+  <!-- Toast -->
+  <div class="toast" v-if="toast.show">
+    {{ toast.message }}
+    <button v-if="toast.undo" @click="doUndo">Ångra</button>
+  </div>
 
-    <!-- ============ HEM ============ -->
-    <div v-if="view === 'home'" class="view-enter" :key="'home'">
-      <div class="card">
-        <div class="card-title">Personer &amp; inkomster</div>
-        <div class="person-inputs">
-          <div class="person-group">
-            <label>Person A</label>
-            <div class="person-row">
-              <input v-model="data.persons.a.name" placeholder="Namn" @input="save">
-              <input v-model.number="data.persons.a.income" inputmode="numeric" placeholder="Inkomst" @focus="selectAll" @input="save">
-            </div>
-          </div>
-          <div class="person-group">
-            <label>Person B</label>
-            <div class="person-row">
-              <input v-model="data.persons.b.name" placeholder="Namn" @input="save">
-              <input v-model.number="data.persons.b.income" inputmode="numeric" placeholder="Inkomst" @focus="selectAll" @input="save">
-            </div>
-          </div>
+  <!-- Confirm dialog -->
+  <div class="confirm-overlay" v-if="confirm.show" @click.self="confirm.show=false">
+    <div class="confirm-box">
+      <h3>{{ confirm.title }}</h3>
+      <p>{{ confirm.text }}</p>
+      <div class="confirm-actions">
+        <button class="btn btn-outline btn-sm" @click="confirm.show=false">Avbryt</button>
+        <button class="btn btn-sm" :class="confirm.danger?'btn-danger':'btn-primary'" @click="confirmAction">{{ confirm.ok || 'OK' }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <div class="view" v-if="view==='home'" :key="'home-'+currentMonth">
+    <div class="person-grid">
+      <div class="person-card" v-for="p in ['a','b']" :key="p">
+        <label>{{ data.persons[p].name }}</label>
+        <input :value="data.persons[p].name" @input="data.persons[p].name=$event.target.value" placeholder="Namn" style="margin-bottom:6px">
+        <label>Inkomst (kr/mån)</label>
+        <input type="text" inputmode="numeric" :value="data.persons[p].income||''" @input="setIncome(p,$event.target.value)" placeholder="0">
+      </div>
+    </div>
+
+    <div class="segmented">
+      <button :class="{active:data.splitMode==='equal'}" @click="data.splitMode='equal'">Dela lika</button>
+      <button :class="{active:data.splitMode==='income'}" @click="data.splitMode='income'">Dela efter inkomst</button>
+    </div>
+
+    <div class="settlement-card" :class="settlement.remaining<=0?'balanced':'debt'">
+      <div class="settlement-sub" v-if="settlement.bShare>0">
+        {{ data.persons.b.name }}s del av gemensamma: {{ fmt(settlement.bShare) }}
+      </div>
+      <div class="settlement-amount">
+        <template v-if="settlement.remaining>0">{{ data.persons.b.name }} ska betala {{ data.persons.a.name }} {{ fmt(settlement.remaining) }}</template>
+        <template v-else-if="monthData.shared.length===0">Inga utgifter ännu</template>
+        <template v-else>Ni ligger jämnt! ✓</template>
+      </div>
+      <template v-if="settlement.totalPaid>0">
+        <div class="settlement-sub">Betalat {{ fmt(settlement.totalPaid) }} av {{ fmt(settlement.bShare) }}</div>
+        <div class="progress-bar"><div class="fill" :style="{width:Math.min(100,settlement.paidPct)+'%'}"></div></div>
+        <div class="settlement-sub" v-if="settlement.remaining>0">Kvar att betala: {{ fmt(settlement.remaining) }}</div>
+      </template>
+      <template v-else-if="settlement.bShare>0 && settlement.totalPaid===0">
+        <div class="progress-bar"><div class="fill" style="width:0%"></div></div>
+      </template>
+    </div>
+
+    <div class="month-quick" v-if="monthData.shared.length>0">
+      {{ monthData.shared.length }} utgifter · totalt {{ fmt(totalShared) }}
+    </div>
+
+    <button class="btn btn-primary btn-block" @click="openPaymentDialog" style="margin-bottom:16px">
+      💳 Registrera betalning
+    </button>
+
+    <div class="card">
+      <div class="card-title">Sammanfattning</div>
+      <div class="summary-grid">
+        <div class="summary-cell summary-full">
+          <div class="val">{{ fmt(totalShared) }}</div>
+          <div class="lbl">Gemensamma utgifter</div>
         </div>
-        <div class="card-title" style="margin-top:8px">Delningsläge</div>
-        <div class="segmented">
-          <button class="seg-btn" :class="{active: data.splitMode==='equal'}" @click="data.splitMode='equal'; save()">Dela lika</button>
-          <button class="seg-btn" :class="{active: data.splitMode==='byIncome'}" @click="data.splitMode='byIncome'; save()">Efter inkomst</button>
+        <div class="summary-cell">
+          <div class="val">{{ fmt(settlement.aShare) }}</div>
+          <div class="lbl">{{ data.persons.a.name }}s del</div>
+        </div>
+        <div class="summary-cell">
+          <div class="val">{{ fmt(settlement.bShare) }}</div>
+          <div class="lbl">{{ data.persons.b.name }}s del</div>
+        </div>
+        <div class="summary-cell">
+          <div class="val">{{ fmt(personalTotal('a')) }}</div>
+          <div class="lbl">{{ data.persons.a.name }} personligt</div>
+        </div>
+        <div class="summary-cell">
+          <div class="val">{{ fmt(personalTotal('b')) }}</div>
+          <div class="lbl">{{ data.persons.b.name }} personligt</div>
+        </div>
+        <div class="summary-cell">
+          <div class="val">{{ fmt(settlement.aShare + personalTotal('a')) }}</div>
+          <div class="lbl">{{ data.persons.a.name }} totalt</div>
+        </div>
+        <div class="summary-cell">
+          <div class="val">{{ fmt(settlement.bShare + personalTotal('b')) }}</div>
+          <div class="lbl">{{ data.persons.b.name }} totalt</div>
         </div>
       </div>
+    </div>
 
-      <!-- Difference card -->
-      <div class="card diff-card">
-        <div class="diff-label">Skillnad</div>
-        <div v-if="totals.diff === 0" class="diff-amount green">Jämnt! ✓</div>
+    <div class="card" v-if="monthData.payments.length>0">
+      <div class="card-title">Betalningar denna månad</div>
+      <div class="payment-list">
+        <div class="payment-item" v-for="py in monthData.payments" :key="py.id">
+          <div class="pi-info">
+            <div class="pi-date">{{ py.date }}</div>
+            <div class="pi-note" v-if="py.note">{{ py.note }}</div>
+          </div>
+          <div class="pi-amount">{{ fmt(py.amount) }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SHARED ============ -->
+  <div class="view" v-if="view==='shared'" :key="'shared-'+currentMonth">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input v-model="searchQuery" placeholder="Sök utgifter…">
+    </div>
+
+    <!-- Recurring banner -->
+    <div class="recurring-banner" v-if="pendingRecurring('shared').length>0">
+      <h3>📦 Återkommande utgifter</h3>
+      <div class="recurring-item" v-for="t in pendingRecurring('shared')" :key="t.id">
+        <div class="ri-info">
+          <div v-if="editingTemplateId!==t.id">
+            <div class="ri-name">{{ t.name }}</div>
+            <div class="ri-amount">{{ fmt(t.amount) }}</div>
+          </div>
+          <div v-else class="ri-edit-row">
+            <input v-model="editTemplateName" placeholder="Namn" style="flex:1">
+            <input v-model="editTemplateAmount" placeholder="Belopp" style="width:80px" inputmode="numeric">
+          </div>
+        </div>
+        <div class="ri-actions">
+          <button v-if="editingTemplateId!==t.id" class="btn btn-sm btn-outline" @click="startEditTemplate(t)">✏️</button>
+          <button class="btn btn-sm btn-primary" @click="addFromTemplate(t,'shared')">Lägg till</button>
+          <button class="btn btn-sm btn-danger" @click="skipTemplate(t.id)">Hoppa</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm btn-block" style="margin-top:8px" @click="addAllRecurring('shared')" v-if="pendingRecurring('shared').length>1">Lägg till alla</button>
+    </div>
+
+    <template v-if="filteredShared.length>0">
+      <div v-for="(exp,idx) in filteredShared" :key="exp.id" class="expense-item"
+           @touchstart="touchStart($event,exp)" @touchmove="touchMove($event,exp)" @touchend="touchEnd($event,exp)"
+           :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
+        <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30">
+          <span>Radera</span>
+        </div>
+        <template v-if="editingId!==exp.id">
+          <div class="expense-header" @click="startEdit(exp)">
+            <div class="expense-name">{{ exp.name }}</div>
+            <div class="expense-amount">{{ fmt(exp.amount) }}</div>
+          </div>
+          <div class="expense-meta">
+            <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
+            <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
+          </div>
+          <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
+        </template>
         <template v-else>
-          <div class="diff-amount" :class="totals.diff > 0 ? 'red' : 'green'">{{ formatCurrency(Math.abs(totals.diff)) }}</div>
-          <div class="diff-who">{{ totals.whoOwes }}</div>
+          <div class="edit-form">
+            <input v-model="editName" placeholder="Namn" ref="editNameInput">
+            <input v-model="editAmount" placeholder="Belopp" inputmode="numeric">
+            <select v-model="editCategory">
+              <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
+            </select>
+            <input v-model="editNote" placeholder="Anteckning (valfritt)">
+            <div class="edit-actions">
+              <button class="btn btn-primary btn-sm" @click="saveEdit('shared')">Spara</button>
+              <button class="btn btn-outline btn-sm" @click="cancelEdit">Avbryt</button>
+              <button class="btn btn-danger btn-sm" @click="deleteExpense('shared',exp.id)">Radera</button>
+            </div>
+          </div>
         </template>
       </div>
-
-      <!-- Summary breakdown -->
-      <div class="card">
-        <div class="card-title">Sammanfattning</div>
-        <div class="summary-row">
-          <span>Gemensamma utgifter</span>
-          <span class="amount">{{ formatCurrency(totals.sharedTotal) }}</span>
-        </div>
-        <div class="summary-row">
-          <span>{{ nameA }} andel</span>
-          <span class="amount">{{ formatCurrency(totals.shareA) }}</span>
-        </div>
-        <div class="summary-row">
-          <span>{{ nameB }} andel</span>
-          <span class="amount">{{ formatCurrency(totals.shareB) }}</span>
-        </div>
-        <div class="summary-row">
-          <span>{{ nameA }} personligt</span>
-          <span class="amount">{{ formatCurrency(totals.personalA) }}</span>
-        </div>
-        <div class="summary-row">
-          <span>{{ nameB }} personligt</span>
-          <span class="amount">{{ formatCurrency(totals.personalB) }}</span>
-        </div>
-        <div class="summary-row total">
-          <span>{{ nameA }} totalt</span>
-          <span class="amount">{{ formatCurrency(totals.totalA) }}</span>
-        </div>
-        <div class="summary-row total">
-          <span>{{ nameB }} totalt</span>
-          <span class="amount">{{ formatCurrency(totals.totalB) }}</span>
-        </div>
-      </div>
+    </template>
+    <div class="empty-state" v-else-if="!searchQuery">
+      <div class="empty-icon">📝</div>
+      <p>Inga gemensamma utgifter denna månad.<br>Tryck på + för att lägga till!</p>
+    </div>
+    <div class="empty-state" v-else>
+      <div class="empty-icon">🔍</div>
+      <p>Inga träffar för "{{ searchQuery }}"</p>
     </div>
 
-    <!-- ============ GEMENSAMT ============ -->
-    <div v-if="view === 'shared'" class="view-enter" :key="'shared'">
+    <button class="fab" @click="openExpenseDialog('shared')" title="Lägg till utgift">+</button>
+  </div>
 
-      <!-- Recurring banner -->
-      <div v-if="pendingRecurring.length > 0" class="recurring-banner">
-        <div class="banner-top">
-          <span class="banner-text">⏰ {{ pendingRecurring.length }} återkommande utgifter väntar</span>
-          <div class="banner-actions">
-            <button class="btn btn-sm btn-primary" @click="acceptAllRecurring">Lägg till alla</button>
-            <button class="btn btn-sm btn-outline" @click="showRecurringList = !showRecurringList">{{ showRecurringList ? 'Dölj' : 'Visa' }}</button>
+  <!-- ============ PERSONAL ============ -->
+  <div class="view" v-if="view==='personal'" :key="'personal-'+currentMonth+personalTab">
+    <div class="segmented">
+      <button :class="{active:personalTab==='a'}" @click="personalTab='a';searchQuery=''">{{ data.persons.a.name }}</button>
+      <button :class="{active:personalTab==='b'}" @click="personalTab='b';searchQuery=''">{{ data.persons.b.name }}</button>
+    </div>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input v-model="searchQuery" placeholder="Sök utgifter…">
+    </div>
+
+    <div class="recurring-banner" v-if="pendingRecurring('personal',personalTab).length>0">
+      <h3>📦 Återkommande utgifter</h3>
+      <div class="recurring-item" v-for="t in pendingRecurring('personal',personalTab)" :key="t.id">
+        <div class="ri-info">
+          <div v-if="editingTemplateId!==t.id">
+            <div class="ri-name">{{ t.name }}</div>
+            <div class="ri-amount">{{ fmt(t.amount) }}</div>
+          </div>
+          <div v-else class="ri-edit-row">
+            <input v-model="editTemplateName" placeholder="Namn" style="flex:1">
+            <input v-model="editTemplateAmount" placeholder="Belopp" style="width:80px" inputmode="numeric">
           </div>
         </div>
-        <div v-if="showRecurringList" style="display:flex;flex-direction:column;gap:6px">
-          <div v-for="t in pendingRecurring" :key="t.id" class="recurring-item">
-            <div class="ri-info">
-              <div class="ri-name">{{ t.name }}</div>
-              <div class="ri-amount">{{ formatCurrency(t.amount) }}</div>
+        <div class="ri-actions">
+          <button v-if="editingTemplateId!==t.id" class="btn btn-sm btn-outline" @click="startEditTemplate(t)">✏️</button>
+          <button class="btn btn-sm btn-primary" @click="addFromTemplate(t,'personal')">Lägg till</button>
+          <button class="btn btn-sm btn-danger" @click="skipTemplate(t.id)">Hoppa</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm btn-block" style="margin-top:8px" @click="addAllRecurring('personal')" v-if="pendingRecurring('personal',personalTab).length>1">Lägg till alla</button>
+    </div>
+
+    <template v-if="filteredPersonal.length>0">
+      <div v-for="exp in filteredPersonal" :key="exp.id" class="expense-item"
+           @touchstart="touchStart($event,exp)" @touchmove="touchMove($event,exp)" @touchend="touchEnd($event,exp)"
+           :style="exp._swipe?{transform:'translateX('+exp._swipe+'px)'}:{}">
+        <div class="delete-bg" v-if="exp._swipe&&exp._swipe<-30">
+          <span>Radera</span>
+        </div>
+        <template v-if="editingId!==exp.id">
+          <div class="expense-header" @click="startEdit(exp)">
+            <div class="expense-name">{{ exp.name }}</div>
+            <div class="expense-amount">{{ fmt(exp.amount) }}</div>
+          </div>
+          <div class="expense-meta">
+            <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
+            <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
+          </div>
+          <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
+        </template>
+        <template v-else>
+          <div class="edit-form">
+            <input v-model="editName" placeholder="Namn" ref="editNameInput">
+            <input v-model="editAmount" placeholder="Belopp" inputmode="numeric">
+            <select v-model="editCategory">
+              <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
+            </select>
+            <input v-model="editNote" placeholder="Anteckning (valfritt)">
+            <div class="edit-actions">
+              <button class="btn btn-primary btn-sm" @click="saveEdit('personal')">Spara</button>
+              <button class="btn btn-outline btn-sm" @click="cancelEdit">Avbryt</button>
+              <button class="btn btn-danger btn-sm" @click="deleteExpense('personal',exp.id)">Radera</button>
             </div>
-            <div class="ri-actions">
-              <button class="btn btn-sm btn-primary" @click="acceptRecurring(t)">✓</button>
-              <button class="btn btn-sm btn-outline" @click="skipRecurring(t)">Hoppa</button>
-            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+    <div class="empty-state" v-else-if="!searchQuery">
+      <div class="empty-icon">📝</div>
+      <p>Inga personliga utgifter för {{ data.persons[personalTab].name }}.<br>Tryck på + för att lägga till!</p>
+    </div>
+    <div class="empty-state" v-else>
+      <div class="empty-icon">🔍</div>
+      <p>Inga träffar för "{{ searchQuery }}"</p>
+    </div>
+
+    <button class="fab" @click="openExpenseDialog('personal')" title="Lägg till utgift">+</button>
+  </div>
+
+  <!-- ============ STATISTICS ============ -->
+  <div class="view" v-if="view==='stats'" :key="'stats-'+currentMonth">
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-val">{{ fmt(ytdTotal) }}</div>
+        <div class="kpi-lbl">Hittills i år</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">{{ fmt(avgMonthly) }}</div>
+        <div class="kpi-lbl">Snitt/månad</div>
+      </div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-val">{{ highestMonth.label }}</div>
+        <div class="kpi-lbl">Dyraste: {{ fmt(highestMonth.val) }}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">{{ lowestMonth.label }}</div>
+        <div class="kpi-lbl">Billigaste: {{ fmt(lowestMonth.val) }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <h3>📊 Månadsöversikt (senaste 6 mån)</h3>
+      <div class="bar-chart">
+        <div class="bar-row" v-for="m in trendData" :key="m.month">
+          <div class="bar-label">{{ m.label }}</div>
+          <div class="bar-track">
+            <div class="bar-fill accent" :style="{width:m.pct+'%'}">{{ fmt(m.total) }}</div>
           </div>
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-title">Gemensamma utgifter</div>
-        <div v-if="monthData.shared.length === 0" class="empty-state">
-          <div class="emoji">📋</div>
-          <p>Inga utgifter ännu</p>
-          <div class="arrow">↘</div>
-        </div>
-        <div class="expense-list">
-          <template v-for="(exp, idx) in monthData.shared" :key="exp.id">
-            <div v-if="editingId === exp.id" class="inline-edit">
-              <input v-model="editName" placeholder="Namn" ref="editNameInput">
-              <input v-model.number="editAmount" inputmode="numeric" placeholder="Belopp" @focus="selectAll" @keydown.enter="saveEdit(exp)">
-              <button class="btn btn-sm btn-primary" @click="saveEdit(exp)">✓</button>
-              <button class="btn btn-sm btn-secondary" @click="editingId=null">✕</button>
-            </div>
-            <div v-else class="expense-item" @click="startEdit(exp)">
-              <span class="name">{{ exp.name }}</span>
-              <span v-if="exp.recurring" class="recurring-badge">↻</span>
-              <span class="amount">{{ formatCurrency(exp.amount) }}</span>
-              <button class="del-btn" @click.stop="removeShared(idx)" title="Ta bort">×</button>
-            </div>
-          </template>
-        </div>
-      </div>
-      <button class="fab" @click="openAddShared" title="Ny utgift">+</button>
+      <div class="empty-state" v-if="trendData.length===0" style="padding:16px"><p>Ingen data ännu</p></div>
     </div>
 
-    <!-- ============ PERSONLIGT ============ -->
-    <div v-if="view === 'personal'" class="view-enter" :key="'personal'">
-      <div class="tabs">
-        <button class="tab-btn" :class="{active: personalTab==='a'}" @click="personalTab='a'">{{ nameA }}</button>
-        <button class="tab-btn" :class="{active: personalTab==='b'}" @click="personalTab='b'">{{ nameB }}</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">{{ personalTab === 'a' ? nameA : nameB }} utgifter</div>
-        <div v-if="currentPersonalList.length === 0" class="empty-state">
-          <div class="emoji">🧾</div>
-          <p>Inga personliga utgifter</p>
-          <div class="arrow">↘</div>
-        </div>
-        <div class="expense-list">
-          <template v-for="(exp, idx) in currentPersonalList" :key="exp.id">
-            <div v-if="editingId === exp.id" class="inline-edit">
-              <input v-model="editName" placeholder="Namn" ref="editNameInput">
-              <input v-model.number="editAmount" inputmode="numeric" placeholder="Belopp" @focus="selectAll" @keydown.enter="saveEditPersonal(exp)">
-              <button class="btn btn-sm btn-primary" @click="saveEditPersonal(exp)">✓</button>
-              <button class="btn btn-sm btn-secondary" @click="editingId=null">✕</button>
-            </div>
-            <div v-else class="expense-item" @click="startEdit(exp)">
-              <span class="name">{{ exp.name }}</span>
-              <span class="amount">{{ formatCurrency(exp.amount) }}</span>
-              <button class="del-btn" @click.stop="removePersonal(idx)" title="Ta bort">×</button>
-            </div>
-          </template>
-        </div>
-      </div>
-      <button class="fab" @click="openAddPersonal" title="Ny utgift">+</button>
-    </div>
-
-    <!-- ============ DELA ============ -->
-    <div v-if="view === 'share'" class="view-enter" :key="'share'">
-      <div class="card share-section">
-        <div class="card-title">Dela med partner</div>
-        <button class="btn btn-primary btn-block" @click="shareLink" style="margin-bottom:12px">🔗 Dela länk</button>
-        <p style="font-size:13px;color:var(--text-secondary);text-align:center">Genererar en länk som innehåller all data. Din partner öppnar länken och får allt i sin cache.</p>
-      </div>
-
-      <div class="card share-section">
-        <div class="collapsible-header" :class="{open: showFallback}" @click="showFallback=!showFallback">
-          <span class="chevron">▶</span> Manuell import/export
-        </div>
-        <div v-if="showFallback">
-          <button class="btn btn-outline btn-block" @click="copyData" style="margin-bottom:10px">📋 Kopiera data</button>
-          <div class="dialog-field">
-            <label>Importera data</label>
-            <textarea v-model="importText" placeholder="Klistra in data här…"></textarea>
+    <div class="stat-card">
+      <h3>🥧 Kategorier denna månad</h3>
+      <div v-if="catBreakdown.length>0">
+        <div class="donut" :style="{background:conicGradient}">
+          <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
+            <div class="donut-val">{{ catBreakdown.length }}</div>
+            <div class="donut-txt">kategorier</div>
           </div>
-          <button class="btn btn-primary btn-block" @click="importData">Importera</button>
+        </div>
+        <div class="cat-legend">
+          <div class="cat-legend-item" v-for="c in catBreakdown" :key="c.id">
+            <div class="dot" :style="{background:c.color}"></div>
+            {{ c.emoji }} {{ c.pct }}%
+          </div>
         </div>
       </div>
+      <div class="empty-state" v-else style="padding:16px"><p>Inga utgifter denna månad</p></div>
+    </div>
 
-      <div class="card share-section">
-        <div class="card-title">Övrigt</div>
-        <button class="btn btn-outline btn-block" @click="exportJSON" style="margin-bottom:10px">📥 Exportera JSON</button>
-        <button class="btn btn-danger btn-block" @click="clearMonth">🗑 Rensa månad</button>
+    <div class="stat-card">
+      <h3>👥 Jämförelse denna månad</h3>
+      <div class="compare-bars">
+        <div class="compare-bar">
+          <div class="cb-val">{{ fmt(settlement.aShare + personalTotal('a')) }}</div>
+          <div class="cb-track" style="height:100px">
+            <div class="cb-fill accent" :style="{height:compareBarH('a')+'%'}"></div>
+          </div>
+          <div class="cb-name">{{ data.persons.a.name }}</div>
+        </div>
+        <div class="compare-bar">
+          <div class="cb-val">{{ fmt(settlement.bShare + personalTotal('b')) }}</div>
+          <div class="cb-track" style="height:100px">
+            <div class="cb-fill secondary" :style="{height:compareBarH('b')+'%'}"></div>
+          </div>
+          <div class="cb-name">{{ data.persons.b.name }}</div>
+        </div>
       </div>
     </div>
 
-  </div><!-- /main -->
+    <div class="stat-card">
+      <h3>🔄 Återkommande vs engång</h3>
+      <div v-if="recurringVsOnce.total>0">
+        <div class="donut" :style="{background:'conic-gradient(var(--accent) 0% '+recurringVsOnce.recurPct+'%, var(--bg3) '+recurringVsOnce.recurPct+'% 100%)'}">
+          <div class="donut-label" style="background:var(--bg2);width:70px;height:70px;border-radius:50%;margin:25px">
+            <div class="donut-val">{{ recurringVsOnce.recurPct }}%</div>
+            <div class="donut-txt">återkom.</div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:13px;color:var(--text2)">
+          Återkommande: {{ fmt(recurringVsOnce.recurAmt) }} · Engång: {{ fmt(recurringVsOnce.onceAmt) }}
+        </div>
+      </div>
+      <div class="empty-state" v-else style="padding:16px"><p>Inga utgifter denna månad</p></div>
+    </div>
 
-  <!-- V2 View (outside main for full width) -->
-  <iframe v-if="view === 'v2'" class="v2-frame" src="v2.html"></iframe>
+    <div class="stat-card">
+      <h3>🏆 Största utgifter denna månad</h3>
+      <div class="top-list" v-if="topExpenses.length>0">
+        <div class="top-item" v-for="(exp,i) in topExpenses" :key="exp.id">
+          <span class="top-rank">{{ i+1 }}.</span>
+          <span class="top-name">{{ exp.name }}</span>
+          <span class="top-val">{{ fmt(exp.amount) }}</span>
+        </div>
+      </div>
+      <div class="empty-state" v-else style="padding:16px"><p>Inga utgifter denna månad</p></div>
+    </div>
+
+    <div class="stat-card" v-if="allPayments.length>0">
+      <h3>💳 Betalningshistorik</h3>
+      <div class="payment-list">
+        <div class="payment-item" v-for="py in allPayments" :key="py.id">
+          <div class="pi-info">
+            <div class="pi-date">{{ py.monthLabel }} · {{ py.date }}</div>
+            <div class="pi-note" v-if="py.note">{{ py.note }}</div>
+          </div>
+          <div class="pi-amount">{{ fmt(py.amount) }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SHARE ============ -->
+  <div class="view" v-if="view==='share'" :key="'share-'+currentMonth">
+    <div class="card">
+      <div class="card-title">Dela data</div>
+      <button class="btn btn-primary btn-block" @click="shareLink" style="margin-bottom:8px">📤 Dela länk</button>
+      <button class="btn btn-outline btn-block" @click="copyData">📋 Kopiera data</button>
+    </div>
+
+    <div class="card">
+      <div class="collapsible-header" @click="importOpen=!importOpen">
+        <h3 style="font-size:14px;font-weight:600">📥 Importera data</h3>
+        <span class="arrow" :class="{open:importOpen}">▼</span>
+      </div>
+      <div v-if="importOpen">
+        <textarea v-model="importText" placeholder="Klistra in komprimerad data eller URL här…" style="margin-bottom:8px"></textarea>
+        <button class="btn btn-primary btn-block btn-sm" @click="importFromText">Importera</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Exportera</div>
+      <button class="btn btn-outline btn-block" @click="exportJSON">📄 Exportera JSON</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Verktyg</div>
+      <button class="btn btn-outline btn-block" @click="copyPreviousMonth" style="margin-bottom:8px">📋 Kopiera föregående månad</button>
+      <button class="btn btn-danger btn-block" @click="clearMonth">🗑️ Rensa denna månad</button>
+    </div>
+  </div>
 
   <!-- Bottom Nav -->
-  <div class="bottom-nav">
-    <button class="nav-btn" :class="{active: view==='home'}" @click="view='home'">
-      <span class="icon">🏠</span><span class="label">Hem</span>
+  <nav class="bottom-nav">
+    <button v-for="tab in tabs" :key="tab.id" :class="{active:view===tab.id}" @click="switchView(tab.id)">
+      <span class="icon">{{ tab.icon }}</span>
+      {{ tab.label }}
     </button>
-    <button class="nav-btn" :class="{active: view==='shared'}" @click="view='shared'">
-      <span class="icon">📊</span><span class="label">Gemensamt</span>
-    </button>
-    <button class="nav-btn" :class="{active: view==='personal'}" @click="view='personal'">
-      <span class="icon">👤</span><span class="label">Personligt</span>
-    </button>
-    <button class="nav-btn" :class="{active: view==='share'}" @click="view='share'">
-      <span class="icon">🔗</span><span class="label">Dela</span>
-    </button>
-    <button class="nav-btn" :class="{active: view==='v2'}" @click="view='v2'">
-      <span class="icon">🆕</span><span class="label">V2</span>
-    </button>
-  </div>
+  </nav>
 
-  <!-- Toast -->
-  <div v-if="toast.show" class="toast">
-    {{ toast.text }}
-    <button v-if="toast.undo" class="undo-btn" @click="toast.undo(); hideToast()">Ångra</button>
-  </div>
-
-  <!-- Add Shared Dialog -->
-  <dialog ref="addSharedDialog">
-    <h2>Ny gemensam utgift</h2>
-    <div class="dialog-field">
+  <!-- Add/Edit Expense Dialog -->
+  <dialog ref="expenseDialog">
+    <div class="dialog-content">
+      <h2>{{ dialogTitle }}</h2>
       <label>Namn</label>
-      <input v-model="newExpense.name" placeholder="T.ex. Hyra" ref="newExpenseNameInput">
-    </div>
-    <div class="dialog-field">
+      <input v-model="dialogName" placeholder="T.ex. Hyra" ref="dialogNameInput">
       <label>Belopp (kr)</label>
-      <input v-model.number="newExpense.amount" inputmode="numeric" placeholder="0" @focus="selectAll">
-    </div>
-    <div class="dialog-field">
-      <label class="checkbox-row">
-        <input type="checkbox" v-model="newExpense.recurring"> Återkommande varje månad
-      </label>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn btn-secondary" @click="$refs.addSharedDialog.close()">Avbryt</button>
-      <button class="btn btn-primary" @click="addShared">Lägg till</button>
+      <input v-model="dialogAmount" placeholder="0" inputmode="numeric">
+      <label>Kategori</label>
+      <select v-model="dialogCategory">
+        <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
+      </select>
+      <label>Anteckning (valfritt)</label>
+      <input v-model="dialogNote" placeholder="">
+      <div class="check-group">
+        <input type="checkbox" id="dlg-recur" v-model="dialogRecurring">
+        <label for="dlg-recur">Återkommande varje månad</label>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-outline" @click="closeExpenseDialog">Avbryt</button>
+        <button class="btn btn-primary" @click="saveExpenseDialog">Lägg till</button>
+      </div>
     </div>
   </dialog>
 
-  <!-- Add Personal Dialog -->
-  <dialog ref="addPersonalDialog">
-    <h2>Ny personlig utgift</h2>
-    <div class="dialog-field">
-      <label>Namn</label>
-      <input v-model="newExpense.name" placeholder="T.ex. Lunch" ref="newExpenseNameInputP">
-    </div>
-    <div class="dialog-field">
+  <!-- Payment Dialog -->
+  <dialog ref="paymentDialog">
+    <div class="dialog-content">
+      <h2>Registrera betalning</h2>
       <label>Belopp (kr)</label>
-      <input v-model.number="newExpense.amount" inputmode="numeric" placeholder="0" @focus="selectAll">
-    </div>
-    <div class="dialog-actions">
-      <button class="btn btn-secondary" @click="$refs.addPersonalDialog.close()">Avbryt</button>
-      <button class="btn btn-primary" @click="addPersonal">Lägg till</button>
+      <input v-model="payAmount" placeholder="0" inputmode="numeric" ref="payAmountInput">
+      <label>Datum</label>
+      <input type="date" v-model="payDate">
+      <label>Anteckning (valfritt)</label>
+      <input v-model="payNote" placeholder="T.ex. Swish mars">
+      <div class="dialog-actions">
+        <button class="btn btn-outline" @click="$refs.paymentDialog.close()">Avbryt</button>
+        <button class="btn btn-primary" @click="savePayment">Spara</button>
+      </div>
     </div>
   </dialog>
 
-  <!-- Confirm Clear Dialog -->
-  <dialog ref="confirmClearDialog">
-    <h2>Rensa månad?</h2>
-    <p style="margin-bottom:16px">All data för {{ monthLabel(currentMonth) }} tas bort. Detta går inte att ångra.</p>
-    <div class="dialog-actions">
-      <button class="btn btn-secondary" @click="$refs.confirmClearDialog.close()">Avbryt</button>
-      <button class="btn btn-danger" @click="confirmClear">Rensa</button>
+  <!-- Large amount confirm dialog -->
+  <dialog ref="largeAmountDialog">
+    <div class="dialog-content">
+      <h2>Bekräfta belopp</h2>
+      <p style="color:var(--text2);margin-bottom:16px">Beloppet {{ fmt(pendingLargeAmount) }} verkar ovanligt högt. Vill du fortsätta?</p>
+      <div class="dialog-actions">
+        <button class="btn btn-outline" @click="$refs.largeAmountDialog.close();pendingLargeCallback=null">Avbryt</button>
+        <button class="btn btn-primary" @click="confirmLargeAmount">Ja, fortsätt</button>
+      </div>
     </div>
   </dialog>
 
@@ -793,561 +748,758 @@ textarea {
 <script>
 const { createApp, ref, reactive, computed, watch, onMounted, nextTick } = Vue;
 
-const STORAGE_KEY = 'expense-data';
-const MONTHS_SV = ['januari','februari','mars','april','maj','juni','juli','augusti','september','oktober','november','december'];
-
-function emptyData() {
-  return {
-    persons: {
-      a: { name: '', income: 0 },
-      b: { name: '', income: 0 }
-    },
-    splitMode: 'equal',
-    months: {},
-    recurringTemplates: []
-  };
-}
-
-function emptyMonth() {
-  return { shared: [], personal: { a: [], b: [] } };
-}
-
-function genId() {
-  return crypto.randomUUID();
-}
-
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      // Ensure structure
-      if (!parsed.persons) parsed.persons = emptyData().persons;
-      if (!parsed.persons.a) parsed.persons.a = { name: '', income: 0 };
-      if (!parsed.persons.b) parsed.persons.b = { name: '', income: 0 };
-      if (!parsed.splitMode) parsed.splitMode = 'equal';
-      if (!parsed.months) parsed.months = {};
-      if (!parsed.recurringTemplates) parsed.recurringTemplates = [];
-      return parsed;
-    }
-  } catch(e) { /* ignore */ }
-  return emptyData();
-}
-
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-function getCurrentMonthStr() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-}
-
-function generateMonthOptions() {
-  const options = [];
-  const now = new Date();
-  for (let i = -12; i <= 1; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-    const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const label = `${MONTHS_SV[d.getMonth()]} ${d.getFullYear()}`;
-    options.push({ value: val, label });
-  }
-  return options;
-}
-
-// Compression utilities using native CompressionStream / DecompressionStream
-async function compressData(jsonStr) {
-  const encoder = new TextEncoder();
-  const input = encoder.encode(jsonStr);
-  const cs = new CompressionStream('gzip');
-  const writer = cs.writable.getWriter();
-  writer.write(input);
-  writer.close();
-  const reader = cs.readable.getReader();
-  const chunks = [];
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-  }
-  const totalLen = chunks.reduce((s, c) => s + c.length, 0);
-  const result = new Uint8Array(totalLen);
-  let offset = 0;
-  for (const chunk of chunks) {
-    result.set(chunk, offset);
-    offset += chunk.length;
-  }
-  return result;
-}
-
-async function decompressData(compressed) {
-  const ds = new DecompressionStream('gzip');
-  const writer = ds.writable.getWriter();
-  writer.write(compressed);
-  writer.close();
-  const reader = ds.readable.getReader();
-  const chunks = [];
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-  }
-  const totalLen = chunks.reduce((s, c) => s + c.length, 0);
-  const result = new Uint8Array(totalLen);
-  let offset = 0;
-  for (const chunk of chunks) {
-    result.set(chunk, offset);
-    offset += chunk.length;
-  }
-  return new TextDecoder().decode(result);
-}
-
-function toBase64Url(uint8) {
-  let binary = '';
-  for (let i = 0; i < uint8.length; i++) binary += String.fromCharCode(uint8[i]);
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-function fromBase64Url(str) {
-  str = str.replace(/-/g, '+').replace(/_/g, '/');
-  while (str.length % 4) str += '=';
-  const binary = atob(str);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
-}
-
-const app = createApp({
+createApp({
   setup() {
+    // ========== CATEGORIES ==========
+    const categories = [
+      { id:'hyra', emoji:'🏠', label:'Hyra', color:'var(--cat-hyra)' },
+      { id:'el', emoji:'🔌', label:'El & Vatten', color:'var(--cat-el)' },
+      { id:'telefon', emoji:'📱', label:'Telefon & Internet', color:'var(--cat-telefon)' },
+      { id:'mat', emoji:'🛒', label:'Mat & Hushåll', color:'var(--cat-mat)' },
+      { id:'transport', emoji:'🚗', label:'Transport', color:'var(--cat-transport)' },
+      { id:'noje', emoji:'🎬', label:'Nöje', color:'var(--cat-noje)' },
+      { id:'klader', emoji:'👕', label:'Kläder', color:'var(--cat-klader)' },
+      { id:'halsa', emoji:'🏥', label:'Hälsa', color:'var(--cat-halsa)' },
+      { id:'pren', emoji:'📦', label:'Prenumerationer', color:'var(--cat-pren)' },
+      { id:'ovrigt', emoji:'💰', label:'Övrigt', color:'var(--cat-ovrigt)' }
+    ];
+    const catMap = {};
+    categories.forEach(c => catMap[c.id] = c);
+    const catEmoji = id => catMap[id]?.emoji || '💰';
+    const catLabel = id => catMap[id]?.label || 'Övrigt';
+    const catColor = id => catMap[id]?.color || 'var(--cat-ovrigt)';
+    const catStyle = id => ({background: catColor(id)+'22', color: catColor(id)});
+
+    // ========== FORMAT ==========
+    const fmtN = new Intl.NumberFormat('sv-SE', { style:'currency', currency:'SEK', maximumFractionDigits:0 });
+    const fmt = v => fmtN.format(v || 0);
+
+    // ========== DATE ==========
+    const now = new Date();
+    const toMonthKey = d => d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0');
+    const currentMonth = ref(toMonthKey(now));
+
+    const formatMonthLabel = m => {
+      const [y,mo] = m.split('-');
+      const d = new Date(+y, +mo-1);
+      return d.toLocaleDateString('sv-SE',{year:'numeric',month:'long'});
+    };
+
+    // ========== DATA ==========
+    const defaultData = () => ({
+      persons: { a: { name:'Elliot', income:0 }, b: { name:'Alis', income:0 } },
+      splitMode: 'equal',
+      months: {},
+      recurringTemplates: []
+    });
+
+    const ensureMonth = (d, key) => {
+      if (!d.months[key]) {
+        d.months[key] = { shared:[], personal:{ a:[], b:[] }, payments:[], skippedRecurringIds:[] };
+      }
+      const m = d.months[key];
+      if (!Array.isArray(m.shared)) m.shared = [];
+      if (!m.personal || typeof m.personal !== 'object') m.personal = { a:[], b:[] };
+      if (!Array.isArray(m.personal.a)) m.personal.a = [];
+      if (!Array.isArray(m.personal.b)) m.personal.b = [];
+      if (!Array.isArray(m.payments)) m.payments = [];
+      if (!Array.isArray(m.skippedRecurringIds)) m.skippedRecurringIds = [];
+      return m;
+    };
+
+    const loadData = () => {
+      try {
+        const raw = localStorage.getItem('expense-data');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const d = defaultData();
+          if (parsed.persons && typeof parsed.persons === 'object') {
+            if (parsed.persons.a) { d.persons.a.name = String(parsed.persons.a.name||'Elliot'); d.persons.a.income = Math.max(0,parseInt(parsed.persons.a.income)||0); }
+            if (parsed.persons.b) { d.persons.b.name = String(parsed.persons.b.name||'Alis'); d.persons.b.income = Math.max(0,parseInt(parsed.persons.b.income)||0); }
+          }
+          if (parsed.splitMode === 'equal' || parsed.splitMode === 'income') d.splitMode = parsed.splitMode;
+          if (parsed.months && typeof parsed.months === 'object') d.months = parsed.months;
+          if (Array.isArray(parsed.recurringTemplates)) d.recurringTemplates = parsed.recurringTemplates;
+          // Ensure all months are valid
+          Object.keys(d.months).forEach(k => ensureMonth(d, k));
+          return d;
+        }
+      } catch(e) { console.warn('Failed to load data, using defaults', e); }
+      return defaultData();
+    };
+
     const data = reactive(loadData());
+    ensureMonth(data, currentMonth.value);
+
+    const saveData = () => {
+      try { localStorage.setItem('expense-data', JSON.stringify(data)); } catch(e) { console.warn('Save failed', e); }
+    };
+
+    watch(() => data, saveData, { deep: true });
+
+    // ========== MONTH DATA ==========
+    const monthData = computed(() => {
+      ensureMonth(data, currentMonth.value);
+      return data.months[currentMonth.value];
+    });
+
+    const availableMonths = computed(() => {
+      const keys = new Set(Object.keys(data.months));
+      keys.add(currentMonth.value);
+      // add previous/next month
+      const [y,m] = currentMonth.value.split('-').map(Number);
+      const prev = new Date(y, m-2); keys.add(toMonthKey(prev));
+      const next = new Date(y, m); keys.add(toMonthKey(next));
+      // also add current real month
+      keys.add(toMonthKey(now));
+      return [...keys].sort();
+    });
+
+    const onMonthChange = () => {
+      ensureMonth(data, currentMonth.value);
+      editingId.value = null;
+      searchQuery.value = '';
+    };
+
+    // ========== SETTLEMENT ==========
+    const totalShared = computed(() => monthData.value.shared.reduce((s,e) => s + (parseInt(e.amount)||0), 0));
+
+    const splitRatio = computed(() => {
+      if (data.splitMode === 'equal') return 0.5;
+      const a = data.persons.a.income || 0;
+      const b = data.persons.b.income || 0;
+      if (a === 0 && b === 0) return 0.5;
+      if (a === 0) return 0; // B pays 0% if only A has no income -> wait, spec says "if only one income is 0, other person pays 100%"
+      // "If only one income is 0: other person pays 100%"
+      // This is B's ratio. If A income is 0, B pays 100%. If B income is 0, B pays 0%.
+      if (b === 0) return 0;
+      if (a === 0) return 1;
+      return b / (a + b);
+    });
+
+    const settlement = computed(() => {
+      const total = totalShared.value;
+      const bRatio = splitRatio.value;
+      const bShare = Math.round(total * bRatio);
+      const aShare = total - bShare;
+      const totalPaid = monthData.value.payments.reduce((s,p) => s + (parseInt(p.amount)||0), 0);
+      const remaining = Math.max(0, bShare - totalPaid);
+      const paidPct = bShare > 0 ? Math.round((totalPaid / bShare) * 100) : 0;
+      return { aShare, bShare, totalPaid, remaining, paidPct };
+    });
+
+    const personalTotal = person => {
+      const arr = monthData.value.personal[person] || [];
+      return arr.reduce((s,e) => s + (parseInt(e.amount)||0), 0);
+    };
+
+    // ========== AMOUNT PARSING ==========
+    const parseAmount = str => {
+      if (!str && str !== 0) return 0;
+      const cleaned = String(str).replace(/[^0-9]/g, '');
+      return parseInt(cleaned) || 0;
+    };
+
+    // ========== NAV ==========
+    const tabs = [
+      { id:'home', icon:'🏠', label:'Hem' },
+      { id:'shared', icon:'👥', label:'Gemensamt' },
+      { id:'personal', icon:'👤', label:'Personligt' },
+      { id:'stats', icon:'📊', label:'Statistik' },
+      { id:'share', icon:'📤', label:'Dela' }
+    ];
     const view = ref('home');
-    const currentMonth = ref(getCurrentMonthStr());
-    const monthOptions = generateMonthOptions();
+    const switchView = v => { view.value = v; editingId.value = null; searchQuery.value = ''; };
+
+    // ========== PERSON TAB ==========
     const personalTab = ref('a');
-    const showRecurringList = ref(false);
-    const showFallback = ref(false);
-    const importText = ref('');
+
+    // ========== INCOME ==========
+    const setIncome = (p, val) => { data.persons[p].income = parseAmount(val); };
+
+    // ========== SEARCH ==========
+    const searchQuery = ref('');
+
+    const filteredShared = computed(() => {
+      const q = searchQuery.value.toLowerCase();
+      const items = monthData.value.shared;
+      return q ? items.filter(e => e.name.toLowerCase().includes(q)) : items;
+    });
+
+    const filteredPersonal = computed(() => {
+      const q = searchQuery.value.toLowerCase();
+      const items = monthData.value.personal[personalTab.value] || [];
+      return q ? items.filter(e => e.name.toLowerCase().includes(q)) : items;
+    });
+
+    // ========== EDITING ==========
     const editingId = ref(null);
     const editName = ref('');
-    const editAmount = ref(0);
-    const newExpense = reactive({ name: '', amount: 0, recurring: false });
+    const editAmount = ref('');
+    const editCategory = ref('ovrigt');
+    const editNote = ref('');
 
-    // Toast
-    const toast = reactive({ show: false, text: '', undo: null });
-    let toastTimer = null;
-    function showToast(text, undoFn) {
-      if (toastTimer) clearTimeout(toastTimer);
-      toast.show = true;
-      toast.text = text;
-      toast.undo = undoFn || null;
-      toastTimer = setTimeout(() => { toast.show = false; toast.undo = null; }, 5000);
-    }
-    function hideToast() {
-      if (toastTimer) clearTimeout(toastTimer);
-      toast.show = false;
-      toast.undo = null;
-    }
-
-    // Refs
-    const addSharedDialog = ref(null);
-    const addPersonalDialog = ref(null);
-    const confirmClearDialog = ref(null);
-    const newExpenseNameInput = ref(null);
-    const newExpenseNameInputP = ref(null);
-
-    // Ensure month data exists
-    function ensureMonth(m) {
-      if (!data.months[m]) {
-        // Auto-copy person info from most recent month
-        const sortedMonths = Object.keys(data.months).sort();
-        if (sortedMonths.length > 0) {
-          // Persons & split already on top-level data
-        }
-        data.months[m] = emptyMonth();
-        save();
-      }
-    }
-
-    const monthData = computed(() => {
-      ensureMonth(currentMonth.value);
-      const md = data.months[currentMonth.value];
-      if (!md.personal) md.personal = { a: [], b: [] };
-      if (!md.personal.a) md.personal.a = [];
-      if (!md.personal.b) md.personal.b = [];
-      if (!md.shared) md.shared = [];
-      return md;
-    });
-
-    const nameA = computed(() => data.persons.a.name || 'Person A');
-    const nameB = computed(() => data.persons.b.name || 'Person B');
-
-    const currentPersonalList = computed(() => monthData.value.personal[personalTab.value] || []);
-
-    // Pending recurring templates
-    const pendingRecurring = computed(() => {
-      const md = monthData.value;
-      const existingNames = new Set(md.shared.filter(e => e.recurring).map(e => e.name));
-      const skipped = new Set(md._skippedRecurring || []);
-      return data.recurringTemplates.filter(t => {
-        if (t.type === 'shared') return !existingNames.has(t.name) && !skipped.has(t.name);
-        return false;
-      });
-    });
-
-    // Totals
-    const totals = computed(() => {
-      const md = monthData.value;
-      const sharedTotal = md.shared.reduce((s, e) => s + (e.amount || 0), 0);
-      const personalA = (md.personal.a || []).reduce((s, e) => s + (e.amount || 0), 0);
-      const personalB = (md.personal.b || []).reduce((s, e) => s + (e.amount || 0), 0);
-
-      let shareA, shareB;
-      if (data.splitMode === 'byIncome') {
-        const totalIncome = (data.persons.a.income || 0) + (data.persons.b.income || 0);
-        if (totalIncome > 0) {
-          shareA = sharedTotal * (data.persons.a.income || 0) / totalIncome;
-          shareB = sharedTotal * (data.persons.b.income || 0) / totalIncome;
-        } else {
-          shareA = sharedTotal / 2;
-          shareB = sharedTotal / 2;
-        }
-      } else {
-        shareA = sharedTotal / 2;
-        shareB = sharedTotal / 2;
-      }
-
-      const totalA = shareA + personalA;
-      const totalB = shareB + personalB;
-      const diff = totalA - totalB;
-
-      let whoOwes = '';
-      if (diff > 0) {
-        whoOwes = `${nameA.value} betalar ${formatCurrency(Math.abs(diff))} mer`;
-      } else if (diff < 0) {
-        whoOwes = `${nameB.value} betalar ${formatCurrency(Math.abs(diff))} mer`;
-      }
-
-      return { sharedTotal, shareA, shareB, personalA, personalB, totalA, totalB, diff, whoOwes };
-    });
-
-    function formatCurrency(val) {
-      if (val == null) return '0 kr';
-      return new Intl.NumberFormat('sv-SE', {
-        style: 'currency',
-        currency: 'SEK',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(val);
-    }
-
-    function monthLabel(val) {
-      const [y, m] = val.split('-');
-      return `${MONTHS_SV[parseInt(m) - 1]} ${y}`;
-    }
-
-    function save() {
-      saveData(data);
-    }
-
-    function changeMonth(val) {
-      currentMonth.value = val;
-      ensureMonth(val);
-    }
-
-    function selectAll(e) {
-      e.target.select();
-    }
-
-    // Add shared
-    function openAddShared() {
-      newExpense.name = '';
-      newExpense.amount = 0;
-      newExpense.recurring = false;
-      addSharedDialog.value.showModal();
-      nextTick(() => { if (newExpenseNameInput.value) newExpenseNameInput.value.focus(); });
-    }
-
-    function addShared() {
-      if (!newExpense.name || !newExpense.amount) return;
-      const exp = {
-        id: genId(),
-        name: newExpense.name,
-        amount: newExpense.amount,
-        recurring: newExpense.recurring
-      };
-      monthData.value.shared.push(exp);
-
-      if (newExpense.recurring) {
-        const existing = data.recurringTemplates.find(t => t.name === newExpense.name && t.type === 'shared');
-        if (!existing) {
-          data.recurringTemplates.push({
-            id: genId(),
-            name: newExpense.name,
-            amount: newExpense.amount,
-            type: 'shared',
-            person: null
-          });
-        }
-      }
-
-      save();
-      addSharedDialog.value.close();
-      showToast('Utgift tillagd');
-    }
-
-    // Add personal
-    function openAddPersonal() {
-      newExpense.name = '';
-      newExpense.amount = 0;
-      newExpense.recurring = false;
-      addPersonalDialog.value.showModal();
-      nextTick(() => { if (newExpenseNameInputP.value) newExpenseNameInputP.value.focus(); });
-    }
-
-    function addPersonal() {
-      if (!newExpense.name || !newExpense.amount) return;
-      const exp = { id: genId(), name: newExpense.name, amount: newExpense.amount };
-      if (!monthData.value.personal[personalTab.value]) {
-        monthData.value.personal[personalTab.value] = [];
-      }
-      monthData.value.personal[personalTab.value].push(exp);
-      save();
-      addPersonalDialog.value.close();
-      showToast('Utgift tillagd');
-    }
-
-    // Remove with undo
-    function removeShared(idx) {
-      const removed = monthData.value.shared.splice(idx, 1)[0];
-      save();
-      showToast('Utgift borttagen', () => {
-        monthData.value.shared.splice(idx, 0, removed);
-        save();
-      });
-    }
-
-    function removePersonal(idx) {
-      const list = monthData.value.personal[personalTab.value];
-      const removed = list.splice(idx, 1)[0];
-      save();
-      showToast('Utgift borttagen', () => {
-        list.splice(idx, 0, removed);
-        save();
-      });
-    }
-
-    // Inline edit
-    function startEdit(exp) {
+    const startEdit = exp => {
       editingId.value = exp.id;
       editName.value = exp.name;
-      editAmount.value = exp.amount;
-    }
+      editAmount.value = String(exp.amount);
+      editCategory.value = exp.category || 'ovrigt';
+      editNote.value = exp.note || '';
+    };
+    const cancelEdit = () => { editingId.value = null; };
 
-    function saveEdit(exp) {
-      exp.name = editName.value;
-      exp.amount = editAmount.value || 0;
+    const saveEdit = type => {
+      const amt = parseAmount(editAmount.value);
+      if (!editName.value.trim() || amt <= 0) return;
+
+      const doSave = () => {
+        let arr;
+        if (type === 'shared') arr = monthData.value.shared;
+        else arr = monthData.value.personal[personalTab.value];
+        const exp = arr.find(e => e.id === editingId.value);
+        if (exp) {
+          exp.name = editName.value.trim();
+          exp.amount = amt;
+          exp.category = editCategory.value;
+          exp.note = editNote.value.trim();
+        }
+        editingId.value = null;
+      };
+
+      if (amt > 50000) {
+        pendingLargeAmount.value = amt;
+        pendingLargeCallback.value = doSave;
+        nextTick(() => { try { expenseRefs.largeAmountDialog?.showModal(); } catch(e){} });
+      } else {
+        doSave();
+      }
+    };
+
+    // ========== DELETE ==========
+    const deleteExpense = (type, id) => {
+      let arr;
+      if (type === 'shared') arr = monthData.value.shared;
+      else arr = monthData.value.personal[personalTab.value];
+      const idx = arr.findIndex(e => e.id === id);
+      if (idx < 0) return;
+      const removed = arr.splice(idx, 1)[0];
       editingId.value = null;
-      save();
-    }
-
-    function saveEditPersonal(exp) {
-      exp.name = editName.value;
-      exp.amount = editAmount.value || 0;
-      editingId.value = null;
-      save();
-    }
-
-    // Recurring
-    function acceptRecurring(t) {
-      monthData.value.shared.push({
-        id: genId(),
-        name: t.name,
-        amount: t.amount,
-        recurring: true
+      const monthKey = currentMonth.value;
+      const tabKey = personalTab.value;
+      showToast('Utgift raderad', () => {
+        // undo
+        let target;
+        if (type === 'shared') {
+          ensureMonth(data, monthKey);
+          target = data.months[monthKey].shared;
+        } else {
+          ensureMonth(data, monthKey);
+          target = data.months[monthKey].personal[tabKey];
+        }
+        target.splice(idx, 0, removed);
       });
-      save();
-      showToast(`"${t.name}" tillagd`);
-    }
+    };
 
-    function acceptAllRecurring() {
-      for (const t of pendingRecurring.value) {
-        monthData.value.shared.push({
-          id: genId(),
-          name: t.name,
-          amount: t.amount,
-          recurring: true
-        });
+    // ========== SWIPE ==========
+    const touchState = {};
+    const touchStart = (e, exp) => {
+      const t = e.touches[0];
+      touchState.startX = t.clientX;
+      touchState.startY = t.clientY;
+      touchState.id = exp.id;
+      touchState.swiping = false;
+    };
+    const touchMove = (e, exp) => {
+      if (touchState.id !== exp.id) return;
+      const t = e.touches[0];
+      const dx = t.clientX - touchState.startX;
+      const dy = t.clientY - touchState.startY;
+      if (!touchState.swiping && Math.abs(dy) > Math.abs(dx)) return;
+      if (dx < -10) {
+        touchState.swiping = true;
+        exp._swipe = Math.max(-80, dx);
       }
-      save();
-      showToast(`${pendingRecurring.value.length} utgifter tillagda`);
-    }
+    };
+    const touchEnd = (e, exp) => {
+      if (touchState.id !== exp.id) return;
+      if (exp._swipe && exp._swipe < -50) {
+        const type = view.value === 'shared' ? 'shared' : 'personal';
+        deleteExpense(type, exp.id);
+      }
+      exp._swipe = 0;
+      touchState.swiping = false;
+    };
 
-    function skipRecurring(t) {
-      // add a skipped marker so it doesn't show again this month
-      if (!monthData.value._skippedRecurring) monthData.value._skippedRecurring = [];
-      monthData.value._skippedRecurring.push(t.name);
-      save();
-    }
+    // ========== DIALOG ==========
+    const dialogMode = ref('shared');
+    const dialogTitle = computed(() => dialogMode.value === 'shared' ? 'Ny gemensam utgift' : 'Ny personlig utgift');
+    const dialogName = ref('');
+    const dialogAmount = ref('');
+    const dialogCategory = ref('ovrigt');
+    const dialogNote = ref('');
+    const dialogRecurring = ref(false);
+    const expenseDialog = ref(null);
+    const dialogNameInput = ref(null);
+    const paymentDialog = ref(null);
+    const largeAmountDialog = ref(null);
+    const payAmountInput = ref(null);
 
-    // Share
-    async function shareLink() {
+    // Template refs store
+    const expenseRefs = {};
+    onMounted(() => {
+      expenseRefs.expenseDialog = expenseDialog.value;
+      expenseRefs.paymentDialog = paymentDialog.value;
+      expenseRefs.largeAmountDialog = largeAmountDialog.value;
+    });
+
+    const openExpenseDialog = mode => {
+      dialogMode.value = mode;
+      dialogName.value = '';
+      dialogAmount.value = '';
+      dialogCategory.value = 'ovrigt';
+      dialogNote.value = '';
+      dialogRecurring.value = false;
+      nextTick(() => {
+        try { expenseDialog.value?.showModal(); } catch(e){}
+        nextTick(() => { dialogNameInput.value?.focus?.(); });
+      });
+    };
+
+    const closeExpenseDialog = () => { expenseDialog.value?.close(); };
+
+    const pendingLargeAmount = ref(0);
+    const pendingLargeCallback = ref(null);
+
+    const confirmLargeAmount = () => {
+      largeAmountDialog.value?.close();
+      if (pendingLargeCallback.value) {
+        pendingLargeCallback.value();
+        pendingLargeCallback.value = null;
+      }
+    };
+
+    const saveExpenseDialog = () => {
+      const name = dialogName.value.trim();
+      const amt = parseAmount(dialogAmount.value);
+      if (!name) { nextTick(() => dialogNameInput.value?.focus?.()); return; }
+      if (amt <= 0) return;
+
+      const doSave = () => {
+        const expense = {
+          id: crypto.randomUUID(),
+          name,
+          amount: amt,
+          category: dialogCategory.value,
+          note: dialogNote.value.trim(),
+          recurring: dialogRecurring.value,
+          sourceTemplateId: null
+        };
+
+        if (dialogMode.value === 'shared') {
+          monthData.value.shared.push(expense);
+        } else {
+          monthData.value.personal[personalTab.value].push(expense);
+        }
+
+        // Create recurring template if checked
+        if (dialogRecurring.value) {
+          const tmpl = {
+            id: crypto.randomUUID(),
+            name,
+            amount: amt,
+            category: dialogCategory.value,
+            type: dialogMode.value,
+            person: dialogMode.value === 'personal' ? personalTab.value : null
+          };
+          expense.sourceTemplateId = tmpl.id;
+          data.recurringTemplates.push(tmpl);
+        }
+
+        expenseDialog.value?.close();
+        showToast('Utgift tillagd');
+      };
+
+      if (amt > 50000) {
+        pendingLargeAmount.value = amt;
+        pendingLargeCallback.value = doSave;
+        nextTick(() => { try { largeAmountDialog.value?.showModal(); } catch(e){} });
+      } else {
+        doSave();
+      }
+    };
+
+    // ========== RECURRING TEMPLATES ==========
+    const editingTemplateId = ref(null);
+    const editTemplateName = ref('');
+    const editTemplateAmount = ref('');
+
+    const startEditTemplate = t => {
+      editingTemplateId.value = t.id;
+      editTemplateName.value = t.name;
+      editTemplateAmount.value = String(t.amount);
+    };
+
+    const pendingRecurring = (type, person) => {
+      const md = monthData.value;
+      const skipped = md.skippedRecurringIds || [];
+      return data.recurringTemplates.filter(t => {
+        if (t.type !== type) return false;
+        if (type === 'personal' && t.person !== person) return false;
+        if (skipped.includes(t.id)) return false;
+        // Check if already added
+        let arr = type === 'shared' ? md.shared : md.personal[person || 'a'];
+        const exists = arr.some(e => e.sourceTemplateId === t.id || (e.name === t.name && e.amount === t.amount && e.recurring));
+        return !exists;
+      });
+    };
+
+    const addFromTemplate = (t, type) => {
+      const name = editingTemplateId.value === t.id ? editTemplateName.value.trim() || t.name : t.name;
+      const amount = editingTemplateId.value === t.id ? parseAmount(editTemplateAmount.value) || t.amount : t.amount;
+      editingTemplateId.value = null;
+
+      const expense = {
+        id: crypto.randomUUID(),
+        name,
+        amount,
+        category: t.category,
+        note: '',
+        recurring: true,
+        sourceTemplateId: t.id
+      };
+      if (type === 'shared') monthData.value.shared.push(expense);
+      else monthData.value.personal[personalTab.value].push(expense);
+      showToast(name + ' tillagd');
+    };
+
+    const skipTemplate = id => {
+      if (!monthData.value.skippedRecurringIds.includes(id)) {
+        monthData.value.skippedRecurringIds.push(id);
+      }
+    };
+
+    const addAllRecurring = type => {
+      const person = type === 'personal' ? personalTab.value : undefined;
+      const pending = pendingRecurring(type, person);
+      pending.forEach(t => addFromTemplate(t, type));
+    };
+
+    // ========== PAYMENTS ==========
+    const payAmount = ref('');
+    const payDate = ref(now.toISOString().slice(0,10));
+    const payNote = ref('');
+
+    const openPaymentDialog = () => {
+      payAmount.value = '';
+      payDate.value = new Date().toISOString().slice(0,10);
+      payNote.value = '';
+      nextTick(() => {
+        try { paymentDialog.value?.showModal(); } catch(e){}
+        nextTick(() => { payAmountInput.value?.focus?.(); });
+      });
+    };
+
+    const savePayment = () => {
+      const amt = parseAmount(payAmount.value);
+      if (amt <= 0) return;
+      monthData.value.payments.push({
+        id: crypto.randomUUID(),
+        amount: amt,
+        date: payDate.value,
+        note: payNote.value.trim()
+      });
+      paymentDialog.value?.close();
+      showToast('Betalning registrerad');
+    };
+
+    // ========== TOAST ==========
+    const toast = reactive({ show: false, message: '', undo: null });
+    let toastTimer = null;
+
+    const showToast = (msg, undoFn) => {
+      if (toastTimer) clearTimeout(toastTimer);
+      toast.show = true;
+      toast.message = msg;
+      toast.undo = undoFn || null;
+      toastTimer = setTimeout(() => { toast.show = false; toast.undo = null; }, 5000);
+    };
+
+    const doUndo = () => {
+      if (toast.undo) toast.undo();
+      toast.show = false;
+      toast.undo = null;
+      if (toastTimer) clearTimeout(toastTimer);
+    };
+
+    // ========== CONFIRM ==========
+    const confirm = reactive({ show: false, title: '', text: '', ok: '', danger: false, action: null });
+    const confirmAction = () => { if (confirm.action) confirm.action(); confirm.show = false; };
+
+    // ========== STATISTICS ==========
+    const getAllMonthKeys = () => Object.keys(data.months).sort();
+
+    const monthTotal = key => {
+      const m = data.months[key];
+      if (!m) return 0;
+      let total = (m.shared || []).reduce((s,e) => s + (parseInt(e.amount)||0), 0);
+      ['a','b'].forEach(p => { total += (m.personal?.[p] || []).reduce((s,e) => s + (parseInt(e.amount)||0), 0); });
+      return total;
+    };
+
+    const trendData = computed(() => {
+      const keys = getAllMonthKeys();
+      const last6 = keys.slice(-6);
+      const maxVal = Math.max(1, ...last6.map(k => monthTotal(k)));
+      return last6.map(k => ({
+        month: k,
+        label: formatMonthLabel(k).slice(0,3),
+        total: monthTotal(k),
+        pct: Math.round((monthTotal(k) / maxVal) * 100)
+      }));
+    });
+
+    const catBreakdown = computed(() => {
+      const md = monthData.value;
+      const totals = {};
+      const allExp = [...md.shared, ...(md.personal.a||[]), ...(md.personal.b||[])];
+      allExp.forEach(e => {
+        const cat = e.category || 'ovrigt';
+        totals[cat] = (totals[cat] || 0) + (parseInt(e.amount)||0);
+      });
+      const grand = Object.values(totals).reduce((a,b)=>a+b,0) || 1;
+      return Object.entries(totals).sort((a,b)=>b[1]-a[1]).map(([id,val]) => ({
+        id, emoji: catEmoji(id), label: catLabel(id), color: catColor(id),
+        val, pct: Math.round(val/grand*100)
+      }));
+    });
+
+    const conicGradient = computed(() => {
+      if (catBreakdown.value.length === 0) return 'var(--bg3)';
+      let acc = 0;
+      const stops = catBreakdown.value.map(c => {
+        const start = acc;
+        acc += c.pct;
+        return `${c.color} ${start}% ${acc}%`;
+      });
+      return `conic-gradient(${stops.join(',')})`;
+    });
+
+    const topExpenses = computed(() => {
+      const md = monthData.value;
+      const all = [...md.shared, ...(md.personal.a||[]), ...(md.personal.b||[])];
+      return all.sort((a,b) => (parseInt(b.amount)||0) - (parseInt(a.amount)||0)).slice(0,5);
+    });
+
+    const ytdTotal = computed(() => {
+      const year = currentMonth.value.slice(0,4);
+      return getAllMonthKeys().filter(k => k.startsWith(year)).reduce((s,k) => s + monthTotal(k), 0);
+    });
+
+    const avgMonthly = computed(() => {
+      const keys = getAllMonthKeys().filter(k => monthTotal(k) > 0);
+      if (keys.length === 0) return 0;
+      return Math.round(keys.reduce((s,k) => s + monthTotal(k), 0) / keys.length);
+    });
+
+    const highestMonth = computed(() => {
+      const keys = getAllMonthKeys();
+      if (keys.length === 0) return { label: '-', val: 0 };
+      let max = { key: keys[0], val: 0 };
+      keys.forEach(k => { const t = monthTotal(k); if (t > max.val) max = { key:k, val:t }; });
+      return { label: formatMonthLabel(max.key).slice(0,3), val: max.val };
+    });
+
+    const lowestMonth = computed(() => {
+      const keys = getAllMonthKeys().filter(k => monthTotal(k) > 0);
+      if (keys.length === 0) return { label: '-', val: 0 };
+      let min = { key: keys[0], val: Infinity };
+      keys.forEach(k => { const t = monthTotal(k); if (t < min.val) min = { key:k, val:t }; });
+      return { label: formatMonthLabel(min.key).slice(0,3), val: min.val };
+    });
+
+    const recurringVsOnce = computed(() => {
+      const md = monthData.value;
+      const all = [...md.shared, ...(md.personal.a||[]), ...(md.personal.b||[])];
+      const recurAmt = all.filter(e => e.recurring).reduce((s,e) => s + (parseInt(e.amount)||0), 0);
+      const onceAmt = all.filter(e => !e.recurring).reduce((s,e) => s + (parseInt(e.amount)||0), 0);
+      const total = recurAmt + onceAmt;
+      return { recurAmt, onceAmt, total, recurPct: total > 0 ? Math.round(recurAmt/total*100) : 0 };
+    });
+
+    const compareBarH = person => {
+      const aTotal = settlement.value.aShare + personalTotal('a');
+      const bTotal = settlement.value.bShare + personalTotal('b');
+      const max = Math.max(aTotal, bTotal, 1);
+      const val = person === 'a' ? aTotal : bTotal;
+      return Math.round((val / max) * 100);
+    };
+
+    const allPayments = computed(() => {
+      const result = [];
+      getAllMonthKeys().forEach(k => {
+        const m = data.months[k];
+        if (m?.payments) {
+          m.payments.forEach(p => result.push({ ...p, monthLabel: formatMonthLabel(k) }));
+        }
+      });
+      return result.reverse();
+    });
+
+    // ========== SHARE / SYNC ==========
+    const importOpen = ref(false);
+    const importText = ref('');
+
+    const compressData = async () => {
+      const json = JSON.stringify(data);
+      const blob = new Blob([json]);
+      const cs = new CompressionStream('gzip');
+      const stream = blob.stream().pipeThrough(cs);
+      const compressed = await new Response(stream).arrayBuffer();
+      const bytes = new Uint8Array(compressed);
+      let binary = '';
+      bytes.forEach(b => binary += String.fromCharCode(b));
+      return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    };
+
+    const decompressData = async b64 => {
+      const padded = b64.replace(/-/g,'+').replace(/_/g,'/');
+      const binary = atob(padded);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes]);
+      const ds = new DecompressionStream('gzip');
+      const stream = blob.stream().pipeThrough(ds);
+      const text = await new Response(stream).text();
+      return JSON.parse(text);
+    };
+
+    const shareLink = async () => {
       try {
-        const json = JSON.stringify(data);
-        const compressed = await compressData(json);
-        const b64 = toBase64Url(compressed);
+        const b64 = await compressData();
         const url = location.origin + location.pathname + '#data=' + b64;
-
-        if (url.length > 2000) {
-          if (navigator.share) {
-            await navigator.share({ title: 'Utgifter', text: b64 });
-          } else {
-            await navigator.clipboard.writeText(b64);
-            showToast('Data kopierad (för lång för URL)');
-          }
-          return;
-        }
-
         if (navigator.share) {
-          try {
-            await navigator.share({ title: 'Utgifter', url: url });
-            return;
-          } catch(e) { /* user cancelled, fall through to clipboard */ }
+          await navigator.share({ title: 'Utgifter', url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          showToast('Länk kopierad!');
         }
-        await navigator.clipboard.writeText(url);
-        showToast('Länk kopierad!');
       } catch(e) {
-        showToast('Kunde inte dela');
+        showToast('Kunde inte dela: ' + e.message);
       }
-    }
+    };
 
-    async function copyData() {
+    const copyData = async () => {
       try {
-        const json = JSON.stringify(data);
-        const compressed = await compressData(json);
-        const b64 = toBase64Url(compressed);
+        const b64 = await compressData();
         await navigator.clipboard.writeText(b64);
         showToast('Data kopierad!');
-      } catch(e) {
-        showToast('Kunde inte kopiera');
-      }
-    }
+      } catch(e) { showToast('Fel: ' + e.message); }
+    };
 
-    async function importData() {
-      if (!importText.value.trim()) return;
+    const importFromText = async () => {
       try {
-        const bytes = fromBase64Url(importText.value.trim());
-        const json = await decompressData(bytes);
-        const imported = JSON.parse(json);
-        Object.assign(data, imported);
-        save();
+        let txt = importText.value.trim();
+        if (txt.includes('#data=')) txt = txt.split('#data=')[1];
+        if (!txt) { showToast('Inget data att importera'); return; }
+        const imported = await decompressData(txt);
+        Object.assign(data, { ...defaultData(), ...imported });
+        Object.keys(data.months).forEach(k => ensureMonth(data, k));
+        ensureMonth(data, currentMonth.value);
         importText.value = '';
         showToast('Data importerad!');
-      } catch(e) {
-        showToast('Ogiltig data');
-      }
-    }
+      } catch(e) { showToast('Import misslyckades: Ogiltigt format'); }
+    };
 
-    function exportJSON() {
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const exportJSON = () => {
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `utgifter-${currentMonth.value}.json`;
-      document.body.appendChild(a);
+      a.download = 'utgifter-' + currentMonth.value + '.json';
       a.click();
-      document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('JSON exporterad');
-    }
+      showToast('JSON exporterad!');
+    };
 
-    function clearMonth() {
-      confirmClearDialog.value.showModal();
-    }
-
-    function confirmClear() {
-      data.months[currentMonth.value] = emptyMonth();
-      save();
-      confirmClearDialog.value.close();
-      showToast('Månad rensad');
-    }
-
-    // Check URL hash on load
-    async function checkHash() {
-      const hash = location.hash;
-      if (hash.startsWith('#data=')) {
-        try {
-          const b64 = hash.slice(6);
-          const bytes = fromBase64Url(b64);
-          const json = await decompressData(bytes);
-          const imported = JSON.parse(json);
-          Object.assign(data, imported);
-          save();
-          history.replaceState(null, '', location.pathname);
-          showToast('Data laddad från länk!');
-        } catch(e) {
-          showToast('Kunde inte läsa länkdata');
-        }
+    const copyPreviousMonth = () => {
+      const [y,m] = currentMonth.value.split('-').map(Number);
+      const prev = toMonthKey(new Date(y, m-2));
+      const prevMonth = data.months[prev];
+      if (!prevMonth || (prevMonth.shared.length === 0 && prevMonth.personal.a.length === 0 && prevMonth.personal.b.length === 0)) {
+        showToast('Ingen data i föregående månad');
+        return;
       }
-    }
+      confirm.show = true;
+      confirm.title = 'Kopiera föregående månad';
+      confirm.text = 'Vill du kopiera alla utgifter från ' + formatMonthLabel(prev) + ' till denna månad?';
+      confirm.ok = 'Kopiera';
+      confirm.danger = false;
+      confirm.action = () => {
+        const md = monthData.value;
+        prevMonth.shared.forEach(e => {
+          md.shared.push({ ...e, id: crypto.randomUUID() });
+        });
+        ['a','b'].forEach(p => {
+          (prevMonth.personal[p]||[]).forEach(e => {
+            md.personal[p].push({ ...e, id: crypto.randomUUID() });
+          });
+        });
+        showToast('Utgifter kopierade!');
+      };
+    };
 
-    onMounted(() => {
-      checkHash();
-      ensureMonth(currentMonth.value);
+    const clearMonth = () => {
+      confirm.show = true;
+      confirm.title = 'Rensa månad';
+      confirm.text = 'Vill du verkligen rensa alla utgifter och betalningar för ' + formatMonthLabel(currentMonth.value) + '? Detta kan inte ångras.';
+      confirm.ok = 'Rensa';
+      confirm.danger = true;
+      confirm.action = () => {
+        data.months[currentMonth.value] = { shared:[], personal:{ a:[], b:[] }, payments:[], skippedRecurringIds:[] };
+        showToast('Månad rensad');
+      };
+    };
+
+    // ========== HASH IMPORT ==========
+    onMounted(async () => {
+      if (location.hash.startsWith('#data=')) {
+        try {
+          const b64 = location.hash.slice(6);
+          const imported = await decompressData(b64);
+          Object.assign(data, { ...defaultData(), ...imported });
+          Object.keys(data.months).forEach(k => ensureMonth(data, k));
+          ensureMonth(data, currentMonth.value);
+          history.replaceState(null, '', location.pathname);
+          showToast('Data importerad från länk!');
+        } catch(e) { showToast('Kunde inte importera data från länk'); }
+      }
     });
 
     return {
-      data, view, currentMonth, monthOptions, personalTab,
-      showRecurringList, showFallback, importText,
-      editingId, editName, editAmount, newExpense,
-      toast, monthData, nameA, nameB, currentPersonalList,
-      pendingRecurring, totals,
-      addSharedDialog, addPersonalDialog, confirmClearDialog, newExpenseNameInput,
-      formatCurrency, monthLabel, save, changeMonth, selectAll,
-      openAddShared, addShared, openAddPersonal, addPersonal,
-      removeShared, removePersonal,
-      startEdit, saveEdit, saveEditPersonal,
-      acceptRecurring, acceptAllRecurring, skipRecurring,
-      shareLink, copyData, importData, exportJSON,
-      clearMonth, confirmClear, hideToast,
-      showToast
+      data, currentMonth, monthData, availableMonths, formatMonthLabel, onMonthChange,
+      categories, catEmoji, catLabel, catStyle, fmt,
+      view, tabs, switchView, personalTab,
+      settlement, totalShared, splitRatio, personalTotal, setIncome,
+      searchQuery, filteredShared, filteredPersonal,
+      editingId, editName, editAmount, editCategory, editNote,
+      startEdit, cancelEdit, saveEdit, deleteExpense,
+      touchStart, touchMove, touchEnd,
+      dialogMode, dialogTitle, dialogName, dialogAmount, dialogCategory, dialogNote, dialogRecurring,
+      openExpenseDialog, closeExpenseDialog, saveExpenseDialog,
+      expenseDialog, dialogNameInput, paymentDialog, payAmountInput, largeAmountDialog,
+      pendingLargeAmount, pendingLargeCallback, confirmLargeAmount,
+      editingTemplateId, editTemplateName, editTemplateAmount,
+      startEditTemplate, pendingRecurring, addFromTemplate, skipTemplate, addAllRecurring,
+      payAmount, payDate, payNote, openPaymentDialog, savePayment,
+      toast, doUndo, confirm, confirmAction,
+      trendData, catBreakdown, conicGradient, topExpenses, ytdTotal, avgMonthly,
+      highestMonth, lowestMonth, recurringVsOnce, compareBarH, allPayments,
+      importOpen, importText, shareLink, copyData, importFromText, exportJSON,
+      copyPreviousMonth, clearMonth,
     };
   }
-});
-
-app.mount('#app');
-
-// Register service worker for offline support
-if ('serviceWorker' in navigator) {
-  const swCode = `
-    const CACHE_NAME = 'utgifter-v1';
-    self.addEventListener('install', e => {
-      e.waitUntil(
-        caches.open(CACHE_NAME).then(cache => cache.addAll(['./', './index.html']))
-      );
-      self.skipWaiting();
-    });
-    self.addEventListener('activate', e => {
-      e.waitUntil(
-        caches.keys().then(keys => Promise.all(
-          keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-        ))
-      );
-      self.clients.claim();
-    });
-    self.addEventListener('fetch', e => {
-      e.respondWith(
-        caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-          return res;
-        }))
-      );
-    });
-  `;
-  const blob = new Blob([swCode], { type: 'application/javascript' });
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(() => {});
-}
+}).mount('#app');
 </script>
 </body>
 </html>
