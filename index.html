@@ -253,6 +253,16 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 input[type=number]{-moz-appearance:textbox}
 .ri-edit-row{display:flex;gap:6px;margin-top:4px}
 .ri-edit-row input{padding:4px 8px;font-size:13px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font)}
+.paidby-tag{font-size:11px;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--text3);cursor:pointer;-webkit-tap-highlight-color:transparent;border:none;font-family:var(--font)}
+.paidby-tag.by-b{background:var(--warn-light);color:var(--warn)}
+.paidby-select{padding:4px 8px;font-size:13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font)}
+.avatar-wrapper{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.avatar-circle{width:56px;height:56px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .2s}
+.avatar-circle:hover{border-color:var(--accent)}
+.avatar-circle img{width:100%;height:100%;object-fit:cover}
+.avatar-circle .avatar-placeholder{font-size:24px;color:var(--text3)}
+.avatar-input{display:none}
 </style>
 </head>
 <body>
@@ -419,6 +429,7 @@ input[type=number]{-moz-appearance:textbox}
           <div class="expense-meta">
             <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
             <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
+            <button class="paidby-tag" :class="{'by-b':exp.paidBy==='b'}" @click.stop="togglePaidBy(exp)" :title="'Betald av '+(exp.paidBy==='b'?data.persons.b.name:data.persons.a.name)">💳 {{ exp.paidBy==='b'?data.persons.b.name:data.persons.a.name }}</button>
           </div>
           <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
         </template>
@@ -430,6 +441,10 @@ input[type=number]{-moz-appearance:textbox}
               <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
             </select>
             <input v-model="editNote" placeholder="Anteckning (valfritt)">
+            <select v-model="editPaidBy" class="paidby-select">
+              <option value="a">💳 Betald av {{ data.persons.a.name }}</option>
+              <option value="b">💳 Betald av {{ data.persons.b.name }}</option>
+            </select>
             <div class="edit-actions">
               <button class="btn btn-primary btn-sm" @click="saveEdit('shared')">Spara</button>
               <button class="btn btn-outline btn-sm" @click="cancelEdit">Avbryt</button>
@@ -591,6 +606,12 @@ input[type=number]{-moz-appearance:textbox}
       <h3>👥 Jämförelse denna månad</h3>
       <div class="compare-bars">
         <div class="compare-bar">
+          <div class="avatar-wrapper" @click="triggerAvatarUpload('a')">
+            <div class="avatar-circle">
+              <img v-if="avatars.a" :src="avatars.a" alt="">
+              <span v-else class="avatar-placeholder">📷</span>
+            </div>
+          </div>
           <div class="cb-val">{{ fmt(settlement.aShare + personalTotal('a')) }}</div>
           <div class="cb-track" style="height:100px">
             <div class="cb-fill accent" :style="{height:compareBarH('a')+'%'}"></div>
@@ -598,6 +619,12 @@ input[type=number]{-moz-appearance:textbox}
           <div class="cb-name">{{ data.persons.a.name }}</div>
         </div>
         <div class="compare-bar">
+          <div class="avatar-wrapper" @click="triggerAvatarUpload('b')">
+            <div class="avatar-circle">
+              <img v-if="avatars.b" :src="avatars.b" alt="">
+              <span v-else class="avatar-placeholder">📷</span>
+            </div>
+          </div>
           <div class="cb-val">{{ fmt(settlement.bShare + personalTotal('b')) }}</div>
           <div class="cb-track" style="height:100px">
             <div class="cb-fill secondary" :style="{height:compareBarH('b')+'%'}"></div>
@@ -605,6 +632,7 @@ input[type=number]{-moz-appearance:textbox}
           <div class="cb-name">{{ data.persons.b.name }}</div>
         </div>
       </div>
+      <input type="file" accept="image/*" class="avatar-input" ref="avatarInput" @change="handleAvatarUpload">
     </div>
 
     <div class="stat-card">
@@ -706,6 +734,13 @@ input[type=number]{-moz-appearance:textbox}
         <input type="checkbox" id="dlg-recur" v-model="dialogRecurring">
         <label for="dlg-recur">Återkommande varje månad</label>
       </div>
+      <template v-if="dialogMode==='shared'">
+        <label>Betald av</label>
+        <select v-model="dialogPaidBy">
+          <option value="a">{{ data.persons.a.name }}</option>
+          <option value="b">{{ data.persons.b.name }}</option>
+        </select>
+      </template>
       <div class="dialog-actions">
         <button class="btn btn-outline" @click="closeExpenseDialog">Avbryt</button>
         <button class="btn btn-primary" @click="saveExpenseDialog">Lägg till</button>
@@ -878,10 +913,18 @@ createApp({
     });
 
     const settlement = computed(() => {
-      const total = totalShared.value;
       const bRatio = splitRatio.value;
-      const bShare = Math.round(total * bRatio);
-      const aShare = total - bShare;
+      const aRatio = 1 - bRatio;
+      const shared = monthData.value.shared;
+      // A-paid expenses: B owes their share
+      const aPaidTotal = shared.filter(e => (e.paidBy || 'a') === 'a').reduce((s,e) => s + (parseInt(e.amount)||0), 0);
+      // B-paid expenses: B already paid full amount, so A owes A's share to B (offsets B's debt)
+      const bPaidTotal = shared.filter(e => e.paidBy === 'b').reduce((s,e) => s + (parseInt(e.amount)||0), 0);
+      const total = aPaidTotal + bPaidTotal;
+      const bOwesFromAPaid = Math.round(aPaidTotal * bRatio);
+      const aOwesBFromBPaid = Math.round(bPaidTotal * aRatio);
+      const bShare = Math.max(0, bOwesFromAPaid - aOwesBFromBPaid);
+      const aShare = total - bOwesFromAPaid + aOwesBFromBPaid;
       const totalPaid = monthData.value.payments.reduce((s,p) => s + (parseInt(p.amount)||0), 0);
       const remaining = Math.max(0, bShare - totalPaid);
       const paidPct = bShare > 0 ? Math.round((totalPaid / bShare) * 100) : 0;
@@ -938,6 +981,7 @@ createApp({
     const editAmount = ref('');
     const editCategory = ref('ovrigt');
     const editNote = ref('');
+    const editPaidBy = ref('a');
 
     const startEdit = exp => {
       editingId.value = exp.id;
@@ -945,6 +989,7 @@ createApp({
       editAmount.value = String(exp.amount);
       editCategory.value = exp.category || 'ovrigt';
       editNote.value = exp.note || '';
+      editPaidBy.value = exp.paidBy || 'a';
     };
     const cancelEdit = () => { editingId.value = null; };
 
@@ -962,6 +1007,7 @@ createApp({
           exp.amount = amt;
           exp.category = editCategory.value;
           exp.note = editNote.value.trim();
+          if (type === 'shared') exp.paidBy = editPaidBy.value;
         }
         editingId.value = null;
       };
@@ -1040,6 +1086,7 @@ createApp({
     const dialogCategory = ref('ovrigt');
     const dialogNote = ref('');
     const dialogRecurring = ref(false);
+    const dialogPaidBy = ref('a');
     const expenseDialog = ref(null);
     const dialogNameInput = ref(null);
     const paymentDialog = ref(null);
@@ -1061,6 +1108,7 @@ createApp({
       dialogCategory.value = 'ovrigt';
       dialogNote.value = '';
       dialogRecurring.value = false;
+      dialogPaidBy.value = 'a';
       nextTick(() => {
         try { expenseDialog.value?.showModal(); } catch(e){}
         nextTick(() => { dialogNameInput.value?.focus?.(); });
@@ -1096,6 +1144,7 @@ createApp({
           recurring: dialogRecurring.value,
           sourceTemplateId: null
         };
+        if (dialogMode.value === 'shared') expense.paidBy = dialogPaidBy.value;
 
         if (dialogMode.value === 'shared') {
           monthData.value.shared.push(expense);
@@ -1463,6 +1512,61 @@ createApp({
       };
     };
 
+    // ========== PAID BY TOGGLE ==========
+    const togglePaidBy = exp => {
+      exp.paidBy = (exp.paidBy || 'a') === 'a' ? 'b' : 'a';
+    };
+
+    // ========== AVATARS ==========
+    const avatarInput = ref(null);
+    const avatarTarget = ref('a');
+    const avatars = reactive({ a: null, b: null });
+
+    const loadAvatars = () => {
+      try {
+        const raw = localStorage.getItem('expense-avatars');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed.a) avatars.a = parsed.a;
+          if (parsed.b) avatars.b = parsed.b;
+        }
+      } catch(e) {}
+    };
+    loadAvatars();
+
+    const saveAvatars = () => {
+      try { localStorage.setItem('expense-avatars', JSON.stringify({ a: avatars.a, b: avatars.b })); } catch(e) {}
+    };
+
+    const triggerAvatarUpload = person => {
+      avatarTarget.value = person;
+      nextTick(() => avatarInput.value?.click());
+    };
+
+    const handleAvatarUpload = e => {
+      const file = e.target.files?.[0];
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const size = 128;
+          canvas.width = size; canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          const min = Math.min(img.width, img.height);
+          const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+          ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+          avatars[avatarTarget.value] = canvas.toDataURL('image/jpeg', 0.8);
+          saveAvatars();
+          showToast('Bild sparad!');
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    };
+
     // ========== HASH IMPORT ==========
     onMounted(async () => {
       if (location.hash.startsWith('#data=')) {
@@ -1484,10 +1588,10 @@ createApp({
       view, tabs, switchView, personalTab,
       settlement, totalShared, splitRatio, personalTotal, setIncome,
       searchQuery, filteredShared, filteredPersonal,
-      editingId, editName, editAmount, editCategory, editNote,
-      startEdit, cancelEdit, saveEdit, deleteExpense,
+      editingId, editName, editAmount, editCategory, editNote, editPaidBy,
+      startEdit, cancelEdit, saveEdit, deleteExpense, togglePaidBy,
       touchStart, touchMove, touchEnd,
-      dialogMode, dialogTitle, dialogName, dialogAmount, dialogCategory, dialogNote, dialogRecurring,
+      dialogMode, dialogTitle, dialogName, dialogAmount, dialogCategory, dialogNote, dialogRecurring, dialogPaidBy,
       openExpenseDialog, closeExpenseDialog, saveExpenseDialog,
       expenseDialog, dialogNameInput, paymentDialog, payAmountInput, largeAmountDialog,
       pendingLargeAmount, pendingLargeCallback, confirmLargeAmount,
@@ -1497,6 +1601,7 @@ createApp({
       toast, doUndo, confirm, confirmAction,
       trendData, catBreakdown, conicGradient, topExpenses, ytdTotal, avgMonthly,
       highestMonth, lowestMonth, recurringVsOnce, compareBarH, allPayments,
+      avatars, avatarInput, triggerAvatarUpload, handleAvatarUpload,
       importOpen, importText, shareLink, copyData, importFromText, exportJSON,
       copyPreviousMonth, clearMonth,
     };
