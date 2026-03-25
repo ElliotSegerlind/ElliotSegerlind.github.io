@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#18a058">
@@ -1182,7 +1182,7 @@ input[type=number]{-moz-appearance:textfield}
       <label>Taggar (tryck Enter)</label>
       <div class="tag-input-wrapper" @click="focusTagInput">
         <span class="tag-pill" v-for="(tg,ti) in dialogTags" :key="ti">{{ tg }} <span class="tag-rm" @click="dialogTags.splice(ti,1)">✕</span></span>
-        <input ref="dialogTagInput" @keydown.enter.prevent="addDialogTag" @keydown.,.prevent="addDialogTag" v-model="dialogTagInput" placeholder="Ny tagg…" style="font-size:14px">
+        <input ref="dialogTagInputRef" @keydown.enter.prevent="addDialogTag" @keydown.,.prevent="addDialogTag" v-model="dialogTagInput" placeholder="Ny tagg…" style="font-size:16px">
       </div>
       <div class="check-group">
         <input type="checkbox" id="dlg-recur" v-model="dialogRecurring">
@@ -2681,7 +2681,7 @@ createApp({
       dialogDate, dialogTags, dialogTagInput, addDialogTag, dialogUseCustomSplit, dialogCustomSplit,
       dialogCalcPreview, onDialogAmountInput, focusTagInput,
       openExpenseDialog, closeExpenseDialog, saveExpenseDialog,
-      expenseDialog, dialogNameInput, dialogTagInput: dialogTagInputRef,
+      expenseDialog, dialogNameInput, dialogTagInputRef,
       paymentDialog, payAmountInput, largeAmountDialog, budgetDialog, goalDialog, addGoalDialog, addGoalInput, wishDialog,
       pendingLargeAmount, pendingLargeCallback, confirmLargeAmount,
       editingTemplateId, editTemplateName, editTemplateAmount,
