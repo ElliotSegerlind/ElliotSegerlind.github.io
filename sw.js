@@ -1,4 +1,4 @@
-const CACHE_NAME = 'utgifter-v4';
+const CACHE_NAME = 'utgifter-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -21,6 +21,20 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Network-first for HTML pages so updates show immediately
+  if (e.request.mode === 'navigate' || e.request.destination === 'document') {
+    e.respondWith(
+      fetch(e.request).then(resp => {
+        if (resp.status === 200) {
+          const c = resp.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, c));
+        }
+        return resp;
+      }).catch(() => caches.match(e.request).then(r => r || new Response('Offline', { status: 503 })))
+    );
+    return;
+  }
+  // Cache-first for other assets
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
       if (resp.status === 200) {

@@ -202,8 +202,10 @@ dialog::backdrop{background:rgba(0,0,0,0.4)}
 .collapsible-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 0}
 .collapsible-header .arrow{transition:transform .2s}
 .collapsible-header .arrow.open{transform:rotate(180deg)}
-.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:250;display:flex;align-items:center;justify-content:center;padding:16px}
-.confirm-box{background:var(--bg2);border-radius:var(--radius);padding:24px;max-width:340px;width:100%;box-shadow:var(--shadow-lg)}
+.confirm-dialog{border:none;border-radius:var(--radius);padding:0;background:transparent;max-width:calc(100vw - 32px);width:400px;overflow:visible}
+.confirm-dialog[open]{display:flex;align-items:center;justify-content:center}
+.confirm-dialog::backdrop{background:rgba(0,0,0,0.45)}
+.confirm-box{background:var(--bg2);border-radius:var(--radius);padding:24px;max-width:340px;width:100%;box-shadow:var(--shadow-lg);margin:0 auto}
 .confirm-box h3{font-size:16px;font-weight:700;margin-bottom:8px}
 .confirm-box p{font-size:14px;color:var(--text2);margin-bottom:16px}
 .confirm-box .confirm-actions{display:flex;gap:8px;justify-content:flex-end}
@@ -381,35 +383,110 @@ input[type=number]{-moz-appearance:textfield}
 /* Who-added stamp */
 .added-by{font-size:11px;color:var(--text3);margin-top:2px;font-style:italic}
 
-/* Settings panel */
-.settings-group{margin-bottom:16px}
-.settings-group h4{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
-.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
-.setting-row:last-child{border-bottom:none}
-.setting-row .setting-label{font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px}
-.setting-row .setting-value{font-size:13px;color:var(--text2)}
+/* Settings panel — redesigned */
+.settings-card{overflow:hidden}
+.settings-section{padding:14px 0;border-bottom:1px solid var(--border)}
+.settings-section:first-of-type{padding-top:8px}
+.settings-section:last-child{border-bottom:none;padding-bottom:4px}
+.settings-section-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px}
+
+/* Theme picker */
+.theme-picker{display:flex;gap:8px}
+.theme-option{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:12px 8px;border-radius:var(--radius-sm);border:2px solid var(--border);
+  background:var(--bg3);cursor:pointer;transition:all .15s;font-size:12px;font-weight:500;
+  color:var(--text2);font-family:var(--font)}
+.theme-option .theme-icon{font-size:22px}
+.theme-option.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.theme-option:active{transform:scale(.97)}
 
 /* Accent color picker */
-.accent-colors{display:flex;gap:8px;flex-wrap:wrap}
-.accent-swatch{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s}
-.accent-swatch.active{border-color:var(--text);transform:scale(1.15)}
+.accent-colors{display:flex;gap:10px;flex-wrap:wrap}
+.accent-swatch{width:36px;height:36px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;
+  background:var(--swatch-color);display:flex;align-items:center;justify-content:center;position:relative}
+.accent-swatch.active{border-color:var(--swatch-color);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--swatch-color);transform:scale(1.1)}
 .accent-swatch:active{transform:scale(.9)}
+.accent-check{color:#fff;font-size:14px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,0.3)}
 
-/* Density toggle */
+/* Density picker */
+.density-picker{display:flex;gap:8px}
+.density-option{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:12px 8px;border-radius:var(--radius-sm);border:2px solid var(--border);
+  background:var(--bg3);cursor:pointer;transition:all .15s;font-size:12px;font-weight:500;
+  color:var(--text2);font-family:var(--font)}
+.density-option.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.density-option:active{transform:scale(.97)}
+.density-option svg{color:var(--text3)}
+.density-option.active svg{color:var(--accent)}
+
+/* Density toggle — aggressive compact mode */
 .density-toggle .segmented{font-size:12px}
-body.density-compact .expense-item{padding:8px 12px}
+body.density-compact .top-bar{height:44px}
+body.density-compact #app{padding-top:44px;padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+body.density-compact .top-bar h1{font-size:15px}
+body.density-compact .bottom-nav{padding:4px 0 calc(4px + env(safe-area-inset-bottom,0px))}
+body.density-compact .bottom-nav button{font-size:9px;padding:2px 6px;min-width:48px}
+body.density-compact .bottom-nav button span.icon{font-size:18px}
+body.density-compact .view{padding:10px}
+body.density-compact .card{padding:10px;margin-bottom:8px;border-radius:10px}
+body.density-compact .card-title{font-size:12px;margin-bottom:6px}
+body.density-compact .expense-item{padding:8px 10px;margin-bottom:6px;border-radius:10px}
 body.density-compact .expense-name{font-size:13px}
-body.density-compact .expense-amount{font-size:14px}
+body.density-compact .expense-amount{font-size:13px}
 body.density-compact .expense-meta{gap:4px;margin-top:2px}
 body.density-compact .cat-pill{font-size:10px;padding:1px 6px}
-body.density-compact .card{padding:12px}
+body.density-compact .settlement-card{padding:16px;border-radius:12px}
+body.density-compact .settlement-amount{font-size:22px}
+body.density-compact .settlement-sub{font-size:12px}
+body.density-compact .person-grid{gap:8px;margin-bottom:8px}
+body.density-compact .person-card{padding:10px}
+body.density-compact .person-card input{padding:6px;font-size:13px}
+body.density-compact .person-card label{font-size:11px}
+body.density-compact .segmented{padding:2px;margin-bottom:10px}
+body.density-compact .segmented button{padding:5px 8px;font-size:12px}
+body.density-compact .btn{padding:7px 14px;font-size:13px}
+body.density-compact .btn-sm{padding:5px 10px;font-size:12px}
+body.density-compact .search-bar input{padding:7px 12px 7px 34px;font-size:14px}
+body.density-compact .stat-card{padding:12px;margin-bottom:8px}
+body.density-compact .stat-card h3{font-size:12px;margin-bottom:8px}
+body.density-compact .summary-cell{padding:8px}
+body.density-compact .summary-cell .val{font-size:14px}
+body.density-compact .summary-cell .lbl{font-size:10px}
+body.density-compact .fab{width:48px;height:48px;border-radius:24px;font-size:24px}
+body.density-compact .dialog-content{padding:18px}
+body.density-compact .dialog-content h2{font-size:16px;margin-bottom:12px}
 body.density-compact .comment-toggle{padding:4px 0;font-size:11px}
+body.density-compact .empty-state{padding:32px 16px}
+body.density-compact .empty-state .empty-icon{font-size:36px}
 
 /* Dark mode override */
 body.dark-override{color-scheme:dark}
-body.dark-override,:root.dark-override{--bg:#0a0a0a;--bg2:#141414;--bg3:#1e1e1e;--text:#f1f1f1;--text2:#a1a1a1;--text3:#666;--border:#2a2a2a;--shadow:rgba(0,0,0,.5);--accent-light:rgba(32,184,102,.12)}
+body.dark-override,:root.dark-override{--bg:#0a0a0a;--bg2:#141414;--bg3:#1e1e1e;--text:#f1f1f1;--text2:#a1a1a1;--text3:#666;--border:#2a2a2a;--shadow:0 1px 3px rgba(0,0,0,.3);--shadow-lg:0 4px 12px rgba(0,0,0,.4);--accent-light:rgba(32,184,102,.12)}
+body.dark-override .top-bar{background:rgba(10,10,10,0.85)}
+body.dark-override .bottom-nav{background:rgba(10,10,10,0.85)}
+
+/* Light mode override — polished, clean, subtly warm */
 body.light-override{color-scheme:light}
-body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;--text:#1a1a1a;--text2:#666;--text3:#999;--border:#e0e0e0;--shadow:rgba(0,0,0,.06);--accent-light:rgba(24,160,88,.08)}
+body.light-override,:root.light-override{
+  --bg:#f2f4f7;--bg2:#ffffff;--bg3:#e9ecf0;--text:#111827;--text2:#4b5563;--text3:#9ca3af;
+  --border:#d1d5db;
+  --shadow:0 1px 3px rgba(0,0,0,0.05),0 1px 2px rgba(0,0,0,0.03);
+  --shadow-lg:0 4px 14px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.04);
+  --danger:#dc2626;--danger-light:rgba(220,38,38,0.08);--warn:#d97706;--warn-light:rgba(217,119,6,0.08)
+}
+body.light-override{background:#f2f4f7;
+  background-image:radial-gradient(ellipse at 0% 0%,rgba(24,160,88,0.03) 0%,transparent 50%),
+  radial-gradient(ellipse at 100% 100%,rgba(99,102,241,0.02) 0%,transparent 50%)}
+body.light-override .top-bar{background:rgba(242,244,247,0.88);border-bottom-color:#d1d5db}
+body.light-override .bottom-nav{background:rgba(242,244,247,0.88);border-top-color:#d1d5db}
+body.light-override .card{border-color:#d1d5db;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+body.light-override .expense-item{border-color:#d1d5db;box-shadow:0 1px 2px rgba(0,0,0,0.03)}
+body.light-override .settlement-card{box-shadow:0 4px 16px rgba(24,160,88,0.18)}
+body.light-override dialog{box-shadow:0 8px 30px rgba(0,0,0,0.12)}
+body.light-override .segmented{background:#e5e7eb;border-color:#d1d5db}
+body.light-override .segmented button.active{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+body.light-override .btn-outline{background:rgba(24,160,88,0.06)}
+body.light-override .person-card{background:#fff;border-color:#d1d5db}
 
 /* Data size indicator */
 .data-size{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
@@ -477,17 +554,17 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     <button v-if="toast.undo" @click="doUndo">Ångra</button>
   </div>
 
-  <!-- Confirm dialog -->
-  <div class="confirm-overlay" v-if="confirm.show" @click.self="confirm.show=false">
+  <!-- Confirm dialog (rendered as <dialog> to appear above other modals) -->
+  <dialog ref="confirmDialog" class="confirm-dialog" @cancel.prevent="closeConfirmDialog" @click="($event.target===$refs.confirmDialog)&&closeConfirmDialog()">
     <div class="confirm-box">
       <h3>{{ confirm.title }}</h3>
       <p>{{ confirm.text }}</p>
       <div class="confirm-actions">
-        <button class="btn btn-outline btn-sm" @click="confirm.show=false">Avbryt</button>
+        <button class="btn btn-outline btn-sm" @click="closeConfirmDialog">Avbryt</button>
         <button class="btn btn-sm" :class="confirm.danger?'btn-danger':'btn-primary'" @click="confirmAction">{{ confirm.ok || 'OK' }}</button>
       </div>
     </div>
-  </div>
+  </dialog>
 
   <!-- Context menu (long-press) -->
   <div class="ctx-overlay" v-if="ctxMenu.show" @click.self="ctxMenu.show=false">
@@ -545,12 +622,14 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
       <div class="person-card" v-for="p in ['a','b']" :key="p">
         <label>{{ data.persons[p].name }}</label>
         <input :value="data.persons[p].name" @input="data.persons[p].name=$event.target.value" placeholder="Namn" style="margin-bottom:6px">
+        <template v-if="!simpleMode">
         <label>Inkomst (kr/mån)</label>
         <input type="text" inputmode="numeric" :value="data.persons[p].income||''" @input="setIncome(p,$event.target.value)" placeholder="0">
+        </template>
       </div>
     </div>
 
-    <div class="segmented">
+    <div class="segmented" v-if="!simpleMode">
       <button :class="{active:data.splitMode==='equal'}" @click="data.splitMode='equal'">Dela lika</button>
       <button :class="{active:data.splitMode==='income'}" @click="data.splitMode='income'">Dela efter inkomst</button>
     </div>
@@ -575,7 +654,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     </div>
 
     <!-- Running balance across months -->
-    <div class="running-balance" v-if="runningBalance!==0">
+    <div class="running-balance" v-if="!simpleMode && runningBalance!==0">
       Totalt skuldsaldo: <span class="rb-val" :style="{color:runningBalance>0?'var(--danger)':'var(--accent)'}">{{ runningBalance>0 ? data.persons.b.name+' är skyldig '+fmt(runningBalance) : 'Ingen total skuld' }}</span>
     </div>
 
@@ -588,7 +667,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     </button>
 
     <!-- Budget overview -->
-    <div class="card" v-if="budgetItems.length>0">
+    <div class="card" v-if="!simpleMode && budgetItems.length>0">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
         <span>📊 Budget</span>
         <button class="btn btn-sm btn-outline" @click="openBudgetDialog" style="padding:4px 8px;font-size:11px">Ändra</button>
@@ -654,7 +733,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     </div>
 
     <!-- Notification toggle -->
-    <div class="notif-toggle" @click="toggleNotif">
+    <div class="notif-toggle" v-if="!simpleMode" @click="toggleNotif">
       <label>🔔 Påminnelse vid månadsslut</label>
       <div class="toggle-switch">
         <input type="checkbox" :checked="notifEnabled" @click.stop="toggleNotif">
@@ -663,7 +742,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     </div>
 
     <!-- Historical debt view -->
-    <div class="card" v-if="debtHistory.length>0">
+    <div class="card" v-if="!simpleMode && debtHistory.length>0">
       <div class="collapsible-header" @click="debtOpen=!debtOpen">
         <span class="card-title" style="margin:0">📈 Historisk skuld</span>
         <span class="arrow" :class="{open:debtOpen}">▼</span>
@@ -678,7 +757,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     </div>
 
     <!-- Savings Goals -->
-    <div class="card">
+    <div class="card" v-if="!simpleMode">
       <div class="collapsible-header" @click="savingsOpen=!savingsOpen">
         <span class="card-title" style="margin:0">🎯 Sparande-mål</span>
         <span class="arrow" :class="{open:savingsOpen}">▼</span>
@@ -702,7 +781,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     </div>
 
     <!-- Wishlist -->
-    <div class="card">
+    <div class="card" v-if="!simpleMode">
       <div class="collapsible-header" @click="wishOpen=!wishOpen">
         <span class="card-title" style="margin:0">🎁 Önskelista</span>
         <span class="arrow" :class="{open:wishOpen}">▼</span>
@@ -724,23 +803,23 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     </div>
 
     <!-- Budget setup button if no budgets -->
-    <button class="btn btn-outline btn-block btn-sm" v-if="budgetItems.length===0" @click="openBudgetDialog" style="margin-bottom:12px">📊 Sätt budgetmål per kategori</button>
+    <button class="btn btn-outline btn-block btn-sm" v-if="!simpleMode && budgetItems.length===0" @click="openBudgetDialog" style="margin-bottom:12px">📊 Sätt budgetmål per kategori</button>
   </div>
 
   <!-- ============ SHARED ============ -->
   <div class="view" :class="viewTransition" v-if="appLoaded && view==='shared'" :key="'shared-'+currentMonth">
     <!-- Floating month summary -->
-    <div class="floating-summary" v-if="sortedShared.length>2">
+    <div class="floating-summary" v-if="!simpleMode && sortedShared.length>2">
       <span class="fs-count">{{ sortedShared.length }} utgifter</span>
       <span class="fs-total">{{ fmt(sharedTotal) }}</span>
     </div>
 
-    <div class="search-bar">
+    <div class="search-bar" v-if="!simpleMode">
       <span class="search-icon">🔍</span>
       <input v-model="searchQuery" placeholder="Sök utgifter…">
     </div>
 
-    <div class="sort-bar">
+    <div class="sort-bar" v-if="!simpleMode">
       <select v-model="sortMode">
         <option value="default">Sortering: Standard</option>
         <option value="date">Datum (nyast först)</option>
@@ -753,7 +832,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     </div>
 
     <!-- Recurring banner -->
-    <div class="recurring-banner" v-if="pendingRecurring('shared').length>0">
+    <div class="recurring-banner" v-if="!simpleMode && pendingRecurring('shared').length>0">
       <h3>📦 Återkommande utgifter</h3>
       <div class="recurring-item" v-for="t in pendingRecurring('shared')" :key="t.id">
         <div class="ri-info">
@@ -791,24 +870,24 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
               </div>
               <div class="expense-meta">
                 <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
-                <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
-                <button class="paidby-tag" :class="{'by-b':exp.paidBy==='b'}" @click.stop="togglePaidBy(exp)" :title="'Betald av '+(exp.paidBy==='b'?data.persons.b.name:data.persons.a.name)">💳 {{ exp.paidBy==='b'?data.persons.b.name:data.persons.a.name }}</button>
-                <span class="split-indicator" v-if="exp.customSplit!=null">{{ 100-exp.customSplit }}/{{ exp.customSplit }}</span>
+                <span class="tag" :class="{recurring:exp.recurring}" v-if="!simpleMode">{{ exp.recurring?'Återkommande':'Engång' }}</span>
+                <button class="paidby-tag" v-if="!simpleMode" :class="{'by-b':exp.paidBy==='b'}" @click.stop="togglePaidBy(exp)" :title="'Betald av '+(exp.paidBy==='b'?data.persons.b.name:data.persons.a.name)">💳 {{ exp.paidBy==='b'?data.persons.b.name:data.persons.a.name }}</button>
+                <span class="split-indicator" v-if="!simpleMode && exp.customSplit!=null">{{ 100-exp.customSplit }}/{{ exp.customSplit }}</span>
                 <span class="expense-date" v-if="exp.date">📅 {{ exp.date }}</span>
               </div>
-              <div class="expense-meta" v-if="exp.tags&&exp.tags.length>0" style="margin-top:4px">
+              <div class="expense-meta" v-if="!simpleMode && exp.tags&&exp.tags.length>0" style="margin-top:4px">
                 <span class="tag-pill" v-for="tg in exp.tags" :key="tg">🏷️ {{ tg }}</span>
               </div>
               <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
-              <div class="added-by" v-if="exp.addedBy">Tillagd av {{ exp.addedBy }}</div>
+              <div class="added-by" v-if="!simpleMode && exp.addedBy">Tillagd av {{ exp.addedBy }}</div>
             </div>
-            <div class="reorder-btns" v-if="reorderMode">
+            <div class="reorder-btns" v-if="!simpleMode && reorderMode">
               <button @click="moveExpense('shared',exp.id,-1)" :disabled="idx===0">▲</button>
               <button @click="moveExpense('shared',exp.id,1)" :disabled="idx===sortedShared.length-1">▼</button>
             </div>
           </div>
           <!-- Comments toggle -->
-          <button class="comment-toggle" @click.stop="toggleComments(exp.id)">
+          <button class="comment-toggle" v-if="!simpleMode" @click.stop="toggleComments(exp.id)">
             💬 {{ (exp.comments||[]).length }} kommentarer
           </button>
           <div class="comment-section" v-if="openComments===exp.id">
@@ -887,17 +966,17 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
     </div>
 
     <!-- Floating month summary -->
-    <div class="floating-summary" v-if="sortedPersonal.length>2">
+    <div class="floating-summary" v-if="!simpleMode && sortedPersonal.length>2">
       <span class="fs-count">{{ sortedPersonal.length }} utgifter</span>
       <span class="fs-total">{{ fmt(personalListTotal) }}</span>
     </div>
 
-    <div class="search-bar">
+    <div class="search-bar" v-if="!simpleMode">
       <span class="search-icon">🔍</span>
       <input v-model="searchQuery" placeholder="Sök utgifter…">
     </div>
 
-    <div class="sort-bar">
+    <div class="sort-bar" v-if="!simpleMode">
       <select v-model="sortMode">
         <option value="default">Sortering: Standard</option>
         <option value="date">Datum (nyast först)</option>
@@ -909,7 +988,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
       <button class="reorder-btn" :class="{active:reorderMode}" @click="reorderMode=!reorderMode" title="Flytta utgifter">↕️</button>
     </div>
 
-    <div class="recurring-banner" v-if="pendingRecurring('personal',personalTab).length>0">
+    <div class="recurring-banner" v-if="!simpleMode && pendingRecurring('personal',personalTab).length>0">
       <h3>📦 Återkommande utgifter</h3>
       <div class="recurring-item" v-for="t in pendingRecurring('personal',personalTab)" :key="t.id">
         <div class="ri-info">
@@ -947,21 +1026,21 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
               </div>
               <div class="expense-meta">
                 <span class="cat-pill" :style="catStyle(exp.category)">{{ catEmoji(exp.category) }} {{ catLabel(exp.category) }}</span>
-                <span class="tag" :class="{recurring:exp.recurring}">{{ exp.recurring?'Återkommande':'Engång' }}</span>
+                <span class="tag" :class="{recurring:exp.recurring}" v-if="!simpleMode">{{ exp.recurring?'Återkommande':'Engång' }}</span>
                 <span class="expense-date" v-if="exp.date">📅 {{ exp.date }}</span>
               </div>
-              <div class="expense-meta" v-if="exp.tags&&exp.tags.length>0" style="margin-top:4px">
+              <div class="expense-meta" v-if="!simpleMode && exp.tags&&exp.tags.length>0" style="margin-top:4px">
                 <span class="tag-pill" v-for="tg in exp.tags" :key="tg">🏷️ {{ tg }}</span>
               </div>
               <div class="expense-note" v-if="exp.note">{{ exp.note }}</div>
-              <div class="added-by" v-if="exp.addedBy">Tillagd av {{ exp.addedBy }}</div>
+              <div class="added-by" v-if="!simpleMode && exp.addedBy">Tillagd av {{ exp.addedBy }}</div>
             </div>
-            <div class="reorder-btns" v-if="reorderMode">
+            <div class="reorder-btns" v-if="!simpleMode && reorderMode">
               <button @click="moveExpense('personal',exp.id,-1)" :disabled="idx===0">▲</button>
               <button @click="moveExpense('personal',exp.id,1)" :disabled="idx===sortedPersonal.length-1">▼</button>
             </div>
           </div>
-          <button class="comment-toggle" @click.stop="toggleComments(exp.id)">
+          <button class="comment-toggle" v-if="!simpleMode" @click.stop="toggleComments(exp.id)">
             💬 {{ (exp.comments||[]).length }} kommentarer
           </button>
           <div class="comment-section" v-if="openComments===exp.id">
@@ -1018,7 +1097,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
   </div>
 
   <!-- ============ STATISTICS ============ -->
-  <div class="view" :class="viewTransition" v-if="appLoaded && view==='stats'" :key="'stats-'+currentMonth+statsMode">
+  <div class="view" :class="viewTransition" v-if="appLoaded && view==='stats' && !simpleMode" :key="'stats-'+currentMonth+statsMode">
     <div class="segmented year-month-toggle">
       <button :class="{active:statsMode==='month'}" @click="statsMode='month'">Månad</button>
       <button :class="{active:statsMode==='year'}" @click="statsMode='year'">År</button>
@@ -1252,7 +1331,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
   <!-- ============ SHARE ============ -->
   <div class="view" :class="viewTransition" v-if="appLoaded && view==='share'" :key="'share-'+currentMonth">
     <!-- Last synced indicator -->
-    <div class="sync-badge" :class="{stale:syncStale}" v-if="syncAgo">
+    <div class="sync-badge" :class="{stale:syncStale}" v-if="!simpleMode && syncAgo">
       <span class="sync-dot"></span>
       Senast synkad: {{ syncAgo }}
     </div>
@@ -1271,6 +1350,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
       <button class="btn btn-sm btn-outline" @click="qrUrl=''" style="margin-top:8px">Dölj</button>
     </div>
 
+    <template v-if="!simpleMode">
     <div class="card">
       <div class="collapsible-header" @click="importOpen=!importOpen">
         <h3 style="font-size:14px;font-weight:600">📥 Importera data</h3>
@@ -1307,44 +1387,75 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
         </div>
       </div>
     </div>
+    </template>
 
     <!-- Settings -->
-    <div class="card">
+    <div class="card settings-card">
       <div class="card-title">⚙️ Inställningar</div>
 
-      <div class="settings-group">
-        <h4>Utseende</h4>
-        <div class="setting-row">
-          <span class="setting-label">🎨 Accentfärg</span>
-          <div class="accent-colors">
-            <div v-for="c in accentColors" :key="c.id" class="accent-swatch" :class="{active:activeAccent===c.id}" :style="{background:c.color}" @click="applyAccent(c.id)"></div>
-          </div>
+      <!-- Simple mode toggle -->
+      <div class="settings-section">
+        <div class="settings-section-title">✨ Läge</div>
+        <div class="theme-picker">
+          <button class="theme-option" :class="{active:simpleMode}" @click="toggleSimpleMode(true)">
+            <span class="theme-icon">🟢</span><span>Enkel</span>
+          </button>
+          <button class="theme-option" :class="{active:!simpleMode}" @click="toggleSimpleMode(false)">
+            <span class="theme-icon">⚡</span><span>Avancerat</span>
+          </button>
         </div>
-        <div class="setting-row">
-          <span class="setting-label">🌙 Mörkt läge</span>
-          <div class="segmented" style="font-size:12px;min-width:0">
-            <button :class="{active:darkModePref==='auto'}" @click="applyDarkMode('auto')" style="padding:4px 10px">Auto</button>
-            <button :class="{active:darkModePref==='light'}" @click="applyDarkMode('light')" style="padding:4px 10px">Ljust</button>
-            <button :class="{active:darkModePref==='dark'}" @click="applyDarkMode('dark')" style="padding:4px 10px">Mörkt</button>
-          </div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px">
+          {{ simpleMode ? 'Visar bara det viktigaste — utgifter, summor och betalningar.' : 'Alla funktioner synliga — statistik, budget, sparmål m.m.' }}
         </div>
-        <div class="setting-row">
-          <span class="setting-label">📐 Layouttäthet</span>
-          <div class="segmented" style="font-size:12px;min-width:0">
-            <button :class="{active:densityMode==='comfortable'}" @click="applyDensity('comfortable')" style="padding:4px 10px">Normal</button>
-            <button :class="{active:densityMode==='compact'}" @click="applyDensity('compact')" style="padding:4px 10px">Kompakt</button>
+      </div>
+
+      <!-- Theme toggle -->
+      <div class="settings-section">
+        <div class="settings-section-title">🌙 Tema</div>
+        <div class="theme-picker">
+          <button class="theme-option" :class="{active:darkModePref==='auto'}" @click="applyDarkMode('auto')">
+            <span class="theme-icon">🔄</span><span>Auto</span>
+          </button>
+          <button class="theme-option" :class="{active:darkModePref==='light'}" @click="applyDarkMode('light')">
+            <span class="theme-icon">☀️</span><span>Ljust</span>
+          </button>
+          <button class="theme-option" :class="{active:darkModePref==='dark'}" @click="applyDarkMode('dark')">
+            <span class="theme-icon">🌙</span><span>Mörkt</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Accent color -->
+      <div class="settings-section">
+        <div class="settings-section-title">🎨 Accentfärg</div>
+        <div class="accent-colors">
+          <div v-for="c in accentColors" :key="c.id" class="accent-swatch" :class="{active:activeAccent===c.id}" :style="{'--swatch-color':c.color}" @click="applyAccent(c.id)">
+            <span class="accent-check" v-if="activeAccent===c.id">✓</span>
           </div>
         </div>
       </div>
 
-      <div class="settings-group">
-        <h4>Data</h4>
-        <div class="setting-row">
-          <span class="setting-label">💾 Lagringsutrymme</span>
-          <div class="data-size">
-            <span>{{ dataSize.label }}</span>
-            <div class="ds-bar"><div class="ds-fill" :style="{width:dataSize.pct+'%'}"></div></div>
-          </div>
+      <!-- Density -->
+      <div class="settings-section" v-if="!simpleMode">
+        <div class="settings-section-title">📐 Layouttäthet</div>
+        <div class="density-picker">
+          <button class="density-option" :class="{active:densityMode==='comfortable'}" @click="applyDensity('comfortable')">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="4" rx="1" fill="currentColor" opacity=".5"/><rect x="2" y="9" width="16" height="4" rx="1" fill="currentColor" opacity=".5"/><rect x="2" y="15" width="16" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+            <span>Normal</span>
+          </button>
+          <button class="density-option" :class="{active:densityMode==='compact'}" @click="applyDensity('compact')">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="2" y="6.5" width="16" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="16" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="2" y="15.5" width="16" height="3" rx="1" fill="currentColor" opacity=".5"/></svg>
+            <span>Kompakt</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Data -->
+      <div class="settings-section" v-if="!simpleMode">
+        <div class="settings-section-title">💾 Lagring</div>
+        <div class="data-size">
+          <span>{{ dataSize.label }}</span>
+          <div class="ds-bar"><div class="ds-fill" :style="{width:dataSize.pct+'%'}"></div></div>
         </div>
       </div>
     </div>
@@ -1352,7 +1463,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
-    <button v-for="tab in tabs" :key="tab.id" :class="{active:view===tab.id}" @click="switchView(tab.id)">
+    <button v-for="tab in tabs" :key="tab.id" v-show="!simpleMode || tab.id!=='stats'" :class="{active:view===tab.id}" @click="switchView(tab.id)">
       <span class="icon">{{ tab.icon }}</span>
       {{ tab.label }}
     </button>
@@ -1373,8 +1484,9 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
       <select v-model="dialogCategory">
         <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.emoji }} {{ c.label }}</option>
       </select>
-      <label>Anteckning (valfritt)</label>
-      <input v-model="dialogNote" placeholder="">
+      <label v-if="!simpleMode">Anteckning (valfritt)</label>
+      <input v-if="!simpleMode" v-model="dialogNote" placeholder="">
+      <template v-if="!simpleMode">
       <label>Taggar (tryck Enter)</label>
       <div class="tag-input-wrapper" @click="focusTagInput">
         <span class="tag-pill" v-for="(tg,ti) in dialogTags" :key="ti">{{ tg }} <span class="tag-rm" @click="dialogTags.splice(ti,1)">✕</span></span>
@@ -1384,12 +1496,14 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
         <input type="checkbox" id="dlg-recur" v-model="dialogRecurring">
         <label for="dlg-recur">Återkommande varje månad</label>
       </div>
+      </template>
       <template v-if="dialogMode==='shared'">
         <label>Betald av</label>
         <select v-model="dialogPaidBy">
           <option value="a">{{ data.persons.a.name }}</option>
           <option value="b">{{ data.persons.b.name }}</option>
         </select>
+        <template v-if="!simpleMode">
         <div class="check-group">
           <input type="checkbox" id="dlg-custom-split" v-model="dialogUseCustomSplit">
           <label for="dlg-custom-split">Anpassad uppdelning</label>
@@ -1400,6 +1514,7 @@ body.light-override,:root.light-override{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ed;-
           <span style="font-size:12px;color:var(--text2)">{{ data.persons.b.name }}</span>
           <span class="split-pct">{{ 100-dialogCustomSplit }}/{{ dialogCustomSplit }}</span>
         </div>
+        </template>
       </template>
       <div class="dialog-actions">
         <button class="btn btn-outline" @click="closeExpenseDialog">Avbryt</button>
@@ -2043,6 +2158,7 @@ createApp({
     const addGoalDialog = ref(null);
     const addGoalInput = ref(null);
     const wishDialog = ref(null);
+    const confirmDialog = ref(null);
 
     const onDialogAmountInput = () => {
       const val = dialogAmount.value;
@@ -2258,7 +2374,12 @@ createApp({
 
     // ========== CONFIRM ==========
     const confirm = reactive({ show: false, title: '', text: '', ok: '', danger: false, action: null });
-    const confirmAction = () => { if (confirm.action) confirm.action(); confirm.show = false; };
+    const closeConfirmDialog = () => { confirm.show = false; confirmDialog.value?.close(); };
+    const confirmAction = () => { if (confirm.action) confirm.action(); closeConfirmDialog(); };
+    watch(() => confirm.show, (val) => {
+      if (val) { nextTick(() => confirmDialog.value?.showModal()); }
+      else { confirmDialog.value?.close(); }
+    });
 
     // ========== PAID BY TOGGLE ==========
     const togglePaidBy = exp => {
@@ -3212,6 +3333,14 @@ createApp({
     // ========== #26 COMPACT VS COMFORTABLE DENSITY ==========
     const densityMode = ref(localStorage.getItem('density-mode') || 'comfortable');
 
+    // ========== SIMPLE MODE ==========
+    const simpleMode = ref(localStorage.getItem('simple-mode') === 'true');
+    const toggleSimpleMode = (val) => {
+      simpleMode.value = val;
+      localStorage.setItem('simple-mode', val ? 'true' : 'false');
+      if (val && view.value === 'stats') view.value = 'home';
+    };
+
     const applyDensity = (mode) => {
       densityMode.value = mode;
       localStorage.setItem('density-mode', mode);
@@ -3301,7 +3430,7 @@ createApp({
       startEditTemplate, pendingRecurring, addFromTemplate, skipTemplate, addAllRecurring,
       payAmount, payDate, payNote, openPaymentDialog, savePayment,
       deletePayment,
-      toast, doUndo, confirm, confirmAction,
+      toast, doUndo, confirm, confirmAction, confirmDialog, closeConfirmDialog,
       // Budget
       budgetItems, budgetEditValues, openBudgetDialog, saveBudgets, parseAmountSimple,
       // Savings Goals
@@ -3336,6 +3465,7 @@ createApp({
       accentColors, activeAccent, applyAccent,
       densityMode, applyDensity,
       darkModePref, applyDarkMode,
+      simpleMode, toggleSimpleMode,
       dataSize,
     };
   }
