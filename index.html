@@ -2738,18 +2738,25 @@ createApp({
       }catch(e){showToast(e?.message||'Kunde inte kopiera')}
     }
     async function ensureQrLibrary(){
-      if(window.qrcode)return true;
+      if(typeof window.qrcode==='function')return window.qrcode;
       try{
         await new Promise((resolve,reject)=>{
+          const existing=document.querySelector(`script[src="${QR_CODE_LIB_URL}"]`);
+          if(existing){
+            if(existing.dataset.loaded==='true'){resolve();return}
+            existing.addEventListener('load',resolve,{once:true});
+            existing.addEventListener('error',reject,{once:true});
+            return;
+          }
           const s=document.createElement('script');
           s.src=QR_CODE_LIB_URL;
-          s.onload=resolve;
+          s.onload=()=>{s.dataset.loaded='true';resolve()};
           s.onerror=reject;
           document.head.appendChild(s);
         });
-        return typeof window.qrcode==='function';
+        return typeof window.qrcode==='function'?window.qrcode:null;
       }catch{
-        return false;
+        return null;
       }
     }
     async function ensureQrScannerLibrary(){
@@ -2758,13 +2765,14 @@ createApp({
         await new Promise((resolve,reject)=>{
           const existing=document.querySelector(`script[src="${QR_SCAN_LIB_URL}"]`);
           if(existing){
+            if(existing.dataset.loaded==='true'){resolve();return}
             existing.addEventListener('load',resolve,{once:true});
             existing.addEventListener('error',reject,{once:true});
             return;
           }
           const s=document.createElement('script');
           s.src=QR_SCAN_LIB_URL;
-          s.onload=resolve;
+          s.onload=()=>{s.dataset.loaded='true';resolve()};
           s.onerror=reject;
           document.head.appendChild(s);
         });
@@ -2917,28 +2925,57 @@ createApp({
         if(evt.target)evt.target.value='';
       }
     }
+    function tryBuildQrDataUrl(qrFactory,payload){
+      for(const level of['M','L']){
+        try{
+          const qr=qrFactory(0,level);
+          qr.addData(payload);
+          qr.make();
+          const size=qr.getModuleCount();
+          const scale=4;
+          const canvas=document.createElement('canvas');
+          canvas.width=canvas.height=size*scale+8;
+          const ctx=canvas.getContext('2d');
+          if(!ctx)throw new Error('QR-koden kunde inte ritas upp på enheten.');
+          ctx.fillStyle='#fff';
+          ctx.fillRect(0,0,canvas.width,canvas.height);
+          for(let r=0;r<size;r++)for(let c=0;c<size;c++){if(qr.isDark(r,c)){ctx.fillStyle='#000';ctx.fillRect(c*scale+4,r*scale+4,scale,scale)}}
+          return canvas.toDataURL('image/png');
+        }catch(err){
+          const msg=String(err?.message||err||'');
+          if(!/overflow|code length/i.test(msg))throw err;
+        }
+      }
+      return null;
+    }
     async function generateQR(){
       qrError.value='';qrDataUrl.value=null;
       try{
+        const compressed=await compressData(data);
         const url=await buildShareUrl();
-        if(url.length>4296){
-          qrError.value='Data för stor för QR-kod ('+url.length+' tecken, max 4296). Länken visas nedan istället.';
-          openManualShare('Länk att kopiera manuellt',url);
-          return;
-        }
-        if(!(await ensureQrLibrary())){
+        const qrFactory=await ensureQrLibrary();
+        if(!qrFactory){
           qrError.value='Kunde inte ladda QR-stödet på mobilen. Länken visas nedan istället.';
           openManualShare('Länk att kopiera manuellt',url);
           return;
         }
-        const qr=qrcode(0,'M');qr.addData(url);qr.make();
-        const size=qr.getModuleCount();const scale=4;const canvas=document.createElement('canvas');
-        canvas.width=canvas.height=size*scale+8;const ctx=canvas.getContext('2d');
-        ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
-        for(let r=0;r<size;r++)for(let c=0;c<size;c++){if(qr.isDark(r,c)){ctx.fillStyle='#000';ctx.fillRect(c*scale+4,r*scale+4,scale,scale)}}
-        qrDataUrl.value=canvas.toDataURL('image/png');
-        clearManualShare();
-      }catch(e){qrError.value=e?.message||'Kunde inte generera QR-kod'}
+        const urlQr=tryBuildQrDataUrl(qrFactory,url);
+        if(urlQr){
+          qrDataUrl.value=urlQr;
+          clearManualShare();
+          return;
+        }
+        const dataQr=tryBuildQrDataUrl(qrFactory,compressed);
+        if(dataQr){
+          qrDataUrl.value=dataQr;
+          openManualShare('QR-koden innehåller komprimerad data för appens inbyggda import',compressed);
+          showToast('QR-koden blev för stor som länk. Skanna den via appens Importera-funktion.');
+          return;
+        }
+        qrError.value='Data för stor för QR-kod. Data visas nedan istället.';
+        openManualShare('Data att kopiera manuellt',compressed);
+        return;
+      }catch(e){qrError.value=String(e?.message||e||'Kunde inte generera QR-kod')}
     }
 
     // Import
