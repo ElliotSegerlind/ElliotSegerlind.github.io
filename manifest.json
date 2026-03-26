@@ -1,58 +1,9 @@
 {
   "name": "Utgifter",
   "short_name": "Utgifter",
-  "description": "Dela utgifter mellan par",
-  "start_url": "./index.html",
-  "scope": ".",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#f8faf9",
   "theme_color": "#18a058",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-maskable-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Lägg till gemensam utgift",
-      "short_name": "Ny utgift",
-      "url": "./index.html#action=add-shared",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Lägg till personlig utgift",
-      "short_name": "Personlig",
-      "url": "./index.html#action=add-personal",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Registrera betalning",
-      "short_name": "Betalning",
-      "url": "./index.html#action=add-payment",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    }
-  ],
-  "categories": ["finance"]
+  "icons": []
 }

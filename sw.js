@@ -1,51 +1,101 @@
-const CACHE_NAME = 'utgifter-v10';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff2',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-regular-400.woff2',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-brands-400.woff2'
-];
+const CACHE_VERSION = 'v2';
+const STATIC_CACHE = `utgifter-static-${CACHE_VERSION}`;
+const RUNTIME_CACHE = `utgifter-runtime-${CACHE_VERSION}`;
+const APP_SHELL = ['./', './index.html', './manifest.json'];
 
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+function isNavigationRequest(request) {
+  return request.mode === 'navigate' || request.destination === 'document';
+}
+
+async function precacheAppShell() {
+  const cache = await caches.open(STATIC_CACHE);
+  await Promise.all(
+    APP_SHELL.map(async url => {
+      try {
+        await cache.add(new Request(url, { cache: 'reload' }));
+      } catch {}
+    })
   );
-  self.skipWaiting();
+}
+
+self.addEventListener('install', event => {
+  event.waitUntil(precacheAppShell().then(() => self.skipWaiting()));
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
+self.addEventListener('activate', event => {
+  event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(
+        keys
+          .filter(key => ![STATIC_CACHE, RUNTIME_CACHE].includes(key))
+          .map(key => caches.delete(key))
+      )
     ).then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', e => {
-  // Network-first for HTML pages so updates show immediately
-  if (e.request.mode === 'navigate' || e.request.destination === 'document') {
-    e.respondWith(
-      fetch(e.request).then(resp => {
-        if (resp.status === 200) {
-          const c = resp.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, c));
-        }
-        return resp;
-      }).catch(() => caches.match(e.request).then(r => r || new Response('Offline', { status: 503 })))
-    );
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+async function networkFirst(request) {
+  const runtime = await caches.open(RUNTIME_CACHE);
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      runtime.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    if (isNavigationRequest(request)) {
+      return (await caches.match('./index.html')) || (await caches.match('./'));
+    }
+    throw error;
+  }
+}
+
+async function staleWhileRevalidate(request) {
+  const runtime = await caches.open(RUNTIME_CACHE);
+  const cached = await caches.match(request);
+  const networkPromise = fetch(request)
+    .then(response => {
+      if (response && response.ok) {
+        runtime.put(request, response.clone());
+      }
+      return response;
+    })
+    .catch(() => null);
+
+  if (cached) return cached;
+
+  const response = await networkPromise;
+  if (response) return response;
+
+  if (isNavigationRequest(request)) {
+    return (await caches.match('./index.html')) || (await caches.match('./'));
+  }
+
+  return new Response('', { status: 503, statusText: 'Offline' });
+}
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+  const sameOrigin = url.origin === self.location.origin;
+  const shellLikeRequest =
+    sameOrigin &&
+    (url.pathname === '/' ||
+      url.pathname.endsWith('/index.html') ||
+      url.pathname.endsWith('.html') ||
+      url.pathname.endsWith('/manifest.json'));
+
+  if (isNavigationRequest(event.request) || shellLikeRequest) {
+    event.respondWith(networkFirst(event.request));
     return;
   }
-  // Cache-first for other assets
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
-      if (resp.status === 200) {
-        const c = resp.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(e.request, c));
-      }
-      return resp;
-    }).catch(() => new Response('Offline', { status: 503 })))
-  );
+
+  event.respondWith(staleWhileRevalidate(event.request));
 });
