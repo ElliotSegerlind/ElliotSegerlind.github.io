@@ -931,9 +931,10 @@ body.density-compact .dialog-inner{padding:14px}
 <div v-if="view==='dela'" :class="viewTransitionClass">
 <div class="card">
 <div class="card-title"><span class="ic-fa"><i class="fa-solid fa-share-nodes"></i></span><span class="ic-em">🔗</span> Dela data</div>
-<button class="share-btn" @click="shareLink"><span class="ic-fa"><i class="fa-solid fa-share"></i></span><span class="ic-em">📤</span>Dela länk</button>
-<button class="share-btn" @click="copyData"><span class="ic-fa"><i class="fa-solid fa-copy"></i></span><span class="ic-em">📋</span>Kopiera data</button>
-<button class="share-btn" @click="generateQR"><span class="ic-fa"><i class="fa-solid fa-qrcode"></i></span><span class="ic-em">📱</span>Generera QR-kod</button>
+<button class="share-btn" @click="shareLink"><span class="ic-fa"><i class="fa-solid fa-share"></i></span><span class="ic-em">📤</span>Dela vald månad</button>
+<button class="share-btn" @click="copyData"><span class="ic-fa"><i class="fa-solid fa-copy"></i></span><span class="ic-em">📋</span>Kopiera hela datan</button>
+<button class="share-btn" @click="generateQR"><span class="ic-fa"><i class="fa-solid fa-qrcode"></i></span><span class="ic-em">📱</span>QR för vald månad</button>
+<div style="font-size:12px;color:var(--text3);line-height:1.45;margin-top:2px">Länk och QR innehåller bara vald månad för att bli mycket kortare. För allt innehåll kan du fortfarande kopiera hela datan eller exportera JSON.</div>
 <div v-if="qrDataUrl" class="qr-container"><img :src="qrDataUrl" style="max-width:200px;border-radius:8px"></div>
 <div v-if="qrError" style="color:var(--danger);font-size:13px;margin-top:4px">{{qrError}}</div>
 <div v-if="lastSynced" style="font-size:12px;color:var(--text3);margin-top:8px">Senast synkad: {{relTime(lastSynced)}} <span v-if="syncStale" style="color:var(--warn)">⚠ Gammal</span></div>
@@ -1652,7 +1653,18 @@ const LZString=(()=>{
 })();
 
 async function compressData(obj){
-  return'lz:'+LZString.compressToEncodedURIComponent(JSON.stringify(obj));
+  const text=JSON.stringify(obj);
+  if(typeof CompressionStream==='function'&&typeof DecompressionStream==='function'){
+    try{
+      const stream=new Blob([text]).stream().pipeThrough(new CompressionStream('gzip'));
+      const buf=new Uint8Array(await new Response(stream).arrayBuffer());
+      let bin='';
+      const chunkSize=0x8000;
+      for(let i=0;i<buf.length;i+=chunkSize)bin+=String.fromCharCode(...buf.subarray(i,i+chunkSize));
+      return'gz:'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    }catch{}
+  }
+  return'lz:'+LZString.compressToEncodedURIComponent(text);
 }
 async function decompressData(b64){
   if(!b64)throw new Error('Ingen data att läsa');
@@ -1672,6 +1684,48 @@ async function decompressData(b64){
   const stream=new Blob([buf]).stream().pipeThrough(ds);
   const text=await new Response(stream).text();
   return JSON.parse(text);
+}
+function serializeShareExpense(e){
+  const shared=e.shared!==false;
+  const out={n:e.name||'',a:Math.round(Number(e.amount)||0),d:e.date||todayStr(),c:e.category||'ovrigt'};
+  if(e.note)out.o=e.note;
+  if(e.tags?.length)out.t=[...e.tags];
+  if(e.comments?.length)out.cm=e.comments.map(c=>[c.author||'',c.text||'',c.time||0]).filter(c=>c[1]);
+  if(e.addedBy)out.u=e.addedBy;
+  if(e.recurring)out.r=1;
+  if((e.expenseType||'variable')==='fixed')out.x='f';
+  if(!shared){
+    out.s=0;
+    out.p=e.person||'a';
+  }
+  if(e.paid)out.pd=1;
+  if(e.paidByMe)out.pm=1;
+  if(e.paidByPartner)out.pp=1;
+  if((e.initialPaidBy||'a')==='b')out.i='b';
+  if(e.customSplit!=null)out.cs=Math.round(Number(e.customSplit));
+  return out;
+}
+function deserializeShareExpense(e,monthKey){
+  const shared=e?.s!==0;
+  return{
+    name:e?.n||'',
+    amount:Math.round(Number(e?.a)||0),
+    date:e?.d||monthKey+'-01',
+    category:e?.c||'ovrigt',
+    note:e?.o||'',
+    tags:Array.isArray(e?.t)?e.t.filter(Boolean):[],
+    comments:Array.isArray(e?.cm)?e.cm.map(c=>({author:c?.[0]||'',text:c?.[1]||'',time:Number(c?.[2])||Date.now()})).filter(c=>c.text):[],
+    addedBy:e?.u||'',
+    recurring:e?.r===1,
+    expenseType:e?.x==='f'?'fixed':'variable',
+    shared,
+    person:shared?null:(e?.p||'a'),
+    paid:e?.pd===1,
+    paidByMe:e?.pm===1,
+    paidByPartner:e?.pp===1,
+    initialPaidBy:e?.i==='b'?'b':'a',
+    customSplit:Number.isFinite(Number(e?.cs))?Math.round(Number(e.cs)):null
+  };
 }
 
 createApp({
@@ -1763,6 +1817,7 @@ createApp({
     const diffDialog=ref(null);
     const importDiff=reactive({summary:'',items:[]});
     let pendingImportData=null;
+    let pendingImportMeta=null;
     const manualShareField=ref(null);
     const manualShareText=ref('');
     const manualShareLabel=ref('');
@@ -2675,6 +2730,41 @@ createApp({
       manualShareText.value=text;
       nextTick(selectManualShare);
     }
+    function buildMonthSharePayload(){
+      const mk=currentMonth.value;
+      const month=getMonth(mk);
+      return{
+        shareVersion:1,
+        shareType:'month',
+        month:mk,
+        persons:[
+          [data.persons.a.name||'Person A',Math.round(Number(data.persons.a.income)||0)],
+          [data.persons.b.name||'Person B',Math.round(Number(data.persons.b.income)||0)]
+        ],
+        splitMode:data.splitMode==='income'?'income':'equal',
+        expenses:(month.expenses||[]).map(serializeShareExpense)
+      };
+    }
+    function normalizeImportedPayload(payload){
+      if(payload?.shareType==='month'&&payload?.month&&Array.isArray(payload.expenses)){
+        const mk=payload.month;
+        const normalized=migrateData({
+          persons:{
+            a:{name:payload.persons?.[0]?.[0]||'Person A',income:Math.round(Number(payload.persons?.[0]?.[1])||0)},
+            b:{name:payload.persons?.[1]?.[0]||'Person B',income:Math.round(Number(payload.persons?.[1]?.[1])||0)}
+          },
+          splitMode:payload.splitMode==='income'?'income':'equal',
+          months:{[mk]:{expenses:payload.expenses.map(e=>deserializeShareExpense(e,mk))}},
+          recurringTemplates:[],
+          pinnedExpenses:[],
+          budgets:{},
+          savingsGoals:[],
+          wishlist:[]
+        });
+        return{data:normalized,mode:'month-merge',month:mk};
+      }
+      return{data:migrateData(payload),mode:'replace',month:null};
+    }
     function copyWithExecCommand(text){
       const area=document.createElement('textarea');
       area.value=text;
@@ -2710,7 +2800,7 @@ createApp({
       return false;
     }
     async function buildShareUrl(){
-      return location.href.split('#')[0]+'#data='+(await compressData(data));
+      return location.href.split('#')[0]+'#data='+(await compressData(buildMonthSharePayload()));
     }
     async function shareLink(){
       try{
@@ -2720,20 +2810,20 @@ createApp({
           try{
             await navigator.share({title:'Utgifter',text:'Öppna delade utgifter',url});
             clearManualShare();
-            showToast('Delad!');
+            showToast('Månadslänk delad!');
             completed=true;
           }catch(e){
             if(e?.name==='AbortError')return;
           }
         }
-        if(!completed)await copyText(url,'Länk att kopiera manuellt','Länk kopierad ✓');
+        if(!completed)await copyText(url,'Månadslänk att kopiera manuellt','Månadslänk kopierad ✓');
         lastSynced.value=Date.now();localStorage.setItem('last-synced',String(lastSynced.value));
       }catch(e){showToast(e?.message||'Kunde inte dela')}
     }
     async function copyData(){
       try{
         const compressed=await compressData(data);
-        await copyText(compressed,'Data att kopiera manuellt','Data kopierad ✓');
+        await copyText(compressed,'Hela datan att kopiera manuellt','All data kopierad ✓');
         lastSynced.value=Date.now();localStorage.setItem('last-synced',String(lastSynced.value));
       }catch(e){showToast(e?.message||'Kunde inte kopiera')}
     }
@@ -2951,12 +3041,12 @@ createApp({
     async function generateQR(){
       qrError.value='';qrDataUrl.value=null;
       try{
-        const compressed=await compressData(data);
+        const compressed=await compressData(buildMonthSharePayload());
         const url=await buildShareUrl();
         const qrFactory=await ensureQrLibrary();
         if(!qrFactory){
-          qrError.value='Kunde inte ladda QR-stödet på mobilen. Länken visas nedan istället.';
-          openManualShare('Länk att kopiera manuellt',url);
+          qrError.value='Kunde inte ladda QR-stödet på mobilen. Månadslänken visas nedan istället.';
+          openManualShare('Månadslänk att kopiera manuellt',url);
           return;
         }
         const urlQr=tryBuildQrDataUrl(qrFactory,url);
@@ -2968,12 +3058,12 @@ createApp({
         const dataQr=tryBuildQrDataUrl(qrFactory,compressed);
         if(dataQr){
           qrDataUrl.value=dataQr;
-          openManualShare('QR-koden innehåller komprimerad data för appens inbyggda import',compressed);
+          openManualShare('QR-koden innehåller komprimerad månadsdata för appens inbyggda import',compressed);
           showToast('QR-koden blev för stor som länk. Skanna den via appens Importera-funktion.');
           return;
         }
-        qrError.value='Data för stor för QR-kod. Data visas nedan istället.';
-        openManualShare('Data att kopiera manuellt',compressed);
+        qrError.value='Månadsdatan blev fortfarande för stor för QR-kod. Den visas nedan istället.';
+        openManualShare('Månadsdata att kopiera manuellt',compressed);
         return;
       }catch(e){qrError.value=String(e?.message||e||'Kunde inte generera QR-kod')}
     }
@@ -2984,8 +3074,9 @@ createApp({
       try{
         let raw=importText.value.trim();
         if(raw.includes('#data='))raw=raw.split('#data=')[1];
-        const imported=await decompressData(raw);
-        migrateData(imported);
+        const payload=await decompressData(raw);
+        const normalized=normalizeImportedPayload(payload);
+        const imported=normalized.data;
         // build diff
         const items=[];
         const newMonths=Object.keys(imported.months||{});
@@ -3000,16 +3091,42 @@ createApp({
         });
         if(imported.persons?.a?.name!==data.persons.a.name)items.push({type:'changed',desc:`Person A: ${imported.persons.a.name}`});
         if(imported.persons?.b?.name!==data.persons.b.name)items.push({type:'changed',desc:`Person B: ${imported.persons.b.name}`});
-        importDiff.summary=`${items.filter(i=>i.type==='added').length} tillagda, ${items.filter(i=>i.type==='changed').length} ändrade`;
+        if(normalized.mode==='month-merge'&&normalized.month){
+          const mk=normalized.month;
+          const newCount=(imported.months[mk]?.expenses||[]).length;
+          const oldCount=(data.months[mk]?.expenses||[]).length;
+          importDiff.summary=`${formatMonthLabel(mk)} · ${newCount} utgifter`;
+          if(!items.some(i=>i.desc.startsWith(formatMonthLabel(mk))))items.unshift({type:oldCount?'changed':'added',desc:`${formatMonthLabel(mk)}: ${oldCount} → ${newCount} utgifter`});
+        }else{
+          importDiff.summary=`${items.filter(i=>i.type==='added').length} tillagda, ${items.filter(i=>i.type==='changed').length} ändrade`;
+        }
         importDiff.items=items;
         pendingImportData=imported;
+        pendingImportMeta=normalized;
         diffDialog.value?.showModal();
       }catch(e){showToast('Kunde inte läsa data')}
     }
     function applyImport(){
       if(!pendingImportData)return;
+      if(pendingImportMeta?.mode==='month-merge'&&pendingImportMeta.month){
+        const imported=migrateData(pendingImportData);
+        const mk=pendingImportMeta.month;
+        Object.assign(data.persons.a,imported.persons.a);
+        Object.assign(data.persons.b,imported.persons.b);
+        data.splitMode=imported.splitMode;
+        data.months[mk]={expenses:[...(imported.months[mk]?.expenses||[])]};
+        currentMonth.value=mk;
+        pendingImportData=null;
+        pendingImportMeta=null;
+        diffDialog.value?.close();
+        importText.value='';
+        lastSynced.value=Date.now();localStorage.setItem('last-synced',String(lastSynced.value));
+        try{const av=localStorage.getItem('expense-avatars');if(av){const p=JSON.parse(av);if(p.a)avatars.a=p.a;if(p.b)avatars.b=p.b}}catch{}
+        showToast(formatMonthLabel(mk)+' importerad ✓');
+        return;
+      }
       Object.assign(data,migrateData(pendingImportData));
-      pendingImportData=null;diffDialog.value?.close();importText.value='';
+      pendingImportData=null;pendingImportMeta=null;diffDialog.value?.close();importText.value='';
       lastSynced.value=Date.now();localStorage.setItem('last-synced',String(lastSynced.value));
       // import avatars if present
       try{const av=localStorage.getItem('expense-avatars');if(av){const p=JSON.parse(av);if(p.a)avatars.a=p.a;if(p.b)avatars.b=p.b}}catch{}
