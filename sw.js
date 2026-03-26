@@ -1,7 +1,13 @@
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE = `utgifter-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `utgifter-runtime-${CACHE_VERSION}`;
 const APP_SHELL = ['./', './index.html', './manifest.json'];
+const WARM_RUNTIME_URLS = [
+  'https://unpkg.com/vue@3/dist/vue.global.prod.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff2',
+  'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'
+];
 
 function isNavigationRequest(request) {
   return request.mode === 'navigate' || request.destination === 'document';
@@ -18,8 +24,20 @@ async function precacheAppShell() {
   );
 }
 
+async function warmRuntimeAssets() {
+  const cache = await caches.open(RUNTIME_CACHE);
+  await Promise.all(
+    WARM_RUNTIME_URLS.map(async url => {
+      try {
+        const response = await fetch(url, { mode: 'no-cors', cache: 'reload' });
+        await cache.put(url, response);
+      } catch {}
+    })
+  );
+}
+
 self.addEventListener('install', event => {
-  event.waitUntil(precacheAppShell().then(() => self.skipWaiting()));
+  event.waitUntil(Promise.all([precacheAppShell(), warmRuntimeAssets()]).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', event => {

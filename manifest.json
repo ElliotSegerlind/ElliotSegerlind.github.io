@@ -1,7 +1,9 @@
 {
   "name": "Utgifter",
   "short_name": "Utgifter",
-  "start_url": ".",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f8faf9",
   "theme_color": "#18a058",

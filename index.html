@@ -25,6 +25,7 @@
 --cat-transport:#ef4444;--cat-noje:#a855f7;--cat-klader:#ec4899;--cat-halsa:#14b8a6;
 --cat-pren:#f97316;--cat-ovrigt:#6b7280;
 --nav-h:60px;--top-h:56px;
+--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
 html{height:100%;-webkit-text-size-adjust:100%}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-tap-highlight-color:transparent;overflow-x:hidden;
@@ -42,7 +43,7 @@ body.dark-override{
 --danger-light:rgba(239,68,68,.15);--warn-light:rgba(245,158,11,.15)}
 body.light-override{--bg:#f8faf9;--bg2:#fff;--bg3:#f1f5f3;--text:#1a2e1f;--text2:#4a6350;--text3:#8a9f90;--border:#e2e8e4;--accent-light:rgba(24,160,88,.1);--shadow:0 1px 3px rgba(0,0,0,.08);--shadow-lg:0 8px 32px rgba(0,0,0,.12)}
 
-#app-wrap{max-width:480px;margin:0 auto;min-height:100vh;position:relative}
+#app-wrap{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;position:relative}
 .top-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:var(--top-h);z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(248,250,249,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
 @media(prefers-color-scheme:dark){body:not(.light-override) .top-bar{background:rgba(17,25,20,.82)}}
 body.dark-override .top-bar{background:rgba(17,25,20,.82)}
@@ -52,10 +53,12 @@ body.dark-override .top-bar{background:rgba(17,25,20,.82)}
 .top-bar .gear-btn{background:none;border:none;font-size:20px;color:var(--text2);cursor:pointer;padding:8px}
 .top-bar .gear-btn .ic-fa,.top-bar .gear-btn .ic-em{font-size:20px}
 
-.main-content{padding:calc(var(--top-h) + 8px) 12px calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px) 12px}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:calc(var(--nav-h) + env(safe-area-inset-bottom));z-index:100;display:flex;align-items:flex-start;justify-content:space-around;padding:6px 0 env(safe-area-inset-bottom) 0;background:rgba(248,250,249,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border)}
+.main-content{padding:calc(var(--top-h) + 8px) 12px calc(var(--nav-h) + var(--safe-bottom) + 16px) 12px}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:calc(var(--nav-h) + var(--safe-bottom));z-index:100;display:flex;align-items:flex-start;justify-content:space-around;padding:6px 0 var(--safe-bottom) 0;background:rgba(248,250,249,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border)}
 @media(prefers-color-scheme:dark){body:not(.light-override) .bottom-nav{background:rgba(17,25,20,.9)}}
 body.dark-override .bottom-nav{background:rgba(17,25,20,.9)}
+body.standalone-app .top-bar{height:calc(var(--top-h) + var(--safe-top));padding:var(--safe-top) 16px 0}
+body.standalone-app .main-content{padding-top:calc(var(--top-h) + var(--safe-top) + 8px)}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text3);cursor:pointer;padding:4px 12px;border:none;background:none;transition:color .2s}
 .nav-item.active{color:var(--accent)}
 .nav-item .ic-fa,.nav-item .ic-em{font-size:20px}
@@ -154,7 +157,7 @@ body.dark-override .bottom-nav{background:rgba(17,25,20,.9)}
 .comment-input input{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;background:var(--bg);color:var(--text);min-height:38px}
 .comment-input button{padding:8px 12px;border:none;background:var(--accent);color:#fff;border-radius:var(--radius-xs);font-size:12px;font-weight:700;cursor:pointer;min-height:38px}
 
-.fab{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);right:calc(50% - 240px + 16px);width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:24px;cursor:pointer;box-shadow:var(--shadow-lg);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.fab{position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);right:calc(50% - 240px + 16px);width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:24px;cursor:pointer;box-shadow:var(--shadow-lg);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .fab:active{transform:scale(.92)}
 .fab .ic-fa,.fab .ic-em{font-size:24px}
 @media(min-width:481px){.fab{right:calc(50% - 224px)}}
@@ -266,7 +269,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .collapsible-header .ic-fa,.collapsible-header .ic-em{transition:transform .2s;color:var(--text3);font-size:12px}
 .collapsible-header .ic-fa.open,.collapsible-header .ic-em.open{transform:rotate(180deg)}
 
-.bottom-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-radius:20px 20px 0 0;padding:12px 16px calc(18px + env(safe-area-inset-bottom));z-index:200;box-shadow:0 -10px 28px rgba(0,0,0,.14),var(--shadow-lg);border:1px solid var(--border);border-bottom:none}
+.bottom-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-radius:20px 20px 0 0;padding:12px 16px calc(18px + var(--safe-bottom));z-index:200;box-shadow:0 -10px 28px rgba(0,0,0,.14),var(--shadow-lg);border:1px solid var(--border);border-bottom:none}
 .bottom-sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199}
 .bottom-sheet .sheet-preview{padding:4px 0 12px;border-bottom:1px solid var(--border);margin-bottom:6px}
 .bottom-sheet .sheet-preview .kicker{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
@@ -277,7 +280,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .bottom-sheet .handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 12px}
 .bottom-sheet .action-item .ic-fa,.bottom-sheet .action-item .ic-em{width:18px;color:var(--text3)}
 
-.toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 20px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:24px;font-size:14px;font-weight:600;z-index:300;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:8px;white-space:nowrap;animation:fadeIn .3s ease}
+.toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 20px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:24px;font-size:14px;font-weight:600;z-index:300;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:8px;white-space:nowrap;animation:fadeIn .3s ease}
 .toast button{background:rgba(255,255,255,.25);border:none;color:inherit;padding:4px 10px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer}
 
 .love-banner{text-align:center;padding:16px;font-size:15px;color:var(--text3);margin:8px 0}
@@ -340,6 +343,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .ic-fa,.ic-em{display:inline-flex;align-items:center;justify-content:center;line-height:1}
 body.use-emojis .ic-fa{display:none}
 body:not(.use-emojis) .ic-em{display:none}
+body.font-icons-missing .ic-fa{display:none}
+body.font-icons-missing .ic-em{display:inline-flex}
 
 body.density-compact .card{padding:10px}
 body.density-compact .expense-item{padding:8px}
@@ -921,6 +926,18 @@ body.density-compact .dialog-inner{padding:14px}
 <div v-if="lastSynced" style="font-size:12px;color:var(--text3);margin-top:8px">Senast synkad: {{relTime(lastSynced)}} <span v-if="syncStale" style="color:var(--warn)">⚠ Gammal</span></div>
 </div>
 
+<div v-if="manualShareText" class="card">
+<div class="card-title"><span class="ic-fa"><i class="fa-solid fa-copy"></i></span><span class="ic-em">📋</span> Kopiera manuellt</div>
+<div style="font-size:13px;color:var(--text2);margin-bottom:8px">{{manualShareLabel}}</div>
+<div class="import-area">
+<textarea ref="manualShareField" :value="manualShareText" readonly @focus="$event.target.select()"></textarea>
+</div>
+<div style="display:flex;gap:8px;margin-top:8px">
+<button class="btn-secondary" style="flex:1;padding:10px;border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer" @click="selectManualShare">Markera allt</button>
+<button class="btn-secondary" style="flex:1;padding:10px;border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer" @click="clearManualShare">Stäng</button>
+</div>
+</div>
+
 <div class="card">
 <div class="collapsible-header" @click="showImport=!showImport">
 <span class="card-title" style="margin:0">Importera</span>
@@ -1337,21 +1354,285 @@ function ensureMonth(d,mk){
   if(!d.months[mk])d.months[mk]={expenses:[]};
 }
 
+const LZString=(()=>{
+  const keyStrUriSafe='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$';
+  const baseReverseDic={};
+  function getBaseValue(alphabet,character){
+    if(!baseReverseDic[alphabet]){
+      baseReverseDic[alphabet]={};
+      for(let i=0;i<alphabet.length;i++)baseReverseDic[alphabet][alphabet.charAt(i)]=i;
+    }
+    return baseReverseDic[alphabet][character];
+  }
+  function _compress(uncompressed,bitsPerChar,getCharFromInt){
+    if(uncompressed==null)return'';
+    let value;
+    const dictionary={};
+    const dictionaryToCreate={};
+    let c='';
+    let wc='';
+    let w='';
+    let enlargeIn=2;
+    let dictSize=3;
+    let numBits=2;
+    const data=[];
+    let dataVal=0;
+    let dataPosition=0;
+    const writeBit=bit=>{
+      dataVal=(dataVal<<1)|bit;
+      if(dataPosition===bitsPerChar-1){
+        dataPosition=0;
+        data.push(getCharFromInt(dataVal));
+        dataVal=0;
+      }else dataPosition++;
+    };
+    const writeBits=(count,bits)=>{
+      for(let i=0;i<count;i++){
+        writeBit(bits&1);
+        bits>>=1;
+      }
+    };
+    for(let i=0;i<uncompressed.length;i++){
+      c=uncompressed.charAt(i);
+      if(!Object.prototype.hasOwnProperty.call(dictionary,c)){
+        dictionary[c]=dictSize++;
+        dictionaryToCreate[c]=true;
+      }
+      wc=w+c;
+      if(Object.prototype.hasOwnProperty.call(dictionary,wc))w=wc;
+      else{
+        if(Object.prototype.hasOwnProperty.call(dictionaryToCreate,w)){
+          if(w.charCodeAt(0)<256){
+            writeBits(numBits,0);
+            writeBits(8,w.charCodeAt(0));
+          }else{
+            writeBits(numBits,1);
+            writeBits(16,w.charCodeAt(0));
+          }
+          enlargeIn--;
+          if(enlargeIn===0){
+            enlargeIn=2**numBits;
+            numBits++;
+          }
+          delete dictionaryToCreate[w];
+        }else{
+          value=dictionary[w];
+          writeBits(numBits,value);
+        }
+        enlargeIn--;
+        if(enlargeIn===0){
+          enlargeIn=2**numBits;
+          numBits++;
+        }
+        dictionary[wc]=dictSize++;
+        w=String(c);
+      }
+    }
+    if(w!==''){
+      if(Object.prototype.hasOwnProperty.call(dictionaryToCreate,w)){
+        if(w.charCodeAt(0)<256){
+          writeBits(numBits,0);
+          writeBits(8,w.charCodeAt(0));
+        }else{
+          writeBits(numBits,1);
+          writeBits(16,w.charCodeAt(0));
+        }
+        enlargeIn--;
+        if(enlargeIn===0){
+          enlargeIn=2**numBits;
+          numBits++;
+        }
+        delete dictionaryToCreate[w];
+      }else{
+        value=dictionary[w];
+        writeBits(numBits,value);
+      }
+      enlargeIn--;
+      if(enlargeIn===0){
+        enlargeIn=2**numBits;
+        numBits++;
+      }
+    }
+    writeBits(numBits,2);
+    while(true){
+      dataVal<<=1;
+      if(dataPosition===bitsPerChar-1){
+        data.push(getCharFromInt(dataVal));
+        break;
+      }else dataPosition++;
+    }
+    return data.join('');
+  }
+  function _decompress(length,resetValue,getNextValue){
+    const dictionary=[];
+    let next;
+    let enlargeIn=4;
+    let dictSize=4;
+    let numBits=3;
+    let entry='';
+    const result=[];
+    let bits;
+    let resb;
+    let maxpower;
+    let power;
+    let c;
+    let w;
+    const data={val:getNextValue(0),position:resetValue,index:1};
+    for(let i=0;i<3;i++)dictionary[i]=i;
+    bits=0;
+    maxpower=2**2;
+    power=1;
+    while(power!==maxpower){
+      resb=data.val&data.position;
+      data.position>>=1;
+      if(data.position===0){
+        data.position=resetValue;
+        data.val=getNextValue(data.index++);
+      }
+      bits|=(resb>0?1:0)*power;
+      power<<=1;
+    }
+    switch(next=bits){
+      case 0:
+        bits=0;
+        maxpower=2**8;
+        power=1;
+        while(power!==maxpower){
+          resb=data.val&data.position;
+          data.position>>=1;
+          if(data.position===0){
+            data.position=resetValue;
+            data.val=getNextValue(data.index++);
+          }
+          bits|=(resb>0?1:0)*power;
+          power<<=1;
+        }
+        c=String.fromCharCode(bits);
+        break;
+      case 1:
+        bits=0;
+        maxpower=2**16;
+        power=1;
+        while(power!==maxpower){
+          resb=data.val&data.position;
+          data.position>>=1;
+          if(data.position===0){
+            data.position=resetValue;
+            data.val=getNextValue(data.index++);
+          }
+          bits|=(resb>0?1:0)*power;
+          power<<=1;
+        }
+        c=String.fromCharCode(bits);
+        break;
+      case 2:return'';
+      default:return null;
+    }
+    dictionary[3]=c;
+    w=c;
+    result.push(c);
+    while(true){
+      if(data.index>length)return'';
+      bits=0;
+      maxpower=2**numBits;
+      power=1;
+      while(power!==maxpower){
+        resb=data.val&data.position;
+        data.position>>=1;
+        if(data.position===0){
+          data.position=resetValue;
+          data.val=getNextValue(data.index++);
+        }
+        bits|=(resb>0?1:0)*power;
+        power<<=1;
+      }
+      switch(c=bits){
+        case 0:
+          bits=0;
+          maxpower=2**8;
+          power=1;
+          while(power!==maxpower){
+            resb=data.val&data.position;
+            data.position>>=1;
+            if(data.position===0){
+              data.position=resetValue;
+              data.val=getNextValue(data.index++);
+            }
+            bits|=(resb>0?1:0)*power;
+            power<<=1;
+          }
+          dictionary[dictSize++]=String.fromCharCode(bits);
+          c=dictSize-1;
+          enlargeIn--;
+          break;
+        case 1:
+          bits=0;
+          maxpower=2**16;
+          power=1;
+          while(power!==maxpower){
+            resb=data.val&data.position;
+            data.position>>=1;
+            if(data.position===0){
+              data.position=resetValue;
+              data.val=getNextValue(data.index++);
+            }
+            bits|=(resb>0?1:0)*power;
+            power<<=1;
+          }
+          dictionary[dictSize++]=String.fromCharCode(bits);
+          c=dictSize-1;
+          enlargeIn--;
+          break;
+        case 2:return result.join('');
+      }
+      if(enlargeIn===0){
+        enlargeIn=2**numBits;
+        numBits++;
+      }
+      if(dictionary[c])entry=dictionary[c];
+      else if(c===dictSize)entry=w+w.charAt(0);
+      else return null;
+      result.push(entry);
+      dictionary[dictSize++]=w+entry.charAt(0);
+      enlargeIn--;
+      w=entry;
+      if(enlargeIn===0){
+        enlargeIn=2**numBits;
+        numBits++;
+      }
+    }
+  }
+  return{
+    compressToEncodedURIComponent(input){
+      if(input==null)return'';
+      return _compress(input,6,a=>keyStrUriSafe.charAt(a));
+    },
+    decompressFromEncodedURIComponent(input){
+      if(input==null)return'';
+      if(input==='')return null;
+      input=input.replace(/ /g,'+');
+      return _decompress(input.length,32,index=>getBaseValue(keyStrUriSafe,input.charAt(index)));
+    }
+  };
+})();
+
 async function compressData(obj){
-  const json=JSON.stringify(obj);
-  const blob=new Blob([json]);
-  const cs=new CompressionStream('gzip');
-  const stream=blob.stream().pipeThrough(cs);
-  const buf=await new Response(stream).arrayBuffer();
-  let b64=btoa(String.fromCharCode(...new Uint8Array(buf)));
-  return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  return'lz:'+LZString.compressToEncodedURIComponent(JSON.stringify(obj));
 }
 async function decompressData(b64){
+  if(!b64)throw new Error('Ingen data att läsa');
+  if(b64.startsWith('lz:')){
+    const text=LZString.decompressFromEncodedURIComponent(b64.slice(3));
+    if(text==null)throw new Error('Kunde inte läsa länken');
+    return JSON.parse(text);
+  }
+  if(b64.startsWith('gz:'))b64=b64.slice(3);
   b64=b64.replace(/-/g,'+').replace(/_/g,'/');
   while(b64.length%4)b64+='=';
   const bin=atob(b64);
   const buf=new Uint8Array(bin.length);
   for(let i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);
+  if(typeof DecompressionStream!=='function')throw new Error('Den här länken skapades i en äldre version. Be om en ny länk.');
   const ds=new DecompressionStream('gzip');
   const stream=new Blob([buf]).stream().pipeThrough(ds);
   const text=await new Response(stream).text();
@@ -1447,6 +1728,9 @@ createApp({
     const diffDialog=ref(null);
     const importDiff=reactive({summary:'',items:[]});
     let pendingImportData=null;
+    const manualShareField=ref(null);
+    const manualShareText=ref('');
+    const manualShareLabel=ref('');
 
     // qr
     const qrDataUrl=ref(null);
@@ -2265,7 +2549,12 @@ createApp({
       document.documentElement.style.setProperty('--accent2',c.v2);
       document.documentElement.style.setProperty('--accent-light',c.light);
     }
-    function setIconStyle(v){useEmojis.value=v;localStorage.setItem('use-emojis',String(v));document.body.classList.toggle('use-emojis',v)}
+    function setIconStyle(v){
+      useEmojis.value=v;
+      localStorage.setItem('use-emojis',String(v));
+      document.body.classList.toggle('use-emojis',v);
+      if(!v)setTimeout(updateIconAvailability,0);
+    }
     function setDensity(v){compactMode.value=v;localStorage.setItem('density-mode',String(v));document.body.classList.toggle('density-compact',v)}
     function setSimpleMode(v){simpleMode.value=v;localStorage.setItem('simple-mode',String(v))}
     function setNotif(v){
@@ -2276,6 +2565,28 @@ createApp({
       const v=parseInt(evt.target.value)||0;
       if(!data.budgets)data.budgets={};
       data.budgets[catId]=v;
+    }
+
+    function isStandaloneMode(){
+      return window.matchMedia?.('(display-mode: standalone)')?.matches||window.navigator.standalone===true;
+    }
+    function updateStandaloneMode(){
+      document.body.classList.toggle('standalone-app',isStandaloneMode());
+    }
+    function updateIconAvailability(){
+      if(useEmojis.value){
+        document.body.classList.remove('font-icons-missing');
+        return;
+      }
+      const probe=document.createElement('i');
+      probe.className='fa-solid fa-wallet';
+      probe.style.position='absolute';
+      probe.style.opacity='0';
+      probe.style.pointerEvents='none';
+      document.body.appendChild(probe);
+      const family=getComputedStyle(probe).fontFamily||'';
+      document.body.removeChild(probe);
+      document.body.classList.toggle('font-icons-missing',!/Font Awesome/i.test(family));
     }
 
     // Avatars
@@ -2301,31 +2612,114 @@ createApp({
     }
 
     // Share
+    function clearManualShare(){
+      manualShareText.value='';
+      manualShareLabel.value='';
+    }
+    function selectManualShare(){
+      nextTick(()=>{
+        const el=manualShareField.value;
+        if(!el)return;
+        el.focus();
+        el.select();
+        el.setSelectionRange(0,el.value.length);
+      });
+    }
+    function openManualShare(label,text){
+      manualShareLabel.value=label;
+      manualShareText.value=text;
+      nextTick(selectManualShare);
+    }
+    function copyWithExecCommand(text){
+      const area=document.createElement('textarea');
+      area.value=text;
+      area.setAttribute('readonly','');
+      area.style.position='fixed';
+      area.style.opacity='0';
+      area.style.inset='0';
+      document.body.appendChild(area);
+      area.focus();
+      area.select();
+      area.setSelectionRange(0,area.value.length);
+      let ok=false;
+      try{ok=document.execCommand('copy')}catch{}
+      document.body.removeChild(area);
+      return ok;
+    }
+    async function copyText(text,label,successMsg){
+      if(navigator.clipboard?.writeText){
+        try{
+          await navigator.clipboard.writeText(text);
+          clearManualShare();
+          if(successMsg)showToast(successMsg);
+          return true;
+        }catch{}
+      }
+      if(copyWithExecCommand(text)){
+        clearManualShare();
+        if(successMsg)showToast(successMsg);
+        return true;
+      }
+      openManualShare(label,text);
+      showToast('Automatisk kopiering blockerades. Markera texten manuellt.');
+      return false;
+    }
+    async function buildShareUrl(){
+      return location.href.split('#')[0]+'#data='+(await compressData(data));
+    }
     async function shareLink(){
       try{
-        const compressed=await compressData(data);
-        const url=location.href.split('#')[0]+'#data='+compressed;
-        if(navigator.share){await navigator.share({title:'Utgifter',url});showToast('Delad!')}
-        else{await navigator.clipboard.writeText(url);showToast('Länk kopierad ✓')}
+        const url=await buildShareUrl();
+        let completed=false;
+        if(navigator.share){
+          try{
+            await navigator.share({title:'Utgifter',text:'Öppna delade utgifter',url});
+            clearManualShare();
+            showToast('Delad!');
+            completed=true;
+          }catch(e){
+            if(e?.name==='AbortError')return;
+          }
+        }
+        if(!completed)await copyText(url,'Länk att kopiera manuellt','Länk kopierad ✓');
         lastSynced.value=Date.now();localStorage.setItem('last-synced',String(lastSynced.value));
-      }catch(e){showToast('Kunde inte dela')}
+      }catch(e){showToast(e?.message||'Kunde inte dela')}
     }
     async function copyData(){
-      try{const compressed=await compressData(data);await navigator.clipboard.writeText(compressed);showToast('Data kopierad ✓');
-        lastSynced.value=Date.now();localStorage.setItem('last-synced',String(lastSynced.value));}catch{showToast('Kunde inte kopiera')}
+      try{
+        const compressed=await compressData(data);
+        await copyText(compressed,'Data att kopiera manuellt','Data kopierad ✓');
+        lastSynced.value=Date.now();localStorage.setItem('last-synced',String(lastSynced.value));
+      }catch(e){showToast(e?.message||'Kunde inte kopiera')}
+    }
+    async function ensureQrLibrary(){
+      if(window.qrcode)return true;
+      try{
+        await new Promise((resolve,reject)=>{
+          const s=document.createElement('script');
+          s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+          s.onload=resolve;
+          s.onerror=reject;
+          document.head.appendChild(s);
+        });
+        return typeof window.qrcode==='function';
+      }catch{
+        return false;
+      }
     }
     async function generateQR(){
       qrError.value='';qrDataUrl.value=null;
       try{
-        const compressed=await compressData(data);
-        const url=location.href.split('#')[0]+'#data='+compressed;
-        if(url.length>4296){qrError.value='Data för stor för QR-kod ('+url.length+' tecken, max 4296)';return}
-        if(!window.qrcode){
-          await new Promise((resolve,reject)=>{
-            const s=document.createElement('script');
-            s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
-            s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
-          });
+        const url=await buildShareUrl();
+        if(url.length>4296){
+          qrError.value='Data för stor för QR-kod ('+url.length+' tecken, max 4296). Länken visas nedan istället.';
+          openManualShare('Länk att kopiera manuellt',url);
+          return;
+        }
+        if(!(await ensureQrLibrary())){
+          qrError.value='Kunde inte ladda QR-stödet på mobilen. Länken visas nedan istället.';
+          openManualShare('Länk att kopiera manuellt',url);
+          return;
         }
         const qr=qrcode(0,'M');qr.addData(url);qr.make();
         const size=qr.getModuleCount();const scale=4;const canvas=document.createElement('canvas');
@@ -2333,7 +2727,8 @@ createApp({
         ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
         for(let r=0;r<size;r++)for(let c=0;c<size;c++){if(qr.isDark(r,c)){ctx.fillStyle='#000';ctx.fillRect(c*scale+4,r*scale+4,scale,scale)}}
         qrDataUrl.value=canvas.toDataURL('image/png');
-      }catch(e){qrError.value='Kunde inte generera QR-kod'}
+        clearManualShare();
+      }catch(e){qrError.value=e?.message||'Kunde inte generera QR-kod'}
     }
 
     // Import
@@ -2520,8 +2915,15 @@ createApp({
       else if(themeMode.value==='light')document.body.classList.add('light-override');
       if(useEmojis.value)document.body.classList.add('use-emojis');
       if(compactMode.value)document.body.classList.add('density-compact');
+      updateStandaloneMode();
       const ac=ACCENT_COLORS.find(c=>c.name===accentColor.value);
       if(ac){document.documentElement.style.setProperty('--accent',ac.value);document.documentElement.style.setProperty('--accent2',ac.v2);document.documentElement.style.setProperty('--accent-light',ac.light)}
+      setTimeout(updateIconAvailability,250);
+      window.addEventListener('load',updateIconAvailability,{once:true});
+      document.fonts?.ready?.then(updateIconAvailability).catch(()=>{});
+      const standaloneMedia=window.matchMedia?.('(display-mode: standalone)');
+      standaloneMedia?.addEventListener?.('change',updateStandaloneMode);
+      standaloneMedia?.addListener?.(updateStandaloneMode);
 
       // Hash import
       if(location.hash.startsWith('#data=')){
@@ -2566,6 +2968,7 @@ createApp({
       savingsDialog,savingsForm,savingsAddDialog,savingsAddTarget,savingsAddAmount,
       wishDialog,wishForm,
       importText,diffDialog,importDiff,
+      manualShareField,manualShareText,manualShareLabel,
       qrDataUrl,qrError,
       largeAmountDialog,largeAmountVal,largeAmountResolve,
       settingsDialog,
@@ -2592,6 +2995,7 @@ createApp({
       openSettings,setTheme,setAccent,setIconStyle,setDensity,setSimpleMode,setNotif,setBudget,
       uploadAvatar,
       shareLink,copyData,generateQR,importData,applyImport,exportJSON,exportCSV,
+      clearManualShare,selectManualShare,
       copyPrevMonth,clearMonth,archiveOld,restoreArchive,purgeComments,
       showConfirm,showToast
     };
