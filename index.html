@@ -264,6 +264,19 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .share-btn .ic-fa,.share-btn .ic-em{color:var(--accent);width:20px}
 .import-area{margin-top:8px}
 .import-area textarea{width:100%;height:80px;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:monospace;resize:vertical;background:var(--bg);color:var(--text)}
+.import-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.import-actions .btn-primary,.import-actions .btn-secondary{flex:1;min-width:140px;padding:10px;border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer}
+.scanner-panel{margin-top:10px;padding:12px;border:1px solid rgba(24,160,88,.18);border-radius:var(--radius);background:linear-gradient(180deg,var(--accent-light),transparent)}
+.scanner-preview{position:relative;border-radius:14px;overflow:hidden;background:#08110c;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center}
+.scanner-preview video{width:100%;height:100%;object-fit:cover;display:block}
+.scanner-placeholder{padding:16px;text-align:center;font-size:13px;color:#d1fae5;line-height:1.5}
+.scanner-status{font-size:13px;color:var(--text2);margin-top:8px}
+.scanner-error{font-size:13px;color:var(--danger);margin-top:8px}
+.scanner-overlay{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(8,17,12,.14),rgba(8,17,12,.05))}
+.scanner-frame{position:absolute;inset:18% 14%;border:2px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.18)}
+.scanner-frame::after{content:'';position:absolute;left:10%;right:10%;top:50%;height:2px;background:rgba(255,255,255,.92);box-shadow:0 0 18px rgba(255,255,255,.55)}
+.scanner-note{font-size:12px;color:var(--text3);margin-top:8px;line-height:1.45}
+.file-picker{display:none}
 
 .collapsible-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;padding:2px 0}
 .collapsible-header .ic-fa,.collapsible-header .ic-em{transition:transform .2s;color:var(--text3);font-size:12px}
@@ -947,7 +960,27 @@ body.density-compact .dialog-inner{padding:14px}
 <div v-if="showImport" style="margin-top:10px">
 <div class="import-area">
 <textarea v-model="importText" placeholder="Klistra in data eller URL..."></textarea>
-<button class="btn-primary" style="width:100%;margin-top:6px;padding:10px;border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer" @click="importData">Importera</button>
+<div class="import-actions">
+<button class="btn-primary" @click="importData">Importera</button>
+<button class="btn-secondary" @click="startQrScanner" :disabled="scannerLoading||scannerActive">{{scannerActive?'Kameran är igång':scannerLoading?'Startar kamera…':'Skanna QR-kod'}}</button>
+</div>
+<div v-if="scannerActive||scannerLoading||scannerError" class="scanner-panel">
+<div class="scanner-preview">
+<video v-if="scannerActive" ref="scannerVideo" autoplay muted playsinline></video>
+<div v-else class="scanner-placeholder">{{scannerLoading?'Startar kameran…':'Starta kameran igen eller välj en bild med QR-koden.'}}</div>
+<div class="scanner-overlay"></div>
+<div class="scanner-frame"></div>
+</div>
+<div class="scanner-status" v-if="scannerActive">Rikta kameran mot QR-koden på den andra enheten.</div>
+<div class="scanner-status" v-else-if="scannerLoading">Väntar på kameratillstånd…</div>
+<div class="scanner-error" v-if="scannerError">{{scannerError}}</div>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button v-if="scannerActive||scannerLoading" class="btn-secondary" style="flex:1;padding:10px;border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer" @click="stopQrScanner">Stäng kamera</button>
+<button class="btn-secondary" style="flex:1;padding:10px;border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer" @click="openScannerImagePicker">Läs från bild</button>
+</div>
+<div class="scanner-note">Fungerar bäst över HTTPS och på en enhet som ger kameratillstånd till appen. Om iPhone-kameran bråkar kan du ta en bild eller välja en skärmdump istället.</div>
+</div>
+<input ref="scannerFileInput" class="file-picker" type="file" accept="image/*" capture="environment" @change="handleScannerImage">
 </div>
 </div>
 </div>
@@ -1229,6 +1262,8 @@ body.density-compact .dialog-inner{padding:14px}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>
 const {createApp,ref,reactive,computed,watch,onMounted,nextTick} = Vue;
+const QR_CODE_LIB_URL='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+const QR_SCAN_LIB_URL='https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js';
 
 const CATEGORIES = [
   {id:'hyra',icon:'fa-solid fa-house',emoji:'🏠',label:'Hyra',color:'#6366f1'},
@@ -1735,6 +1770,16 @@ createApp({
     // qr
     const qrDataUrl=ref(null);
     const qrError=ref('');
+    const scannerVideo=ref(null);
+    const scannerFileInput=ref(null);
+    const scannerActive=ref(false);
+    const scannerLoading=ref(false);
+    const scannerError=ref('');
+    let scannerStream=null;
+    let scannerFrameId=0;
+    let scannerScanAt=0;
+    let scannerCanvas=null;
+    let scannerContext=null;
 
     // large amount
     const largeAmountDialog=ref(null);
@@ -2697,7 +2742,7 @@ createApp({
       try{
         await new Promise((resolve,reject)=>{
           const s=document.createElement('script');
-          s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+          s.src=QR_CODE_LIB_URL;
           s.onload=resolve;
           s.onerror=reject;
           document.head.appendChild(s);
@@ -2705,6 +2750,171 @@ createApp({
         return typeof window.qrcode==='function';
       }catch{
         return false;
+      }
+    }
+    async function ensureQrScannerLibrary(){
+      if(typeof window.jsQR==='function')return true;
+      try{
+        await new Promise((resolve,reject)=>{
+          const existing=document.querySelector(`script[src="${QR_SCAN_LIB_URL}"]`);
+          if(existing){
+            existing.addEventListener('load',resolve,{once:true});
+            existing.addEventListener('error',reject,{once:true});
+            return;
+          }
+          const s=document.createElement('script');
+          s.src=QR_SCAN_LIB_URL;
+          s.onload=resolve;
+          s.onerror=reject;
+          document.head.appendChild(s);
+        });
+        return typeof window.jsQR==='function';
+      }catch{
+        return false;
+      }
+    }
+    function getScannerContext(width,height){
+      if(!scannerCanvas)scannerCanvas=document.createElement('canvas');
+      if(!scannerContext)scannerContext=scannerCanvas.getContext('2d',{willReadFrequently:true});
+      if(!scannerContext)return null;
+      scannerCanvas.width=width;
+      scannerCanvas.height=height;
+      return scannerContext;
+    }
+    function decodeQrFromSource(source,width,height){
+      const ctx=getScannerContext(width,height);
+      if(!ctx||typeof window.jsQR!=='function')return null;
+      ctx.drawImage(source,0,0,width,height);
+      const image=ctx.getImageData(0,0,width,height);
+      return window.jsQR(image.data,width,height,{inversionAttempts:'attemptBoth'})?.data||null;
+    }
+    function describeScannerError(err){
+      switch(err?.name){
+        case'NotAllowedError':return'Kameratillstånd nekades. Tillåt kamera för den här appen i Safari/iPhone-inställningar.';
+        case'NotFoundError':return'Ingen kamera hittades på enheten.';
+        case'NotReadableError':return'Kameran används redan av en annan app eller kunde inte öppnas.';
+        case'OverconstrainedError':return'Kunde inte välja bakkameran. Prova igen eller använd bildimport.';
+        case'SecurityError':return'Kameran kräver HTTPS eller localhost.';
+        default:return err?.message||'Kunde inte starta QR-läsaren.';
+      }
+    }
+    function stopQrScanner(){
+      if(scannerFrameId){
+        cancelAnimationFrame(scannerFrameId);
+        scannerFrameId=0;
+      }
+      const video=scannerVideo.value;
+      if(video){
+        try{video.pause()}catch{}
+        try{video.srcObject=null}catch{}
+      }
+      if(scannerStream){
+        scannerStream.getTracks().forEach(track=>track.stop());
+        scannerStream=null;
+      }
+      scannerActive.value=false;
+      scannerLoading.value=false;
+    }
+    async function handleScannedPayload(raw){
+      if(!raw)return;
+      stopQrScanner();
+      showImport.value=true;
+      importText.value=raw.trim();
+      showToast('QR-kod läst ✓');
+      await importData();
+    }
+    function scanQrFrame(){
+      if(!scannerActive.value)return;
+      scannerFrameId=requestAnimationFrame(scanQrFrame);
+      const video=scannerVideo.value;
+      if(!video||video.readyState<2||!video.videoWidth||!video.videoHeight)return;
+      const now=performance.now();
+      if(now-scannerScanAt<180)return;
+      scannerScanAt=now;
+      const result=decodeQrFromSource(video,video.videoWidth,video.videoHeight);
+      if(result){
+        handleScannedPayload(result).catch(err=>{
+          scannerError.value=err?.message||'Kunde inte läsa QR-koden.';
+        });
+      }
+    }
+    async function startQrScanner(){
+      scannerError.value='';
+      if(scannerActive.value||scannerLoading.value)return;
+      if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){
+        scannerError.value='Kameraläsaren kräver HTTPS och en webbläsare med kamerastöd.';
+        return;
+      }
+      if(!(await ensureQrScannerLibrary())){
+        scannerError.value='Kunde inte ladda QR-läsaren. Prova igen eller använd bildimport.';
+        return;
+      }
+      stopQrScanner();
+      scannerLoading.value=true;
+      try{
+        scannerStream=await navigator.mediaDevices.getUserMedia({
+          audio:false,
+          video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}
+        });
+        scannerActive.value=true;
+        await nextTick();
+        const video=scannerVideo.value;
+        if(!video)throw new Error('Kunde inte öppna kameravisningen.');
+        video.srcObject=scannerStream;
+        video.setAttribute('playsinline','');
+        video.muted=true;
+        await video.play();
+        scannerScanAt=0;
+        scannerLoading.value=false;
+        scanQrFrame();
+      }catch(err){
+        stopQrScanner();
+        scannerError.value=describeScannerError(err);
+      }
+    }
+    function openScannerImagePicker(){
+      stopQrScanner();
+      scannerFileInput.value?.click();
+    }
+    async function decodeQrFromFile(file){
+      if(!(await ensureQrScannerLibrary()))throw new Error('Kunde inte ladda QR-läsaren.');
+      let bitmap=null;
+      let image=null;
+      try{
+        if(typeof createImageBitmap==='function'){
+          bitmap=await createImageBitmap(file);
+          const result=decodeQrFromSource(bitmap,bitmap.width,bitmap.height);
+          if(result)return result;
+        }
+      }catch{}
+      const url=URL.createObjectURL(file);
+      try{
+        image=await new Promise((resolve,reject)=>{
+          const img=new Image();
+          img.onload=()=>resolve(img);
+          img.onerror=()=>reject(new Error('Kunde inte läsa bilden.'));
+          img.src=url;
+        });
+        const width=image.naturalWidth||image.width;
+        const height=image.naturalHeight||image.height;
+        return decodeQrFromSource(image,width,height);
+      }finally{
+        if(bitmap?.close)bitmap.close();
+        URL.revokeObjectURL(url);
+      }
+    }
+    async function handleScannerImage(evt){
+      const file=evt.target.files?.[0];
+      if(!file)return;
+      scannerError.value='';
+      try{
+        const result=await decodeQrFromFile(file);
+        if(!result)throw new Error('Ingen QR-kod hittades i bilden.');
+        await handleScannedPayload(result);
+      }catch(err){
+        scannerError.value=err?.message||'Kunde inte läsa bilden.';
+      }finally{
+        if(evt.target)evt.target.value='';
       }
     }
     async function generateQR(){
@@ -2924,6 +3134,9 @@ createApp({
       const standaloneMedia=window.matchMedia?.('(display-mode: standalone)');
       standaloneMedia?.addEventListener?.('change',updateStandaloneMode);
       standaloneMedia?.addListener?.(updateStandaloneMode);
+      document.addEventListener('visibilitychange',()=>{
+        if(document.visibilityState!=='visible')stopQrScanner();
+      });
 
       // Hash import
       if(location.hash.startsWith('#data=')){
@@ -2955,6 +3168,8 @@ createApp({
         milestoneShown.clear();
       });
     });
+    watch(view,v=>{if(v!=='dela')stopQrScanner()});
+    watch(showImport,open=>{if(!open)stopQrScanner()});
 
     return{
       appLoaded,view,viewTransitionClass,currentMonth,data,toast,
@@ -2969,7 +3184,7 @@ createApp({
       wishDialog,wishForm,
       importText,diffDialog,importDiff,
       manualShareField,manualShareText,manualShareLabel,
-      qrDataUrl,qrError,
+      qrDataUrl,qrError,scannerVideo,scannerFileInput,scannerActive,scannerLoading,scannerError,
       largeAmountDialog,largeAmountVal,largeAmountResolve,
       settingsDialog,
       settledMessages,settledMsgIdx,loveBanners,loveBannerIdx,accentColors,
@@ -2994,7 +3209,7 @@ createApp({
       openWishDialog,addWishItem,toggleWish,removeWish,
       openSettings,setTheme,setAccent,setIconStyle,setDensity,setSimpleMode,setNotif,setBudget,
       uploadAvatar,
-      shareLink,copyData,generateQR,importData,applyImport,exportJSON,exportCSV,
+      shareLink,copyData,generateQR,startQrScanner,stopQrScanner,openScannerImagePicker,handleScannerImage,importData,applyImport,exportJSON,exportCSV,
       clearManualShare,selectManualShare,
       copyPrevMonth,clearMonth,archiveOld,restoreArchive,purgeComments,
       showConfirm,showToast
