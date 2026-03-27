@@ -154,6 +154,7 @@ body.standalone-app .main-content{padding-top:calc(var(--top-h) + var(--safe-top
 .comment .author{font-weight:600}
 .comment .time{color:var(--text3);font-size:10px;margin-left:4px}
 .comment-input{display:flex;gap:6px;margin-top:6px}
+.comment-input select{padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:12px;background:var(--bg);color:var(--text);min-height:38px}
 .comment-input input{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;background:var(--bg);color:var(--text);min-height:38px}
 .comment-input button{padding:8px 12px;border:none;background:var(--accent);color:#fff;border-radius:var(--radius-xs);font-size:12px;font-weight:700;cursor:pointer;min-height:38px}
 
@@ -177,9 +178,11 @@ body.dark-override .floating-summary{background:rgba(17,25,20,.88)}
 .recurring-banner .rec-actions{display:flex;gap:4px}
 .recurring-banner .rec-actions button{padding:6px 10px;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:700;cursor:pointer}
 
-dialog{border:none;border-radius:16px;padding:0;background:var(--bg2);color:var(--text);box-shadow:var(--shadow-lg);max-width:min(440px,calc(100vw - 32px));width:100%}
+dialog{border:none;border-radius:16px;padding:0;background:var(--bg2);color:var(--text);box-shadow:var(--shadow-lg);max-width:min(440px,calc(100vw - 32px));width:100%;max-height:min(85vh,calc(100dvh - 32px))}
 dialog::backdrop{background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
-.dialog-inner{padding:20px;max-height:85vh;overflow-y:auto}
+.dialog-inner{padding:20px;max-height:min(85vh,calc(100dvh - 32px));overflow-y:auto}
+body.standalone-app dialog[open]{position:fixed;left:0;right:0;top:calc(var(--safe-top) + 12px);bottom:auto;max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px)}
+body.standalone-app .dialog-inner{max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px);padding-bottom:calc(20px + var(--safe-bottom))}
 .dialog-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
 .dialog-title .close-btn{background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;padding:4px}
 .form-group{margin-bottom:14px}
@@ -749,6 +752,10 @@ body.density-compact .dialog-inner{padding:14px}
 <div v-for="c in exp.comments" :key="c.time" class="comment"><span class="author">{{c.author}}:</span> {{c.text}} <span class="time">{{relTime(c.time)}}</span></div>
 </div>
 <div v-if="!simpleMode" class="comment-input" @click.stop style="margin-top:6px">
+<select :value="getCommentAuthor(exp.id)" @change="setCommentAuthor(exp.id,$event.target.value)">
+<option value="a">{{data.persons.a.name}}</option>
+<option value="b">{{data.persons.b.name}}</option>
+</select>
 <input :placeholder="'Kommentar...'" @keydown.enter.prevent="addComment(exp,$event)">
 <button @click="addCommentBtn(exp,$event)">↩</button>
 </div>
@@ -1766,6 +1773,7 @@ createApp({
     const addForm=reactive({name:'',amount:0,expenseType:'variable',date:todayStr(),category:'ovrigt',note:'',shared:true,initialPaidBy:'a',customSplitEnabled:false,customSplitVal:50,person:'a',tags:[],recurring:false});
     const addAmountStr=ref('');
     const addCalcPreview=ref('');
+    const commentAuthorByExpense=reactive({});
     const editMode=ref(false);
     const editingId=ref(null);
     const addNameInput=ref(null);
@@ -2339,10 +2347,6 @@ createApp({
       const exps=data.months[currentMonth.value]?.expenses;if(!exps)return;
       const e=exps.find(x=>x.id===exp.id);if(!e)return;
       e[field]=evt.target.checked;
-      if(e.shared){
-        if(field==='paidByPartner'&&e.initialPaidBy==='a'&&e.paidByPartner)e.paidByMe=true;
-        if(field==='paidByMe'&&e.initialPaidBy==='b'&&e.paidByMe)e.paidByPartner=true;
-      }
       launchMiniHearts(evt.clientX||200,evt.clientY||400);
       haptic(10);
       if(field==='paid')return;
@@ -2560,10 +2564,20 @@ createApp({
     }
 
     // Comments
+    function getCommentAuthor(expId){
+      return commentAuthorByExpense[expId]==='b'?'b':'a';
+    }
+    function setCommentAuthor(expId,person){
+      commentAuthorByExpense[expId]=person==='b'?'b':'a';
+    }
     function addComment(exp,evt){
       const v=evt.target.value.trim();if(!v)return;
       const e=data.months[currentMonth.value]?.expenses?.find(x=>x.id===exp.id);
-      if(e){if(!e.comments)e.comments=[];e.comments.push({author:data.persons.a.name,text:v,time:Date.now()})}
+      if(e){
+        const personKey=getCommentAuthor(exp.id);
+        if(!e.comments)e.comments=[];
+        e.comments.push({author:data.persons[personKey].name,text:v,time:Date.now()});
+      }
       evt.target.value='';
     }
     function addCommentBtn(exp,evt){
@@ -3357,7 +3371,7 @@ createApp({
       startEdit,onEditAmountInput,onEditAmountFocus,onEditAmountBlur,addEditTag,saveEdit,
       togglePaid,bulkPay,
       expenseCardStyle,holdProgressStyle,handleExpenseTap,openExpenseActions,onTouchStart,onTouchMove,onTouchEnd,onTouchCancel,confirmSwipeDelete,doContextAction,
-      deleteExpense,removePin,addFromPin,moveExp,addComment,addCommentBtn,
+      deleteExpense,removePin,addFromPin,moveExp,addComment,addCommentBtn,getCommentAuthor,setCommentAuthor,
       addRecurring,skipRecurring,addAllRecurring,
       openSavingsDialog,addSavingsGoal,addToSavings,confirmAddSavings,removeSavingsGoal,
       openWishDialog,addWishItem,toggleWish,removeWish,
