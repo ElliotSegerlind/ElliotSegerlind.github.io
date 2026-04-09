@@ -32,7 +32,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 background-image:radial-gradient(ellipse at 10% 10%,rgba(24,160,88,.035),transparent 60%),radial-gradient(ellipse at 90% 90%,rgba(99,102,241,.025),transparent 60%)}
 button,input,select,textarea{font:inherit}
 button{touch-action:manipulation}
-body.dialog-open{overflow:hidden;position:fixed;width:100%;height:100%}
+body.dialog-open{overflow:hidden;position:fixed;width:100%;height:100%;touch-action:none}
 @media(prefers-color-scheme:dark){body:not(.light-override){
 --bg:#0c1118;--bg2:#151d28;--bg3:#1c2738;--text:#e2ecf0;--text2:#94afc0;--text3:#5e7a8c;
 --border:#243040;--accent-light:rgba(24,160,88,.15);--shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 8px 32px rgba(0,0,0,.5);
@@ -199,7 +199,8 @@ body.standalone-app .dialog-inner{max-height:calc(100dvh - var(--safe-top) - var
 .dialog-title .close-btn{background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;padding:4px}
 .form-group{margin-bottom:14px}
 .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:var(--text2)}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--text)}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--text);box-sizing:border-box;max-width:100%}
+input[type="date"]{overflow:hidden}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light),0 0 12px rgba(24,160,88,.08)}
 .inset-field{position:relative;margin-bottom:14px}
 .inset-field:last-child{margin-bottom:0}
@@ -380,7 +381,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .amount-display.has-math{font-size:22px}
 .amount-display .amount-result{color:var(--accent);font-size:28px}
 
-.calc-strip{display:flex;gap:6px;padding:10px 12px;justify-content:center;align-items:center;animation:calcStripIn .25s ease;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:var(--bg2);border-top:1px solid var(--border);padding-bottom:calc(10px + var(--safe-bottom,0px));box-shadow:0 -2px 12px rgba(0,0,0,.1)}
+.calc-strip{display:flex;gap:6px;padding:10px 12px;justify-content:center;align-items:center;animation:calcStripIn .25s ease;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:var(--bg2);border-top:1px solid var(--border);padding-bottom:calc(10px + var(--safe-bottom,0px));box-shadow:0 -2px 12px rgba(0,0,0,.1);transform:translateY(0);transition:transform .15s ease}
 .calc-strip button{flex:1;max-width:56px;height:42px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);font-size:18px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .15s,box-shadow .15s}
 .calc-strip button:active{transform:scale(.9);background:var(--accent-light)}
 .calc-strip button.calc-equals{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(24,160,88,.3)}
@@ -1082,7 +1083,7 @@ body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(
 <div style="margin-bottom:0">
 <div v-if="addCalcPreview" class="calc-preview" style="margin-bottom:4px;margin-top:0">{{addCalcPreview}}</div>
 <div class="inset-field inset-center" :class="{'has-value':addAmountStr}">
-<input ref="addAmountInput" v-model="addAmountStr" @input="onAddAmountInput" @focus="onAddAmountFocus" @blur="onAddAmountBlur" inputmode="decimal" autocomplete="off" :placeholder="addAmountStr?'':'t.ex. 1 250'" style="font-size:20px;font-weight:700;padding:24px 14px 8px;text-align:center;letter-spacing:.02em">
+<input ref="addAmountInput" v-model="addAmountStr" @input="onAddAmountInput" @focus="onAddAmountFocus" @blur="onAddAmountBlur" inputmode="decimal" autocomplete="off" placeholder="0" style="font-size:20px;font-weight:700;padding:24px 14px 8px;text-align:center;letter-spacing:.02em">
 <label>Belopp (kr)</label>
 </div>
 </div>
@@ -2351,18 +2352,19 @@ createApp({
       addAmountStr.value='';addCalcPreview.value='';
       addDialog.value?.close();
       openModal(addDialog);
-      nextTick(()=>addNameInput.value?.focus());
+      nextTick(()=>addNameInput.value?.focus({preventScroll:true}));
     }
     function onAddAmountInput(){
       setAddAmountState(parseAmountInput(addAmountStr.value));
     }
     function onAddAmountFocus(){
       showAddCalcStrip.value=true;
+      updateCalcStripPos();
       const parsed=parseAmountInput(addAmountStr.value);
       if(parsed.valid&&!parsed.isMath)addAmountStr.value=String(parsed.value);
     }
     function onAddAmountBlur(){
-      setTimeout(()=>{showAddCalcStrip.value=false},200);
+      setTimeout(()=>{showAddCalcStrip.value=false},300);
       const parsed=parseAmountInput(addAmountStr.value);
       setAddAmountState(parsed);
       addAmountStr.value=parsed.valid?formatMoneyValue(parsed.value):'';
@@ -3422,6 +3424,20 @@ createApp({
       document.body.style.top=`-${scrollY}px`;
       document.body.classList.add('dialog-open');
       ref.value.showModal();
+    }
+
+    /* visualViewport-based calc strip positioning for iOS keyboard */
+    function updateCalcStripPos(){
+      const vv=window.visualViewport;
+      if(!vv)return;
+      const el=document.querySelector('.calc-strip');
+      if(!el)return;
+      const kbHeight=window.innerHeight-vv.height-vv.offsetTop;
+      el.style.bottom=(kbHeight>0?kbHeight:0)+'px';
+    }
+    if(window.visualViewport){
+      window.visualViewport.addEventListener('resize',updateCalcStripPos);
+      window.visualViewport.addEventListener('scroll',updateCalcStripPos);
     }
     async function registerServiceWorker(){
       if(!('serviceWorker' in navigator))return;
