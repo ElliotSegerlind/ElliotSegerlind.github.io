@@ -33,20 +33,20 @@ background-image:radial-gradient(ellipse at 10% 10%,rgba(24,160,88,.035),transpa
 button,input,select,textarea{font:inherit}
 button{touch-action:manipulation}
 @media(prefers-color-scheme:dark){body:not(.light-override){
---bg:#111914;--bg2:#1a2420;--bg3:#223028;--text:#e5efe8;--text2:#a3bfac;--text3:#6b8574;
---border:#2d3d34;--accent-light:rgba(24,160,88,.15);--shadow:0 1px 3px rgba(0,0,0,.3);--shadow-lg:0 8px 32px rgba(0,0,0,.4);
+--bg:#0c1118;--bg2:#151d28;--bg3:#1c2738;--text:#e2ecf0;--text2:#94afc0;--text3:#5e7a8c;
+--border:#243040;--accent-light:rgba(24,160,88,.15);--shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 8px 32px rgba(0,0,0,.5);
 --danger-light:rgba(239,68,68,.15);--warn-light:rgba(245,158,11,.15);
-background-image:radial-gradient(ellipse at 10% 10%,rgba(24,160,88,.05),transparent 60%),radial-gradient(ellipse at 90% 90%,rgba(99,102,241,.03),transparent 60%)}}
+background-image:radial-gradient(ellipse at 10% 10%,rgba(24,160,88,.06),transparent 60%),radial-gradient(ellipse at 90% 90%,rgba(99,102,241,.04),transparent 60%)}}
 body.dark-override{
---bg:#111914;--bg2:#1a2420;--bg3:#223028;--text:#e5efe8;--text2:#a3bfac;--text3:#6b8574;
---border:#2d3d34;--accent-light:rgba(24,160,88,.15);--shadow:0 1px 3px rgba(0,0,0,.3);--shadow-lg:0 8px 32px rgba(0,0,0,.4);
+--bg:#0c1118;--bg2:#151d28;--bg3:#1c2738;--text:#e2ecf0;--text2:#94afc0;--text3:#5e7a8c;
+--border:#243040;--accent-light:rgba(24,160,88,.15);--shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 8px 32px rgba(0,0,0,.5);
 --danger-light:rgba(239,68,68,.15);--warn-light:rgba(245,158,11,.15)}
 body.light-override{--bg:#f8faf9;--bg2:#fff;--bg3:#f1f5f3;--text:#1a2e1f;--text2:#4a6350;--text3:#8a9f90;--border:#e2e8e4;--accent-light:rgba(24,160,88,.1);--shadow:0 1px 3px rgba(0,0,0,.08);--shadow-lg:0 8px 32px rgba(0,0,0,.12)}
 
 #app-wrap{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;position:relative}
 .top-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:var(--top-h);z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(248,250,249,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
-@media(prefers-color-scheme:dark){body:not(.light-override) .top-bar{background:rgba(17,25,20,.82)}}
-body.dark-override .top-bar{background:rgba(17,25,20,.82)}
+@media(prefers-color-scheme:dark){body:not(.light-override) .top-bar{background:rgba(12,17,24,.85)}}
+body.dark-override .top-bar{background:rgba(12,17,24,.85)}
 .top-bar .title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px}
 .top-bar .title .ic-fa,.top-bar .title .ic-em{font-size:18px}
 .top-bar .title select{border:none;background:transparent;color:var(--text);font-weight:600;font-size:15px;cursor:pointer;padding:4px}
@@ -55,15 +55,15 @@ body.dark-override .top-bar{background:rgba(17,25,20,.82)}
 
 .main-content{padding:calc(var(--top-h) + 8px) 12px calc(var(--nav-h) + var(--safe-bottom) + 16px) 12px}
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:calc(var(--nav-h) + var(--safe-bottom));z-index:100;display:flex;align-items:flex-start;justify-content:space-around;padding:6px 0 var(--safe-bottom) 0;background:rgba(248,250,249,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border)}
-@media(prefers-color-scheme:dark){body:not(.light-override) .bottom-nav{background:rgba(17,25,20,.9)}}
-body.dark-override .bottom-nav{background:rgba(17,25,20,.9)}
+@media(prefers-color-scheme:dark){body:not(.light-override) .bottom-nav{background:rgba(12,17,24,.92)}}
+body.dark-override .bottom-nav{background:rgba(12,17,24,.92)}
 body.standalone-app .top-bar{height:calc(var(--top-h) + var(--safe-top));padding:var(--safe-top) 16px 0}
 body.standalone-app .main-content{padding-top:calc(var(--top-h) + var(--safe-top) + 8px)}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text3);cursor:pointer;padding:4px 12px;border:none;background:none;transition:color .2s}
 .nav-item.active{color:var(--accent)}
 .nav-item .ic-fa,.nav-item .ic-em{font-size:20px}
 
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);transition:box-shadow .2s}
 .card-title{font-weight:700;font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .card-title .ic-fa,.card-title .ic-em{color:var(--accent)}
 .settlement-card{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:16px;padding:20px;box-shadow:var(--shadow-lg);margin-bottom:12px}
@@ -110,7 +110,7 @@ body.standalone-app .main-content{padding-top:calc(var(--top-h) + var(--safe-top
 .search-bar input{width:100%;padding:10px 12px 10px 36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);font-size:14px;color:var(--text)}
 .search-bar .ic-fa,.search-bar .ic-em{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3)}
 
-.expense-item{--hold-progress:0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;touch-action:pan-y;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;box-shadow:0 10px 24px rgba(15,23,42,.05),var(--shadow);-webkit-touch-callout:none}
+.expense-item{--hold-progress:0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;touch-action:pan-y;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;box-shadow:0 4px 16px rgba(15,23,42,.04),var(--shadow);-webkit-touch-callout:none}
 .expense-item::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top right,var(--accent-light),transparent 42%);opacity:.55;pointer-events:none;transition:opacity .18s ease}
 .expense-item.press-active{transform:scale(.992);box-shadow:0 6px 18px rgba(15,23,42,.08),var(--shadow)}
 .expense-item.hold-active{border-color:rgba(24,160,88,.35);box-shadow:0 12px 30px rgba(24,160,88,.12),var(--shadow)}
@@ -158,14 +158,14 @@ body.standalone-app .main-content{padding-top:calc(var(--top-h) + var(--safe-top
 .comment-input input{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;background:var(--bg);color:var(--text);min-height:38px}
 .comment-input button{padding:8px 12px;border:none;background:var(--accent);color:#fff;border-radius:var(--radius-xs);font-size:12px;font-weight:700;cursor:pointer;min-height:38px}
 
-.fab{position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);right:calc(50% - 240px + 16px);width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:24px;cursor:pointer;box-shadow:var(--shadow-lg);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.fab{position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);right:16px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:24px;cursor:pointer;box-shadow:var(--shadow-lg),0 0 20px rgba(24,160,88,.25);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .fab:active{transform:scale(.92)}
 .fab .ic-fa,.fab .ic-em{font-size:24px}
 @media(min-width:481px){.fab{right:calc(50% - 224px)}}
 
 .floating-summary{position:sticky;top:calc(var(--top-h) + 4px);z-index:10;background:rgba(248,250,249,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:14px;padding:9px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;box-shadow:var(--shadow)}
-@media(prefers-color-scheme:dark){body:not(.light-override) .floating-summary{background:rgba(17,25,20,.88)}}
-body.dark-override .floating-summary{background:rgba(17,25,20,.88)}
+@media(prefers-color-scheme:dark){body:not(.light-override) .floating-summary{background:rgba(12,17,24,.88)}}
+body.dark-override .floating-summary{background:rgba(12,17,24,.88)}
 
 .pinned-row{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin-bottom:8px}
 .pinned-chip{flex-shrink:0;display:flex;align-items:center;gap:4px;padding:8px 12px;border-radius:20px;background:var(--accent-light);color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;border:none;white-space:nowrap;position:relative;box-shadow:var(--shadow)}
@@ -179,7 +179,7 @@ body.dark-override .floating-summary{background:rgba(17,25,20,.88)}
 .recurring-banner .rec-actions button{padding:6px 10px;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:700;cursor:pointer}
 
 dialog{border:none;border-radius:16px;padding:0;background:var(--bg2);color:var(--text);box-shadow:var(--shadow-lg);max-width:min(440px,calc(100vw - 32px));width:100%;max-height:min(85vh,calc(100dvh - 32px))}
-dialog::backdrop{background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
+dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .dialog-inner{padding:20px;max-height:min(85vh,calc(100dvh - 32px));overflow-y:auto}
 body.standalone-app dialog[open]{position:fixed;left:0;right:0;top:calc(var(--safe-top) + 12px);bottom:auto;max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px)}
 body.standalone-app .dialog-inner{max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px);padding-bottom:calc(20px + var(--safe-bottom))}
@@ -188,14 +188,27 @@ body.standalone-app .dialog-inner{max-height:calc(100dvh - var(--safe-top) - var
 .form-group{margin-bottom:14px}
 .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:var(--text2)}
 .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--text)}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light),0 0 12px rgba(24,160,88,.08)}
+.inset-field{position:relative;margin-bottom:14px}
+.inset-field:last-child{margin-bottom:0}
+.form-row>.inset-field{margin-bottom:0}
+.dialog-section>.inset-field:last-child{margin-bottom:0}
+.inset-field label{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;font-weight:500;color:var(--text3);pointer-events:none;transition:all .18s ease;transform-origin:left center;margin:0}
+.inset-field input,.inset-field select{width:100%;padding:22px 14px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:14px}
+.inset-field select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b8574' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.inset-field input:focus,.inset-field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light),0 0 12px rgba(24,160,88,.08)}
+.inset-field input::placeholder{color:transparent;transition:color .18s ease}
+.inset-field input:focus::placeholder{color:var(--text3)}
+.inset-field.has-value label,.inset-field input:focus~label,.inset-field select:focus~label{top:10px;transform:translateY(0);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.inset-field.has-value:not(:focus-within) label{color:var(--text3)}
+.inset-field.inset-center label{left:50%;transform:translateX(-50%) translateY(-50%)}
+.inset-field.inset-center.has-value label,.inset-field.inset-center input:focus~label{left:14px;transform:translateY(0) translateX(0)}
 input[type=number]{-moz-appearance:textfield;appearance:textfield}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.calc-preview{font-size:12px;color:var(--accent);margin-top:2px;font-weight:600}
 .dialog-subtitle{font-size:13px;color:var(--text2);margin:-10px 0 14px;line-height:1.45}
 .field-note{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.4}
 .form-row{display:flex;gap:10px}
-.form-row>*{flex:1}
+.form-row>*{flex:1;min-width:0}
 .checkbox-group{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
 .checkbox-group input{accent-color:var(--accent);width:18px;height:18px}
 .split-slider{margin-top:8px}
@@ -206,9 +219,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .tags-input .tag-pill{display:flex;align-items:center;gap:2px}
 .tags-input .tag-pill .remove-tag{cursor:pointer;font-size:10px;opacity:.7}
 .dialog-actions{display:flex;gap:10px;margin-top:16px}
-.dialog-actions button{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;transition:transform .1s}
+.dialog-actions button{flex:1;padding:14px;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,box-shadow .15s;letter-spacing:.01em}
 .dialog-actions button:active{transform:scale(.97)}
-.btn-primary{background:var(--accent);color:#fff}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(24,160,88,.25)}
 .btn-secondary{background:var(--bg3);color:var(--text)}
 .btn-danger{background:var(--danger);color:#fff}
 
@@ -344,7 +357,31 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .qr-container{text-align:center;margin:12px 0}
 .qr-container canvas{border-radius:var(--radius);max-width:100%}
 
-@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.dialog-section{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;transition:border-color .2s}
+.dialog-section .form-group{margin-bottom:10px}
+.dialog-section .form-group:last-child{margin-bottom:0}
+.dialog-section:focus-within{border-color:rgba(24,160,88,.3)}
+.dialog-section .section-kicker{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.dialog-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 12px}
+
+.amount-display{font-size:28px;font-weight:800;text-align:center;padding:8px 0;letter-spacing:-.02em;color:var(--text);min-height:44px;line-height:1.2}
+.amount-display.has-math{font-size:22px}
+.amount-display .amount-result{color:var(--accent);font-size:28px}
+
+.calc-strip{display:flex;gap:6px;padding:10px 0 4px;justify-content:center;align-items:center;animation:calcStripIn .25s ease}
+.calc-strip button{flex:1;max-width:56px;height:42px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);font-size:18px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .15s,box-shadow .15s}
+.calc-strip button:active{transform:scale(.9);background:var(--accent-light)}
+.calc-strip button.calc-equals{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(24,160,88,.3)}
+.calc-strip button.calc-equals:active{background:var(--accent2);transform:scale(.9)}
+.calc-strip .calc-done{font-size:13px;font-weight:700;color:var(--accent);max-width:64px;letter-spacing:.02em}
+@keyframes calcStripIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.date-quick-btns{display:flex;gap:6px;margin-top:6px}
+.date-quick-btns button{padding:5px 12px;border:1px solid var(--border);border-radius:20px;background:var(--bg2);font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .15s}
+.date-quick-btns button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.date-quick-btns button:active{transform:scale(.95)}
+
+.calc-preview{font-size:14px;color:var(--accent);margin-top:4px;font-weight:700;text-align:center}
 @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
 @keyframes slideInReverse{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
 @keyframes popBounce{0%{transform:scale(0)}50%{transform:scale(1.15)}70%{transform:scale(.95)}100%{transform:scale(1)}}
@@ -375,7 +412,13 @@ body.density-compact .dialog-inner{padding:14px}
 @media(max-width:480px){
 .top-bar .title select,.search-bar input,.sort-bar select,.comment-input input,.form-group input,.form-group select,.form-group textarea,.tags-input input,.import-area textarea{font-size:16px}
 .payment-checks label,.expense-item .action-pill{min-height:40px}
+dialog#addDialog{margin:0;max-width:100%;width:100%;border-radius:20px 20px 0 0;position:fixed;bottom:0;left:0;right:0;top:auto;max-height:calc(100dvh - var(--safe-top,0px) - 20px);animation:dialogSlideUp .32s cubic-bezier(.32,.72,.24,1.02)}
+dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(--safe-top,0px) - 20px);padding:16px 20px calc(20px + var(--safe-bottom,0px))}
+body.standalone-app dialog#addDialog[open]{top:auto;bottom:0;max-height:calc(100dvh - var(--safe-top) - 12px)}
+body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(--safe-top) - 12px)}
+.form-row{flex-direction:column;gap:8px}
 }
+@keyframes dialogSlideUp{0%{opacity:0;transform:translateY(100%)}60%{opacity:1;transform:translateY(-2%)}100%{opacity:1;transform:translateY(0)}}
 
 .unpaid-preview-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
 .unpaid-preview-item:last-child{border:none}
@@ -514,7 +557,7 @@ body.density-compact .dialog-inner{padding:14px}
 <div v-for="bi in budgetItems" :key="bi.id" class="budget-item">
 <div class="budget-header">
 <span class="budget-cat"><span class="ic-fa"><i :class="catIcon(bi.id)"></i></span><span class="ic-em">{{catEmoji(bi.id)}}</span> {{catLabel(bi.id)}}</span>
-<span class="budget-vals">{{formatKr(bi.spent)}} / {{formatKr(bi.limit)}}</span>
+<span class="budget-vals">{{formatKr(bi.spent)}} / {{formatKr(bi.limit)}}<template v-if="bi.mode==='pct'"> ({{bi.raw}}%)</template></span>
 </div>
 <div class="progress-bar-budget"><div class="fill" :style="{width:Math.min(bi.pct,100)+'%',background:bi.pct>100?'var(--danger)':bi.pct>80?'var(--warn)':'var(--accent)'}"></div></div>
 <div v-if="bi.pct>100" class="budget-alert"><span class="ic-fa"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="ic-em">⚠️</span> Överskriden!</div>
@@ -679,39 +722,7 @@ body.density-compact .dialog-inner{padding:14px}
 
 <!-- Expense List -->
 <div v-for="(exp,idx) in displayedInvoices" :key="exp.id">
-<div v-if="editingExpense?.id===exp.id" class="inline-edit">
-<div class="form-group"><label>Namn</label><input v-model="editingExpense.name"></div>
-<div class="form-row">
-<div class="form-group"><label>Belopp</label><input v-model="editAmountStr" @input="onEditAmountInput" @focus="onEditAmountFocus" @blur="onEditAmountBlur" inputmode="decimal" autocomplete="off" placeholder="t.ex. 1 250 eller 799+149"><div class="field-note">Beloppet formateras automatiskt och kan räknas ut i fältet.</div><div v-if="editCalcPreview" class="calc-preview">{{editCalcPreview}}</div></div>
-<div class="form-group"><label>Datum</label><input type="date" v-model="editingExpense.date"><div class="field-note">{{longDate(editingExpense.date)}}</div></div>
-</div>
-<div class="form-row">
-<div class="form-group"><label>Kategori</label><select v-model="editingExpense.category"><option v-for="c in categories" :key="c.id" :value="c.id">{{c.label}}</option></select></div>
-<div class="form-group"><label>Typ</label><select v-model="editingExpense.expenseType"><option value="fixed">Fast (faktura)</option><option value="variable">Rörlig (köp)</option></select></div>
-</div>
-<div class="form-group"><label class="checkbox-group"><input type="checkbox" v-model="editingExpense.shared">Gemensam utgift</label></div>
-<div v-if="editingExpense.shared" class="form-group">
-<label>{{editingExpense.expenseType==='fixed' ? 'Betald av' : 'Köpt av'}}</label>
-<select v-model="editingExpense.initialPaidBy"><option value="a">{{data.persons.a.name}}</option><option value="b">{{data.persons.b.name}}</option></select>
-<div v-if="editingExpense.expenseType==='variable'" class="field-note">Köp brukar ha betalats av den som gjorde köpet.</div>
-<label class="checkbox-group" style="margin-top:6px"><input type="checkbox" v-model="editingExpense.customSplitEnabled">Anpassad uppdelning</label>
-<div v-if="editingExpense.customSplitEnabled" class="split-slider">
-<input type="range" min="0" max="100" v-model.number="editingExpense.customSplitVal">
-<div class="split-label"><span>{{data.persons.a.name}} {{100-editingExpense.customSplitVal}}%</span><span>{{data.persons.b.name}} {{editingExpense.customSplitVal}}%</span></div>
-</div>
-</div>
-<div v-if="!editingExpense.shared" class="form-group"><label>Person</label><select v-model="editingExpense.person"><option value="a">{{data.persons.a.name}}</option><option value="b">{{data.persons.b.name}}</option></select><div v-if="editingExpense.expenseType==='variable'" class="field-note">Personliga köp brukar vara betalda direkt.</div></div>
-<div class="form-group"><label>Anteckning</label><textarea v-model="editingExpense.note" rows="2"></textarea></div>
-<div class="form-group">
-<label>Taggar</label>
-<div class="tags-input"><span v-for="(t,ti) in editingExpense.tags" :key="ti" class="tag-pill">{{t}}<span class="remove-tag" @click="editingExpense.tags.splice(ti,1)">×</span></span><input @keydown.enter.prevent="addEditTag" placeholder="Lägg till tagg..."></div>
-</div>
-<div class="dialog-actions">
-<button class="btn-secondary" @click="editingExpense=null">Avbryt</button>
-<button class="btn-primary" @click="saveEdit">Spara</button>
-</div>
-</div>
-<div v-else class="expense-item"
+<div class="expense-item"
   :class="{'bounce-in':exp._new,'press-active':pressingExpenseId===exp.id,'hold-active':holdingExpenseId===exp.id&&holdProgress>0,'swipe-open':swipingId===exp.id&&swipeX<=-60}"
   @click="handleExpenseTap(exp)"
   @touchstart="onTouchStart($event,exp)"
@@ -1030,37 +1041,80 @@ body.density-compact .dialog-inner{padding:14px}
 </div>
 
 <!-- ADD EXPENSE DIALOG -->
-<dialog ref="addDialog">
+<dialog ref="addDialog" id="addDialog">
 <div class="dialog-inner">
+<div class="dialog-handle"></div>
 <div class="dialog-title">
 <span>{{addDialogTitle}}</span>
 <button class="close-btn" @click="closeAddDialog">×</button>
 </div>
 <div class="dialog-subtitle">{{addDialogHint}}</div>
-<div class="form-group"><label>Namn</label><input ref="addNameInput" v-model="addForm.name" :placeholder="addForm.expenseType==='fixed' ? 'T.ex. Hyra, El, Bredband' : 'T.ex. ICA, Apoteket, Espresso House'"></div>
-<div class="form-group">
+
+<!-- Name Section -->
+<div class="dialog-section">
+<div class="inset-field" :class="{'has-value':addForm.name}">
+<input ref="addNameInput" v-model="addForm.name" @blur="onAddNameBlur" :placeholder="addForm.name?'':addForm.expenseType==='fixed' ? 'T.ex. Hyra, El, Bredband' : 'T.ex. ICA, Apoteket'" style="font-size:16px;padding:22px 14px 8px">
+<label>Namn</label>
+</div>
+</div>
+
+<!-- Amount Section -->
+<div class="dialog-section">
+<div style="margin-bottom:0">
+<div v-if="addCalcPreview" class="calc-preview" style="margin-bottom:4px;margin-top:0">{{addCalcPreview}}</div>
+<div class="inset-field inset-center" :class="{'has-value':addAmountStr}">
+<input ref="addAmountInput" v-model="addAmountStr" @input="onAddAmountInput" @focus="onAddAmountFocus" @blur="onAddAmountBlur" inputmode="decimal" autocomplete="off" :placeholder="addAmountStr?'':'t.ex. 1 250'" style="font-size:20px;font-weight:700;padding:24px 14px 8px;text-align:center;letter-spacing:.02em">
 <label>Belopp (kr)</label>
-<input v-model="addAmountStr" @input="onAddAmountInput" @focus="onAddAmountFocus" @blur="onAddAmountBlur" inputmode="decimal" autocomplete="off" placeholder="t.ex. 1 250 eller 799+149">
-<div class="field-note">Du kan skriva belopp eller snabb matte direkt i fältet.</div>
-<div v-if="addCalcPreview" class="calc-preview">{{addCalcPreview}}</div>
 </div>
+<div v-if="showAddCalcStrip" class="calc-strip">
+<button @mousedown.prevent="insertCalcOp('+','add')" title="Plus">+</button>
+<button @mousedown.prevent="insertCalcOp('−','add')" title="Minus">−</button>
+<button @mousedown.prevent="insertCalcOp('×','add')" title="Gånger">×</button>
+<button @mousedown.prevent="insertCalcOp('÷','add')" title="Delat">÷</button>
+<button class="calc-equals" @mousedown.prevent="evalCalc('add')" title="Beräkna">=</button>
+<button class="calc-done" @mousedown.prevent="doneCalc('add')">Klar</button>
+</div>
+</div>
+</div>
+
+<!-- Type, Date, Category Section -->
+<div class="dialog-section">
+<div class="section-kicker">Detaljer</div>
 <div class="form-row">
-<div class="form-group"><label>Typ</label><select v-model="addForm.expenseType"><option value="fixed">Fast (faktura)</option><option value="variable">Rörlig (köp)</option></select></div>
-<div class="form-group"><label>Datum</label><input type="date" v-model="addForm.date"><div class="field-note">{{longDate(addForm.date)}}</div></div>
+<div class="inset-field has-value"><select v-model="addForm.expenseType"><option value="fixed">Fast (faktura)</option><option value="variable">Rörlig (köp)</option></select><label>Typ</label></div>
+<div class="inset-field has-value"><select v-model="addForm.category"><option v-for="c in categories" :key="c.id" :value="c.id">{{useEmojis ? c.emoji+' ' : ''}}{{c.label}}</option></select><label>Kategori</label></div>
 </div>
-<div class="form-group"><label>Kategori</label><select v-model="addForm.category"><option v-for="c in categories" :key="c.id" :value="c.id">{{useEmojis ? c.emoji+' ' : ''}}{{c.label}}</option></select></div>
-<div class="form-group"><label>Anteckning</label><input v-model="addForm.note" placeholder="Valfri anteckning"></div>
+<div class="form-group">
+<label>Datum</label>
+<input type="date" v-model="addForm.date">
+<div class="date-quick-btns">
+<button :class="{active:addForm.date===todayStr()}" @click="addForm.date=todayStr()">Idag</button>
+<button :class="{active:addForm.date===yesterdayStr()}" @click="addForm.date=yesterdayStr()">Igår</button>
+</div>
+<div class="field-note">{{longDate(addForm.date)}}</div>
+</div>
+<div class="inset-field" :class="{'has-value':addForm.note}"><input v-model="addForm.note"><label>Anteckning</label></div>
+</div>
+
+<!-- Sharing Section -->
+<div class="dialog-section">
+<div class="section-kicker">Delning</div>
 <div class="form-group"><label class="checkbox-group"><input type="checkbox" v-model="addForm.shared"> Gemensam utgift</label></div>
 <div v-if="addForm.shared">
-<div class="form-group"><label>{{addForm.expenseType==='fixed' ? 'Betald av' : 'Köpt av'}}</label><select v-model="addForm.initialPaidBy"><option value="a">{{data.persons.a.name}}</option><option value="b">{{data.persons.b.name}}</option></select><div v-if="addForm.expenseType==='variable'" class="field-note">Den här personen markeras som redan betald när köpet sparas.</div></div>
+<div class="inset-field has-value"><select v-model="addForm.initialPaidBy"><option value="a">{{data.persons.a.name}}</option><option value="b">{{data.persons.b.name}}</option></select><label>{{addForm.expenseType==='fixed' ? 'Betald av' : 'Köpt av'}}</label></div><div v-if="addForm.expenseType==='variable'" class="field-note" style="margin-top:-6px;margin-bottom:10px">Markeras som redan betald av köparen.</div>
 <div class="form-group"><label class="checkbox-group"><input type="checkbox" v-model="addForm.customSplitEnabled"> Anpassad uppdelning</label></div>
 <div v-if="addForm.customSplitEnabled" class="split-slider">
 <input type="range" min="0" max="100" v-model.number="addForm.customSplitVal">
 <div class="split-label"><span>{{data.persons.a.name}} {{100-addForm.customSplitVal}}%</span><span>{{data.persons.b.name}} {{addForm.customSplitVal}}%</span></div>
 </div>
 </div>
-<div v-if="!addForm.shared" class="form-group"><label>Person</label><select v-model="addForm.person"><option value="a">{{data.persons.a.name}}</option><option value="b">{{data.persons.b.name}}</option></select><div v-if="addForm.expenseType==='variable'" class="field-note">Personliga köp markeras som betalda direkt.</div></div>
-<div class="form-group" v-if="!simpleMode">
+<div v-if="!addForm.shared"><div class="inset-field has-value"><select v-model="addForm.person"><option value="a">{{data.persons.a.name}}</option><option value="b">{{data.persons.b.name}}</option></select><label>Person</label></div><div v-if="addForm.expenseType==='variable'" class="field-note" style="margin-top:-6px;margin-bottom:10px">Personliga köp markeras som betalda direkt.</div></div>
+</div>
+
+<!-- Extra Section -->
+<div class="dialog-section" v-if="!simpleMode">
+<div class="section-kicker">Extra</div>
+<div class="form-group">
 <label>Taggar</label>
 <div class="tags-input">
 <span v-for="(t,ti) in addForm.tags" :key="ti" class="tag-pill">{{t}}<span class="remove-tag" @click="addForm.tags.splice(ti,1)">×</span></span>
@@ -1068,9 +1122,11 @@ body.density-compact .dialog-inner{padding:14px}
 </div>
 </div>
 <div class="form-group"><label class="checkbox-group"><input type="checkbox" v-model="addForm.recurring"> Återkommande varje månad</label></div>
+</div>
+
 <div class="dialog-actions">
 <button class="btn-secondary" @click="closeAddDialog">Avbryt</button>
-<button class="btn-primary" @click="submitExpense">{{editMode?'Spara':'Lägg till'}}</button>
+<button class="btn-primary" @click="submitExpense" style="padding:14px;font-size:15px">{{editMode?'Spara':'Lägg till'}}</button>
 </div>
 </div>
 </dialog>
@@ -1143,10 +1199,14 @@ body.density-compact .dialog-inner{padding:14px}
 </div>
 <div class="setting-group">
 <div class="setting-label">Budget</div>
-<div v-for="c in categories" :key="c.id" style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Ange i kr eller % av total inkomst ({{formatKr(totalIncome)}})</div>
+<div v-for="c in categories" :key="c.id" style="margin-bottom:8px">
+<div style="display:flex;align-items:center;gap:8px">
 <span style="font-size:13px;width:120px">{{c.emoji}} {{c.label}}</span>
-<input type="number" :value="data.budgets?.[c.id]||0" @change="setBudget(c.id,$event)" style="width:80px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;background:var(--bg);color:var(--text);-moz-appearance:textfield;appearance:textfield">
-<span style="font-size:12px;color:var(--text3)">kr</span>
+<input type="number" :step="budgetMode(c.id)==='pct'?0.5:100" :value="data.budgets?.[c.id]||0" @change="setBudget(c.id,$event)" style="width:80px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;background:var(--bg);color:var(--text);-moz-appearance:textfield;appearance:textfield">
+<button @click="toggleBudgetMode(c.id)" :style="{background:budgetMode(c.id)==='pct'?'var(--accent)':'var(--bg3)',color:budgetMode(c.id)==='pct'?'#fff':'var(--text2)',border:'1px solid var(--border)',borderRadius:'var(--radius-xs)',padding:'4px 10px',fontSize:'12px',fontWeight:'700',cursor:'pointer',minWidth:'36px',transition:'all .15s'}">{{budgetMode(c.id)==='pct'?'%':'kr'}}</button>
+</div>
+<div v-if="budgetMode(c.id)==='pct' && data.budgets?.[c.id]>0" style="font-size:11px;color:var(--text3);margin-top:2px;margin-left:128px">= {{formatKr(resolveBudget(c.id))}} av {{formatKr(totalIncome)}}</div>
 </div>
 </div>
 <div class="setting-group">
@@ -1173,9 +1233,8 @@ body.density-compact .dialog-inner{padding:14px}
 <dialog ref="savingsDialog">
 <div class="dialog-inner">
 <div class="dialog-title"><span>Nytt sparmål</span><button class="close-btn" @click="$refs.savingsDialog.close()">×</button></div>
-<div class="form-group"><label>Namn</label><input v-model="savingsForm.name" placeholder="T.ex. Semester"></div>
-<div class="form-group"><label>Emoji</label><input v-model="savingsForm.emoji" placeholder="🎯" maxlength="4" style="width:60px"></div>
-<div class="form-group"><label>Målbelopp (kr)</label><input type="number" v-model.number="savingsForm.target" placeholder="0"></div>
+<div class="inset-field" :class="{'has-value':savingsForm.name}"><input v-model="savingsForm.name"><label>Namn</label></div>
+<div style="display:flex;gap:10px;margin-bottom:14px"><div class="inset-field" :class="{'has-value':savingsForm.emoji}" style="width:70px;flex-shrink:0"><input v-model="savingsForm.emoji" maxlength="4"><label>Emoji</label></div><div class="inset-field" :class="{'has-value':savingsForm.target}" style="flex:1"><input type="number" v-model.number="savingsForm.target"><label>Målbelopp (kr)</label></div></div>
 <div class="dialog-actions">
 <button class="btn-secondary" @click="$refs.savingsDialog.close()">Avbryt</button>
 <button class="btn-primary" @click="addSavingsGoal">Lägg till</button>
@@ -1187,9 +1246,9 @@ body.density-compact .dialog-inner{padding:14px}
 <dialog ref="wishDialog">
 <div class="dialog-inner">
 <div class="dialog-title"><span>Ny önskning</span><button class="close-btn" @click="$refs.wishDialog.close()">×</button></div>
-<div class="form-group"><label>Namn</label><input v-model="wishForm.name" placeholder="Önskningens namn"></div>
-<div class="form-group"><label>Belopp (kr)</label><input type="number" v-model.number="wishForm.amount" placeholder="0"></div>
-<div class="form-group"><label>Anteckning</label><input v-model="wishForm.note" placeholder="Valfri"></div>
+<div class="inset-field" :class="{'has-value':wishForm.name}"><input v-model="wishForm.name"><label>Namn</label></div>
+<div class="inset-field" :class="{'has-value':wishForm.amount}"><input type="number" v-model.number="wishForm.amount"><label>Belopp (kr)</label></div>
+<div class="inset-field" :class="{'has-value':wishForm.note}"><input v-model="wishForm.note"><label>Anteckning</label></div>
 <div class="dialog-actions">
 <button class="btn-secondary" @click="$refs.wishDialog.close()">Avbryt</button>
 <button class="btn-primary" @click="addWishItem">Lägg till</button>
@@ -1201,7 +1260,7 @@ body.density-compact .dialog-inner{padding:14px}
 <dialog ref="savingsAddDialog">
 <div class="dialog-inner">
 <div class="dialog-title"><span>Lägg till till {{savingsAddTarget?.name}}</span><button class="close-btn" @click="$refs.savingsAddDialog.close()">×</button></div>
-<div class="form-group"><label>Belopp (kr)</label><input type="number" v-model.number="savingsAddAmount" placeholder="0"></div>
+<div class="inset-field" :class="{'has-value':savingsAddAmount}"><input type="number" v-model.number="savingsAddAmount"><label>Belopp (kr)</label></div>
 <div class="dialog-actions">
 <button class="btn-secondary" @click="$refs.savingsAddDialog.close()">Avbryt</button>
 <button class="btn-primary" @click="confirmAddSavings">Lägg till</button>
@@ -1305,6 +1364,7 @@ const ACCENT_COLORS = [
 ];
 
 function todayStr(){return new Date().toISOString().slice(0,10)}
+function yesterdayStr(){const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)}
 function currentMonthKey(){return todayStr().slice(0,7)}
 function parseCalc(str){
   str=String(str).toLowerCase().replace(/kr/g,'').replace(/[x×]/g,'*').replace(/÷/g,'/').replace(/\s/g,'').replace(/,/g,'.');
@@ -1327,6 +1387,11 @@ function parseAmountInput(str){
   if(calcLike){
     const value=parseCalc(cleaned);
     return{value:Number.isFinite(value)?Math.round(value):0,valid:Number.isFinite(value),isMath:true};
+  }
+  const decNorm=cleaned.replace(/\s/g,'').replace(/,/g,'.');
+  if(/^\d+\.\d+$/.test(decNorm)){
+    const f=parseFloat(decNorm);
+    if(Number.isFinite(f))return{value:Math.round(f),valid:true,isMath:false};
   }
   const digits=cleaned.replace(/[^\d]/g,'');
   if(!digits)return{value:0,valid:false,isMath:false};
@@ -1351,6 +1416,7 @@ function migrateData(d){
     person:p.person||null
   }));
   if(!d.budgets)d.budgets={};
+  if(!d.budgetModes)d.budgetModes={};
   if(!d.savingsGoals)d.savingsGoals=[];
   if(!d.wishlist)d.wishlist=[];
   for(const mk of Object.keys(d.months)){
@@ -1773,6 +1839,9 @@ createApp({
     const addForm=reactive({name:'',amount:0,expenseType:'variable',date:todayStr(),category:'ovrigt',note:'',shared:true,initialPaidBy:'a',customSplitEnabled:false,customSplitVal:50,person:'a',tags:[],recurring:false});
     const addAmountStr=ref('');
     const addCalcPreview=ref('');
+    const showAddCalcStrip=ref(false);
+    const showEditCalcStrip=ref(false);
+    const addAmountInput=ref(null);
     const commentAuthorByExpense=reactive({});
     const editMode=ref(false);
     const editingId=ref(null);
@@ -2008,18 +2077,29 @@ createApp({
     }
 
     // Budget
+    const totalIncome=computed(()=>(data.persons.a.income||0)+(data.persons.b.income||0));
+    function resolveBudget(catId){
+      const raw=data.budgets?.[catId]||0;
+      if(!raw)return 0;
+      const mode=(data.budgetModes||{})[catId]||'kr';
+      if(mode==='pct')return Math.round(raw/100*totalIncome.value);
+      return raw;
+    }
     const budgetItems=computed(()=>{
       if(!data.budgets)return[];
       return CATEGORIES.filter(c=>data.budgets[c.id]>0).map(c=>{
         const spent=allExpenses.value.filter(e=>e.category===c.id).reduce((s,e)=>s+e.amount,0);
-        const limit=data.budgets[c.id];
-        return{id:c.id,spent,limit,pct:Math.round(spent/limit*100)};
+        const limit=resolveBudget(c.id);
+        const mode=(data.budgetModes||{})[c.id]||'kr';
+        const raw=data.budgets[c.id];
+        return{id:c.id,spent,limit,pct:limit>0?Math.round(spent/limit*100):0,mode,raw};
       }).sort((a,b)=>b.pct-a.pct);
     });
     function budgetAlert(catId){
-      if(!data.budgets||!data.budgets[catId])return null;
+      const limit=resolveBudget(catId);
+      if(!limit)return null;
       const spent=allExpenses.value.filter(e=>e.category===catId).reduce((s,e)=>s+e.amount,0);
-      const pct=spent/data.budgets[catId]*100;
+      const pct=spent/limit*100;
       if(pct>100)return'over';if(pct>80)return'warn';return null;
     }
 
@@ -2252,13 +2332,64 @@ createApp({
       setAddAmountState(parseAmountInput(addAmountStr.value));
     }
     function onAddAmountFocus(){
+      showAddCalcStrip.value=true;
       const parsed=parseAmountInput(addAmountStr.value);
       if(parsed.valid&&!parsed.isMath)addAmountStr.value=String(parsed.value);
     }
     function onAddAmountBlur(){
+      setTimeout(()=>{showAddCalcStrip.value=false},200);
       const parsed=parseAmountInput(addAmountStr.value);
       setAddAmountState(parsed);
       addAmountStr.value=parsed.valid?formatMoneyValue(parsed.value):'';
+    }
+    function insertCalcOp(op,target){
+      const opChar=op==='−'?'-':op==='×'?'*':op==='÷'?'/':op;
+      if(target==='add'){
+        addAmountStr.value=addAmountStr.value.replace(/\s/g,'')+opChar;
+        setAddAmountState(parseAmountInput(addAmountStr.value));
+        nextTick(()=>addAmountInput.value?.focus());
+      }else{
+        editAmountStr.value=editAmountStr.value.replace(/\s/g,'')+opChar;
+        setEditAmountState(parseAmountInput(editAmountStr.value));
+      }
+    }
+    function evalCalc(target){
+      if(target==='add'){
+        const parsed=parseAmountInput(addAmountStr.value);
+        if(parsed.valid){
+          addAmountStr.value=formatMoneyValue(parsed.value);
+          setAddAmountState({value:parsed.value,valid:true,isMath:false});
+        }
+        nextTick(()=>addAmountInput.value?.focus());
+      }else{
+        const parsed=parseAmountInput(editAmountStr.value);
+        if(parsed.valid){
+          editAmountStr.value=formatMoneyValue(parsed.value);
+          setEditAmountState({value:parsed.value,valid:true,isMath:false});
+        }
+      }
+    }
+    function doneCalc(target){
+      if(target==='add'){
+        evalCalc('add');
+        showAddCalcStrip.value=false;
+        addAmountInput.value?.blur();
+      }else{
+        evalCalc('edit');
+        showEditCalcStrip.value=false;
+      }
+    }
+    function onAddNameBlur(){
+      if(!addForm.name.trim()||editMode.value)return;
+      const name=addForm.name.trim().toLowerCase();
+      const allMonths=Object.values(data.months);
+      for(const m of allMonths){
+        const match=(m.expenses||[]).find(e=>(e.name||'').toLowerCase()===name);
+        if(match){
+          if(addForm.category==='ovrigt'&&match.category)addForm.category=match.category;
+          break;
+        }
+      }
     }
     function addFormTag(e){
       const v=e.target.value.trim();if(v&&!addForm.tags.includes(v)){addForm.tags.push(v)}e.target.value='';
@@ -2314,8 +2445,19 @@ createApp({
       closeSwipe();
       pressingExpenseId.value=null;
       haptic(6);
-      editingExpense.value={...exp,tags:[...(exp.tags||[])],customSplitEnabled:exp.customSplit!=null,customSplitVal:exp.customSplit??50};
-      editAmountStr.value=formatMoneyValue(exp.amount);editCalcPreview.value='';
+      editMode.value=true;
+      editingId.value=exp.id;
+      Object.assign(addForm,{
+        name:exp.name,amount:exp.amount,expenseType:exp.expenseType||'variable',
+        date:exp.date||todayStr(),category:exp.category||'ovrigt',note:exp.note||'',
+        shared:exp.shared!==false,initialPaidBy:exp.initialPaidBy||'a',
+        customSplitEnabled:exp.customSplit!=null,customSplitVal:exp.customSplit??50,
+        person:exp.person||'a',tags:[...(exp.tags||[])],recurring:exp.recurring||false
+      });
+      addAmountStr.value=formatMoneyValue(exp.amount);
+      addCalcPreview.value='';
+      showAddCalcStrip.value=false;
+      addDialog.value?.showModal();
     }
     function onEditAmountInput(){
       setEditAmountState(parseAmountInput(editAmountStr.value));
@@ -2676,10 +2818,15 @@ createApp({
       if(v&&'Notification' in window&&Notification.permission==='default')Notification.requestPermission();
     }
     function setBudget(catId,evt){
-      const v=parseInt(evt.target.value)||0;
+      const v=parseFloat(evt.target.value)||0;
       if(!data.budgets)data.budgets={};
       data.budgets[catId]=v;
     }
+    function toggleBudgetMode(catId){
+      if(!data.budgetModes)data.budgetModes={};
+      data.budgetModes[catId]=(data.budgetModes[catId]||'kr')==='kr'?'pct':'kr';
+    }
+    function budgetMode(catId){return(data.budgetModes||{})[catId]||'kr';}
 
     function isStandaloneMode(){
       return window.matchMedia?.('(display-mode: standalone)')?.matches||window.navigator.standalone===true;
@@ -3344,7 +3491,7 @@ createApp({
       themeMode,accentColor,useEmojis,compactMode,simpleMode,notifEnabled,avatars,lastSynced,syncStale,
       invoiceScope,invoicePerson,invoiceFilter,invoiceSearch,sortBy,reorderMode,statMode,
       showDebtHistory,showSavingsCompact,showWishlistCompact,showPersonSetup,showImport,
-      addForm,addAmountStr,addCalcPreview,addDialogTitle,addDialogHint,editMode,editingId,addNameInput,addDialog,
+      addForm,addAmountStr,addCalcPreview,showAddCalcStrip,addAmountInput,addDialogTitle,addDialogHint,editMode,editingId,addNameInput,addDialog,
       editingExpense,editAmountStr,editCalcPreview,
       confirmDialog,confirmTitle,confirmText,confirmDanger,confirmResolve,
       bottomSheet,swipingId,swipeX,pressingExpenseId,holdingExpenseId,holdProgress,
@@ -3368,6 +3515,7 @@ createApp({
       formatKr,formatMonthLabel,shortDate,longDate,catIcon,catEmoji,catLabel,catColor,catPillStyle,personInitial,
       expStatus,expStatusLabel,budgetAlert,personalTotal,personBarH,relTime,isSharedSharePaid,
       goToView,openAddExpense,onAddAmountInput,onAddAmountFocus,onAddAmountBlur,addFormTag,submitExpense,closeAddDialog,
+      insertCalcOp,evalCalc,doneCalc,onAddNameBlur,todayStr,yesterdayStr,
       startEdit,onEditAmountInput,onEditAmountFocus,onEditAmountBlur,addEditTag,saveEdit,
       togglePaid,bulkPay,
       expenseCardStyle,holdProgressStyle,handleExpenseTap,openExpenseActions,onTouchStart,onTouchMove,onTouchEnd,onTouchCancel,confirmSwipeDelete,doContextAction,
@@ -3375,7 +3523,7 @@ createApp({
       addRecurring,skipRecurring,addAllRecurring,
       openSavingsDialog,addSavingsGoal,addToSavings,confirmAddSavings,removeSavingsGoal,
       openWishDialog,addWishItem,toggleWish,removeWish,
-      openSettings,setTheme,setAccent,setIconStyle,setDensity,setSimpleMode,setNotif,setBudget,
+      openSettings,setTheme,setAccent,setIconStyle,setDensity,setSimpleMode,setNotif,setBudget,toggleBudgetMode,budgetMode,resolveBudget,totalIncome,
       uploadAvatar,
       shareLink,copyData,generateQR,startQrScanner,stopQrScanner,openScannerImagePicker,handleScannerImage,importData,applyImport,exportJSON,exportCSV,
       clearManualShare,selectManualShare,
