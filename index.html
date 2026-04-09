@@ -193,15 +193,19 @@ body.dark-override .floating-summary{background:rgba(12,17,24,.88)}
 dialog{border:none;border-radius:16px;padding:0;background:var(--bg2);color:var(--text);box-shadow:var(--shadow-lg);max-width:min(440px,calc(100vw - 32px));width:100%;max-height:min(85vh,calc(100dvh - 32px));overscroll-behavior:contain}
 dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .dialog-inner{padding:20px;max-height:min(85vh,calc(100dvh - 32px));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-body.standalone-app dialog[open]{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px)}
+dialog#addDialog .dialog-inner{padding:0;display:flex;flex-direction:column;overflow:hidden}
+.dialog-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:20px;padding-bottom:8px}
+.dialog-footer{padding:12px 20px 20px;flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border)}
+body.standalone-app dialog[open]{position:fixed;left:50%;top:calc(var(--safe-top) + 12px);transform:translateX(-50%);bottom:auto;max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px)}
 body.standalone-app dialog#addDialog[open]{left:0;right:0;top:calc(var(--safe-top) + 12px);transform:none}
-body.standalone-app .dialog-inner{max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px);padding-bottom:calc(20px + var(--safe-bottom))}
+body.standalone-app .dialog-inner{max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px)}
+body.standalone-app .dialog-footer{padding-bottom:calc(20px + var(--safe-bottom))}
 .dialog-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
 .dialog-title .close-btn{background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;padding:4px}
 .form-group{margin-bottom:14px}
 .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:var(--text2)}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--text);box-sizing:border-box;max-width:100%}
-input[type="date"]{overflow:hidden}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--text);box-sizing:border-box;max-width:100%;min-width:0}
+input[type="date"]{overflow:hidden;-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;box-sizing:border-box}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light),0 0 12px rgba(24,160,88,.08)}
 .inset-field{position:relative;margin-bottom:14px}
 .inset-field:last-child{margin-bottom:0}
@@ -382,7 +386,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .amount-display.has-math{font-size:22px}
 .amount-display .amount-result{color:var(--accent);font-size:28px}
 
-.calc-strip{display:flex;gap:6px;padding:10px 12px;justify-content:center;align-items:center;animation:calcStripIn .25s ease;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:var(--bg2);border-top:1px solid var(--border);padding-bottom:calc(10px + var(--safe-bottom,0px));box-shadow:0 -2px 12px rgba(0,0,0,.1);transform:translateY(0);transition:transform .15s ease}
+.calc-strip{display:flex;gap:6px;padding:10px 12px;justify-content:center;align-items:center;animation:calcStripIn .25s ease;background:var(--bg2);border-top:1px solid var(--border);box-shadow:0 -2px 12px rgba(0,0,0,.1);flex-shrink:0}
 .calc-strip button{flex:1;max-width:56px;height:42px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);font-size:18px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .15s,box-shadow .15s}
 .calc-strip button:active{transform:scale(.9);background:var(--accent-light)}
 .calc-strip button.calc-equals{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(24,160,88,.3)}
@@ -428,9 +432,12 @@ body.density-compact .dialog-inner{padding:14px}
 .payment-checks label,.expense-item .action-pill{min-height:40px}
 dialog:not(#addDialog){margin:auto}
 dialog#addDialog{margin:0;max-width:100%;width:100%;border-radius:20px 20px 0 0;position:fixed;bottom:0;left:0;right:0;top:auto;max-height:calc(100dvh - var(--safe-top,0px) - 20px);animation:dialogSlideUp .3s ease}
-dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(--safe-top,0px) - 20px);padding:16px 20px calc(20px + var(--safe-bottom,0px));-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(--safe-top,0px) - 20px)}
+dialog#addDialog .dialog-scroll{padding:16px 20px;padding-bottom:0}
+dialog#addDialog .dialog-footer{padding:0 20px calc(20px + var(--safe-bottom,0px))}
 body.standalone-app dialog#addDialog[open]{top:auto;bottom:0;left:0;right:0;transform:none;max-height:calc(100dvh - var(--safe-top) - 12px)}
 body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(--safe-top) - 12px)}
+body.standalone-app dialog#addDialog .dialog-footer{padding-bottom:calc(20px + var(--safe-bottom))}
 .form-row{flex-direction:column;gap:8px}
 }
 @keyframes dialogSlideUp{from{opacity:0;transform:translateY(40%)}to{opacity:1;transform:translateY(0)}}
@@ -1065,6 +1072,7 @@ body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(
 <!-- ADD EXPENSE DIALOG -->
 <dialog ref="addDialog" id="addDialog">
 <div class="dialog-inner">
+<div class="dialog-scroll">
 <div class="dialog-handle"></div>
 <div class="dialog-title">
 <span>{{addDialogTitle}}</span>
@@ -1087,6 +1095,14 @@ body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(
 <div class="inset-field inset-center" :class="{'has-value':addAmountStr}">
 <input ref="addAmountInput" v-model="addAmountStr" @input="onAddAmountInput" @focus="onAddAmountFocus" @blur="onAddAmountBlur" inputmode="decimal" autocomplete="off" placeholder="0" style="font-size:20px;font-weight:700;padding:24px 14px 8px;text-align:center;letter-spacing:.02em">
 <label>Belopp (kr)</label>
+</div>
+<div v-if="totalIncome>0" style="display:flex;align-items:center;gap:8px;margin-top:6px">
+<label class="checkbox-group" style="font-size:13px;margin:0"><input type="checkbox" v-model="addForm.usePercent"> Andel av inkomst</label>
+<template v-if="addForm.usePercent">
+<input type="number" v-model.number="addForm.pctValue" min="0" max="100" step="0.5" style="width:60px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;background:var(--bg);color:var(--text);-moz-appearance:textfield;appearance:textfield">
+<span style="font-size:13px;font-weight:600">%</span>
+<span style="font-size:12px;color:var(--text3)">= {{formatKr(Math.round(addForm.pctValue/100*totalIncome))}}</span>
+</template>
 </div>
 </div>
 </div>
@@ -1137,10 +1153,20 @@ body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(
 </div>
 <div class="form-group"><label class="checkbox-group"><input type="checkbox" v-model="addForm.recurring"> Återkommande varje månad</label></div>
 </div>
-
+</div><!-- /dialog-scroll -->
+<div v-if="showAddCalcStrip" class="calc-strip">
+<button @touchstart.prevent="insertCalcOp('+','add')" @mousedown.prevent="insertCalcOp('+','add')" title="Plus">+</button>
+<button @touchstart.prevent="insertCalcOp('−','add')" @mousedown.prevent="insertCalcOp('−','add')" title="Minus">−</button>
+<button @touchstart.prevent="insertCalcOp('×','add')" @mousedown.prevent="insertCalcOp('×','add')" title="Gånger">×</button>
+<button @touchstart.prevent="insertCalcOp('÷','add')" @mousedown.prevent="insertCalcOp('÷','add')" title="Delat">÷</button>
+<button class="calc-equals" @touchstart.prevent="evalCalc('add')" @mousedown.prevent="evalCalc('add')" title="Beräkna">=</button>
+<button class="calc-done" @touchstart.prevent="doneCalc('add')" @mousedown.prevent="doneCalc('add')">Klar</button>
+</div>
+<div class="dialog-footer">
 <div class="dialog-actions">
 <button class="btn-secondary" @click="closeAddDialog">Avbryt</button>
 <button class="btn-primary" @click="submitExpense" style="padding:14px;font-size:15px">{{editMode?'Spara':'Lägg till'}}</button>
+</div>
 </div>
 </div>
 </dialog>
@@ -1312,18 +1338,6 @@ body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(
 </div>
 </div>
 </dialog>
-
-<!-- KEYBOARD CALC STRIP -->
-<Teleport to="body">
-<div v-if="showAddCalcStrip" class="calc-strip">
-<button @touchstart.prevent="insertCalcOp('+','add')" @mousedown.prevent="insertCalcOp('+','add')" title="Plus">+</button>
-<button @touchstart.prevent="insertCalcOp('−','add')" @mousedown.prevent="insertCalcOp('−','add')" title="Minus">−</button>
-<button @touchstart.prevent="insertCalcOp('×','add')" @mousedown.prevent="insertCalcOp('×','add')" title="Gånger">×</button>
-<button @touchstart.prevent="insertCalcOp('÷','add')" @mousedown.prevent="insertCalcOp('÷','add')" title="Delat">÷</button>
-<button class="calc-equals" @touchstart.prevent="evalCalc('add')" @mousedown.prevent="evalCalc('add')" title="Beräkna">=</button>
-<button class="calc-done" @touchstart.prevent="doneCalc('add')" @mousedown.prevent="doneCalc('add')">Klar</button>
-</div>
-</Teleport>
 
 <!-- BOTTOM SHEET -->
 <div v-if="bottomSheet" class="bottom-sheet-backdrop" @click="bottomSheet=null"></div>
@@ -1862,7 +1876,7 @@ createApp({
     const showImport=ref(false);
 
     // add form
-    const addForm=reactive({name:'',amount:0,expenseType:'variable',date:todayStr(),category:'ovrigt',note:'',shared:true,initialPaidBy:'a',customSplitEnabled:false,customSplitVal:50,person:'a',tags:[],recurring:false});
+    const addForm=reactive({name:'',amount:0,expenseType:'variable',date:todayStr(),category:'ovrigt',note:'',shared:true,initialPaidBy:'a',customSplitEnabled:false,customSplitVal:50,person:'a',tags:[],recurring:false,usePercent:false,pctValue:0});
     const addAmountStr=ref('');
     const addCalcPreview=ref('');
     const showAddCalcStrip=ref(false);
@@ -2312,6 +2326,15 @@ createApp({
     }
     watch(()=>data,saveData,{deep:true});
 
+    // Auto-fill amount from percent
+    watch(()=>[addForm.usePercent,addForm.pctValue],([usePct,pct])=>{
+      if(usePct&&pct>0&&totalIncome.value>0){
+        const val=Math.round(pct/100*totalIncome.value);
+        addForm.amount=val;
+        addAmountStr.value=formatMoneyValue(val);
+      }
+    });
+
     // Toast
     function showToast(text,opts={}){
       clearTimeout(toastTimer);
@@ -2350,7 +2373,7 @@ createApp({
     // Add expense
     function openAddExpense(type){
       editMode.value=false;editingId.value=null;
-      Object.assign(addForm,{name:'',amount:0,expenseType:type||'variable',date:todayStr(),category:'ovrigt',note:'',shared:true,initialPaidBy:'a',customSplitEnabled:false,customSplitVal:50,person:'a',tags:[],recurring:false});
+      Object.assign(addForm,{name:'',amount:0,expenseType:type||'variable',date:todayStr(),category:'ovrigt',note:'',shared:true,initialPaidBy:'a',customSplitEnabled:false,customSplitVal:50,person:'a',tags:[],recurring:false,usePercent:false,pctValue:0});
       addAmountStr.value='';addCalcPreview.value='';
       addDialog.value?.close();
       openModal(addDialog);
@@ -2361,7 +2384,6 @@ createApp({
     }
     function onAddAmountFocus(){
       showAddCalcStrip.value=true;
-      updateCalcStripPos();
       const parsed=parseAmountInput(addAmountStr.value);
       if(parsed.valid&&!parsed.isMath)addAmountStr.value=String(parsed.value);
     }
@@ -2482,7 +2504,8 @@ createApp({
         date:exp.date||todayStr(),category:exp.category||'ovrigt',note:exp.note||'',
         shared:exp.shared!==false,initialPaidBy:exp.initialPaidBy||'a',
         customSplitEnabled:exp.customSplit!=null,customSplitVal:exp.customSplit??50,
-        person:exp.person||'a',tags:[...(exp.tags||[])],recurring:exp.recurring||false
+        person:exp.person||'a',tags:[...(exp.tags||[])],recurring:exp.recurring||false,
+        usePercent:false,pctValue:0
       });
       addAmountStr.value=formatMoneyValue(exp.amount);
       addCalcPreview.value='';
@@ -3428,19 +3451,6 @@ createApp({
       ref.value.showModal();
     }
 
-    /* visualViewport-based calc strip positioning for iOS keyboard */
-    function updateCalcStripPos(){
-      const vv=window.visualViewport;
-      if(!vv)return;
-      const el=document.querySelector('.calc-strip');
-      if(!el)return;
-      const kbHeight=window.innerHeight-vv.height-vv.offsetTop;
-      el.style.bottom=(kbHeight>0?kbHeight:0)+'px';
-    }
-    if(window.visualViewport){
-      window.visualViewport.addEventListener('resize',updateCalcStripPos);
-      window.visualViewport.addEventListener('scroll',updateCalcStripPos);
-    }
     async function registerServiceWorker(){
       if(!('serviceWorker' in navigator))return;
       let refreshing=false;
