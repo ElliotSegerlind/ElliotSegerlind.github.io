@@ -172,10 +172,21 @@ body.dark-override .floating-summary{background:rgba(12,17,24,.88)}
 .pinned-chip:active{transform:scale(.96)}
 .pinned-chip .remove{font-size:10px;margin-left:2px;opacity:.6}
 
-.recurring-banner{background:var(--accent-light);border:1px solid rgba(24,160,88,.24);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
-.recurring-banner .rec-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(24,160,88,.12)}
+.recurring-banner{background:var(--accent-light);border:1px solid rgba(24,160,88,.24);border-radius:var(--radius);padding:0;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+.recurring-banner .rec-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;gap:8px}
+.recurring-banner .rec-header-left{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;min-width:0}
+.recurring-banner .rec-count{font-size:11px;font-weight:700;background:var(--accent);color:#fff;border-radius:10px;padding:1px 7px;flex-shrink:0}
+.recurring-banner .rec-header-actions{display:flex;gap:6px;flex-shrink:0}
+.recurring-banner .rec-add-all{padding:8px 14px;border:none;border-radius:20px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:transform .1s}
+.recurring-banner .rec-add-all:active{transform:scale(.95)}
+.recurring-banner .rec-toggle{padding:6px 8px;border:none;border-radius:var(--radius-xs);background:transparent;color:var(--accent);font-size:12px;cursor:pointer;font-weight:600;white-space:nowrap}
+.recurring-banner .rec-list{border-top:1px solid rgba(24,160,88,.15);max-height:200px;overflow-y:auto;overscroll-behavior:contain}
+.recurring-banner .rec-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(24,160,88,.08);gap:8px}
 .recurring-banner .rec-item:last-child{border:none}
-.recurring-banner .rec-actions{display:flex;gap:4px}
+.recurring-banner .rec-item-info{min-width:0;flex:1}
+.recurring-banner .rec-item-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.recurring-banner .rec-item-amount{font-size:12px;color:var(--accent);font-weight:700}
+.recurring-banner .rec-actions{display:flex;gap:4px;flex-shrink:0}
 .recurring-banner .rec-actions button{padding:6px 10px;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:700;cursor:pointer}
 
 dialog{border:none;border-radius:16px;padding:0;background:var(--bg2);color:var(--text);box-shadow:var(--shadow-lg);max-width:min(440px,calc(100vw - 32px));width:100%;max-height:min(85vh,calc(100dvh - 32px))}
@@ -703,15 +714,22 @@ body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(
 
 <!-- Recurring Banner -->
 <div v-if="pendingRecurring.length" class="recurring-banner">
-<div style="font-weight:700;font-size:14px;margin-bottom:6px"><span class="ic-fa"><i class="fa-solid fa-rotate"></i></span><span class="ic-em">🔁</span> Återkommande utgifter</div>
+<div class="rec-header">
+<div class="rec-header-left"><span class="ic-fa"><i class="fa-solid fa-rotate"></i></span><span class="ic-em">🔁</span> Återkommande <span class="rec-count">{{pendingRecurring.length}}</span></div>
+<div class="rec-header-actions">
+<button class="rec-add-all" @click="addAllRecurring">Lägg till alla</button>
+<button class="rec-toggle" @click="showRecurringList=!showRecurringList">{{showRecurringList?'Dölj':'Visa'}}</button>
+</div>
+</div>
+<div v-if="showRecurringList" class="rec-list">
 <div v-for="r in pendingRecurring" :key="r.id" class="rec-item">
-<span>{{r.name}} — {{formatKr(r.amount)}}</span>
+<div class="rec-item-info"><div class="rec-item-name">{{r.name}}</div><div class="rec-item-amount">{{formatKr(r.amount)}}</div></div>
 <div class="rec-actions">
 <button style="background:var(--accent);color:#fff" @click="addRecurring(r)">Lägg till</button>
 <button style="background:var(--bg3);color:var(--text2)" @click="skipRecurring(r)">Hoppa</button>
 </div>
 </div>
-<button v-if="pendingRecurring.length>1" style="margin-top:6px;width:100%;padding:8px;border:none;border-radius:var(--radius-xs);background:var(--accent);color:#fff;font-weight:600;cursor:pointer" @click="addAllRecurring">Lägg till alla</button>
+</div>
 </div>
 
 <!-- Floating Summary -->
@@ -1841,6 +1859,7 @@ createApp({
     const addCalcPreview=ref('');
     const showAddCalcStrip=ref(false);
     const showEditCalcStrip=ref(false);
+    const showRecurringList=ref(false);
     const addAmountInput=ref(null);
     const commentAuthorByExpense=reactive({});
     const editMode=ref(false);
@@ -3520,7 +3539,7 @@ createApp({
       togglePaid,bulkPay,
       expenseCardStyle,holdProgressStyle,handleExpenseTap,openExpenseActions,onTouchStart,onTouchMove,onTouchEnd,onTouchCancel,confirmSwipeDelete,doContextAction,
       deleteExpense,removePin,addFromPin,moveExp,addComment,addCommentBtn,getCommentAuthor,setCommentAuthor,
-      addRecurring,skipRecurring,addAllRecurring,
+      addRecurring,skipRecurring,addAllRecurring,showRecurringList,
       openSavingsDialog,addSavingsGoal,addToSavings,confirmAddSavings,removeSavingsGoal,
       openWishDialog,addWishItem,toggleWish,removeWish,
       openSettings,setTheme,setAccent,setIconStyle,setDensity,setSimpleMode,setNotif,setBudget,toggleBudgetMode,budgetMode,resolveBudget,totalIncome,
