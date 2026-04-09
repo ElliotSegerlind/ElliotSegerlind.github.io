@@ -197,6 +197,7 @@ dialog#addDialog .dialog-inner{padding:0;display:flex;flex-direction:column;over
 .dialog-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:20px;padding-bottom:8px}
 .dialog-footer{padding:12px 20px 20px;flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border)}
 body.standalone-app dialog[open]{position:fixed;left:50%;top:calc(var(--safe-top) + 12px);transform:translateX(-50%);bottom:auto;max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px)}
+body.standalone-app dialog.dialog-center[open]{top:50%;transform:translate(-50%,-50%)}
 body.standalone-app dialog#addDialog[open]{left:0;right:0;top:calc(var(--safe-top) + 12px);transform:none}
 body.standalone-app .dialog-inner{max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px)}
 body.standalone-app .dialog-footer{padding-bottom:calc(20px + var(--safe-bottom))}
@@ -386,13 +387,11 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .amount-display.has-math{font-size:22px}
 .amount-display .amount-result{color:var(--accent);font-size:28px}
 
-.calc-strip{display:flex;gap:6px;padding:10px 12px;justify-content:center;align-items:center;animation:calcStripIn .25s ease;background:var(--bg2);border-top:1px solid var(--border);box-shadow:0 -2px 12px rgba(0,0,0,.1);flex-shrink:0}
-.calc-strip button{flex:1;max-width:56px;height:42px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);font-size:18px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .15s,box-shadow .15s}
-.calc-strip button:active{transform:scale(.9);background:var(--accent-light)}
-.calc-strip button.calc-equals{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(24,160,88,.3)}
-.calc-strip button.calc-equals:active{background:var(--accent2);transform:scale(.9)}
-.calc-strip .calc-done{font-size:13px;font-weight:700;color:var(--accent);max-width:64px;letter-spacing:.02em}
-@keyframes calcStripIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.calc-strip-inline{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.calc-strip-inline button{flex:1;max-width:48px;height:36px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-size:16px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .15s}
+.calc-strip-inline button:active{transform:scale(.88);background:var(--accent-light)}
+.calc-strip-inline .calc-eq{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px rgba(24,160,88,.25)}
+.calc-strip-inline .calc-eq:active{background:var(--accent2);transform:scale(.88)}
 
 .date-quick-btns{display:flex;gap:6px;margin-top:6px}
 .date-quick-btns button{padding:5px 12px;border:1px solid var(--border);border-radius:20px;background:var(--bg2);font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .15s}
@@ -1096,6 +1095,13 @@ body.standalone-app dialog#addDialog .dialog-footer{padding-bottom:calc(20px + v
 <input ref="addAmountInput" v-model="addAmountStr" @input="onAddAmountInput" @focus="onAddAmountFocus" @blur="onAddAmountBlur" inputmode="decimal" autocomplete="off" placeholder="0" style="font-size:20px;font-weight:700;padding:24px 14px 8px;text-align:center;letter-spacing:.02em">
 <label>Belopp (kr)</label>
 </div>
+<div class="calc-strip-inline">
+<button @touchstart.prevent="insertCalcOp('+','add')" @mousedown.prevent="insertCalcOp('+','add')">+</button>
+<button @touchstart.prevent="insertCalcOp('−','add')" @mousedown.prevent="insertCalcOp('−','add')">−</button>
+<button @touchstart.prevent="insertCalcOp('×','add')" @mousedown.prevent="insertCalcOp('×','add')">×</button>
+<button @touchstart.prevent="insertCalcOp('÷','add')" @mousedown.prevent="insertCalcOp('÷','add')">÷</button>
+<button class="calc-eq" @touchstart.prevent="evalCalc('add')" @mousedown.prevent="evalCalc('add')">=</button>
+</div>
 <div v-if="totalIncome>0" style="display:flex;align-items:center;gap:8px;margin-top:6px">
 <label class="checkbox-group" style="font-size:13px;margin:0"><input type="checkbox" v-model="addForm.usePercent"> Andel av inkomst</label>
 <template v-if="addForm.usePercent">
@@ -1154,14 +1160,6 @@ body.standalone-app dialog#addDialog .dialog-footer{padding-bottom:calc(20px + v
 <div class="form-group"><label class="checkbox-group"><input type="checkbox" v-model="addForm.recurring"> Återkommande varje månad</label></div>
 </div>
 </div><!-- /dialog-scroll -->
-<div v-if="showAddCalcStrip" class="calc-strip">
-<button @touchstart.prevent="insertCalcOp('+','add')" @mousedown.prevent="insertCalcOp('+','add')" title="Plus">+</button>
-<button @touchstart.prevent="insertCalcOp('−','add')" @mousedown.prevent="insertCalcOp('−','add')" title="Minus">−</button>
-<button @touchstart.prevent="insertCalcOp('×','add')" @mousedown.prevent="insertCalcOp('×','add')" title="Gånger">×</button>
-<button @touchstart.prevent="insertCalcOp('÷','add')" @mousedown.prevent="insertCalcOp('÷','add')" title="Delat">÷</button>
-<button class="calc-equals" @touchstart.prevent="evalCalc('add')" @mousedown.prevent="evalCalc('add')" title="Beräkna">=</button>
-<button class="calc-done" @touchstart.prevent="doneCalc('add')" @mousedown.prevent="doneCalc('add')">Klar</button>
-</div>
 <div class="dialog-footer">
 <div class="dialog-actions">
 <button class="btn-secondary" @click="closeAddDialog">Avbryt</button>
@@ -1258,7 +1256,7 @@ body.standalone-app dialog#addDialog .dialog-footer{padding-bottom:calc(20px + v
 </dialog>
 
 <!-- CONFIRM DIALOG -->
-<dialog ref="confirmDialog">
+<dialog ref="confirmDialog" class="dialog-center">
 <div class="dialog-inner">
 <div class="dialog-title"><span>{{confirmTitle}}</span></div>
 <p style="margin-bottom:16px;color:var(--text2)">{{confirmText}}</p>
@@ -1328,7 +1326,7 @@ body.standalone-app dialog#addDialog .dialog-footer{padding-bottom:calc(20px + v
 </dialog>
 
 <!-- LARGE AMOUNT DIALOG -->
-<dialog ref="largeAmountDialog">
+<dialog ref="largeAmountDialog" class="dialog-center">
 <div class="dialog-inner">
 <div class="dialog-title"><span>⚠️ Stort belopp!</span></div>
 <p style="margin-bottom:16px;color:var(--text2)">Är du säker på {{formatKr(largeAmountVal)}}?</p>
@@ -2383,12 +2381,10 @@ createApp({
       setAddAmountState(parseAmountInput(addAmountStr.value));
     }
     function onAddAmountFocus(){
-      showAddCalcStrip.value=true;
       const parsed=parseAmountInput(addAmountStr.value);
       if(parsed.valid&&!parsed.isMath)addAmountStr.value=String(parsed.value);
     }
     function onAddAmountBlur(){
-      setTimeout(()=>{showAddCalcStrip.value=false},300);
       const parsed=parseAmountInput(addAmountStr.value);
       setAddAmountState(parsed);
       addAmountStr.value=parsed.valid?formatMoneyValue(parsed.value):'';
@@ -2423,7 +2419,6 @@ createApp({
     function doneCalc(target){
       if(target==='add'){
         evalCalc('add');
-        showAddCalcStrip.value=false;
         addAmountInput.value?.blur();
       }else{
         evalCalc('edit');
@@ -2509,7 +2504,6 @@ createApp({
       });
       addAmountStr.value=formatMoneyValue(exp.amount);
       addCalcPreview.value='';
-      showAddCalcStrip.value=false;
       openModal(addDialog);
     }
     function onEditAmountInput(){
@@ -3560,7 +3554,7 @@ createApp({
       themeMode,accentColor,useEmojis,compactMode,simpleMode,notifEnabled,avatars,lastSynced,syncStale,
       invoiceScope,invoicePerson,invoiceFilter,invoiceSearch,sortBy,reorderMode,statMode,
       showDebtHistory,showSavingsCompact,showWishlistCompact,showPersonSetup,showImport,
-      addForm,addAmountStr,addCalcPreview,showAddCalcStrip,addAmountInput,addDialogTitle,addDialogHint,editMode,editingId,addNameInput,addDialog,
+      addForm,addAmountStr,addCalcPreview,addAmountInput,addDialogTitle,addDialogHint,editMode,editingId,addNameInput,addDialog,
       editingExpense,editAmountStr,editCalcPreview,
       confirmDialog,confirmTitle,confirmText,confirmDanger,confirmResolve,
       bottomSheet,swipingId,swipeX,pressingExpenseId,holdingExpenseId,holdProgress,
