@@ -32,6 +32,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 background-image:radial-gradient(ellipse at 10% 10%,rgba(24,160,88,.035),transparent 60%),radial-gradient(ellipse at 90% 90%,rgba(99,102,241,.025),transparent 60%)}
 button,input,select,textarea{font:inherit}
 button{touch-action:manipulation}
+body.dialog-open{overflow:hidden;position:fixed;width:100%;height:100%}
 @media(prefers-color-scheme:dark){body:not(.light-override){
 --bg:#0c1118;--bg2:#151d28;--bg3:#1c2738;--text:#e2ecf0;--text2:#94afc0;--text3:#5e7a8c;
 --border:#243040;--accent-light:rgba(24,160,88,.15);--shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 8px 32px rgba(0,0,0,.5);
@@ -189,9 +190,9 @@ body.dark-override .floating-summary{background:rgba(12,17,24,.88)}
 .recurring-banner .rec-actions{display:flex;gap:4px;flex-shrink:0}
 .recurring-banner .rec-actions button{padding:6px 10px;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:700;cursor:pointer}
 
-dialog{border:none;border-radius:16px;padding:0;background:var(--bg2);color:var(--text);box-shadow:var(--shadow-lg);max-width:min(440px,calc(100vw - 32px));width:100%;max-height:min(85vh,calc(100dvh - 32px))}
+dialog{border:none;border-radius:16px;padding:0;background:var(--bg2);color:var(--text);box-shadow:var(--shadow-lg);max-width:min(440px,calc(100vw - 32px));width:100%;max-height:min(85vh,calc(100dvh - 32px));overscroll-behavior:contain}
 dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.dialog-inner{padding:20px;max-height:min(85vh,calc(100dvh - 32px));overflow-y:auto}
+.dialog-inner{padding:20px;max-height:min(85vh,calc(100dvh - 32px));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 body.standalone-app dialog[open]{position:fixed;left:0;right:0;top:calc(var(--safe-top) + 12px);bottom:auto;max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px)}
 body.standalone-app .dialog-inner{max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px);padding-bottom:calc(20px + var(--safe-bottom))}
 .dialog-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
@@ -379,7 +380,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .amount-display.has-math{font-size:22px}
 .amount-display .amount-result{color:var(--accent);font-size:28px}
 
-.calc-strip{display:flex;gap:6px;padding:10px 0 4px;justify-content:center;align-items:center;animation:calcStripIn .25s ease}
+.calc-strip{display:flex;gap:6px;padding:10px 12px;justify-content:center;align-items:center;animation:calcStripIn .25s ease;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:var(--bg2);border-top:1px solid var(--border);padding-bottom:calc(10px + var(--safe-bottom,0px));box-shadow:0 -2px 12px rgba(0,0,0,.1)}
 .calc-strip button{flex:1;max-width:56px;height:42px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);font-size:18px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .15s,box-shadow .15s}
 .calc-strip button:active{transform:scale(.9);background:var(--accent-light)}
 .calc-strip button.calc-equals{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(24,160,88,.3)}
@@ -423,13 +424,13 @@ body.density-compact .dialog-inner{padding:14px}
 @media(max-width:480px){
 .top-bar .title select,.search-bar input,.sort-bar select,.comment-input input,.form-group input,.form-group select,.form-group textarea,.tags-input input,.import-area textarea{font-size:16px}
 .payment-checks label,.expense-item .action-pill{min-height:40px}
-dialog#addDialog{margin:0;max-width:100%;width:100%;border-radius:20px 20px 0 0;position:fixed;bottom:0;left:0;right:0;top:auto;max-height:calc(100dvh - var(--safe-top,0px) - 20px);animation:dialogSlideUp .32s cubic-bezier(.32,.72,.24,1.02)}
-dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(--safe-top,0px) - 20px);padding:16px 20px calc(20px + var(--safe-bottom,0px))}
+dialog#addDialog{margin:0;max-width:100%;width:100%;border-radius:20px 20px 0 0;position:fixed;bottom:0;left:0;right:0;top:auto;max-height:calc(100dvh - var(--safe-top,0px) - 20px);animation:dialogSlideUp .3s ease}
+dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(--safe-top,0px) - 20px);padding:16px 20px calc(20px + var(--safe-bottom,0px));-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 body.standalone-app dialog#addDialog[open]{top:auto;bottom:0;max-height:calc(100dvh - var(--safe-top) - 12px)}
 body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(--safe-top) - 12px)}
 .form-row{flex-direction:column;gap:8px}
 }
-@keyframes dialogSlideUp{0%{opacity:0;transform:translateY(100%)}60%{opacity:1;transform:translateY(-2%)}100%{opacity:1;transform:translateY(0)}}
+@keyframes dialogSlideUp{from{opacity:0;transform:translateY(40%)}to{opacity:1;transform:translateY(0)}}
 
 .unpaid-preview-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
 .unpaid-preview-item:last-child{border:none}
@@ -1084,14 +1085,6 @@ body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(
 <input ref="addAmountInput" v-model="addAmountStr" @input="onAddAmountInput" @focus="onAddAmountFocus" @blur="onAddAmountBlur" inputmode="decimal" autocomplete="off" :placeholder="addAmountStr?'':'t.ex. 1 250'" style="font-size:20px;font-weight:700;padding:24px 14px 8px;text-align:center;letter-spacing:.02em">
 <label>Belopp (kr)</label>
 </div>
-<div v-if="showAddCalcStrip" class="calc-strip">
-<button @mousedown.prevent="insertCalcOp('+','add')" title="Plus">+</button>
-<button @mousedown.prevent="insertCalcOp('−','add')" title="Minus">−</button>
-<button @mousedown.prevent="insertCalcOp('×','add')" title="Gånger">×</button>
-<button @mousedown.prevent="insertCalcOp('÷','add')" title="Delat">÷</button>
-<button class="calc-equals" @mousedown.prevent="evalCalc('add')" title="Beräkna">=</button>
-<button class="calc-done" @mousedown.prevent="doneCalc('add')">Klar</button>
-</div>
 </div>
 </div>
 
@@ -1316,6 +1309,18 @@ body.standalone-app dialog#addDialog .dialog-inner{max-height:calc(100dvh - var(
 </div>
 </div>
 </dialog>
+
+<!-- KEYBOARD CALC STRIP -->
+<Teleport to="body">
+<div v-if="showAddCalcStrip" class="calc-strip">
+<button @touchstart.prevent="insertCalcOp('+','add')" @mousedown.prevent="insertCalcOp('+','add')" title="Plus">+</button>
+<button @touchstart.prevent="insertCalcOp('−','add')" @mousedown.prevent="insertCalcOp('−','add')" title="Minus">−</button>
+<button @touchstart.prevent="insertCalcOp('×','add')" @mousedown.prevent="insertCalcOp('×','add')" title="Gånger">×</button>
+<button @touchstart.prevent="insertCalcOp('÷','add')" @mousedown.prevent="insertCalcOp('÷','add')" title="Delat">÷</button>
+<button class="calc-equals" @touchstart.prevent="evalCalc('add')" @mousedown.prevent="evalCalc('add')" title="Beräkna">=</button>
+<button class="calc-done" @touchstart.prevent="doneCalc('add')" @mousedown.prevent="doneCalc('add')">Klar</button>
+</div>
+</Teleport>
 
 <!-- BOTTOM SHEET -->
 <div v-if="bottomSheet" class="bottom-sheet-backdrop" @click="bottomSheet=null"></div>
@@ -2317,7 +2322,7 @@ createApp({
     // Confirm dialog
     function showConfirm(title,text,danger=false){
       confirmTitle.value=title;confirmText.value=text;confirmDanger.value=danger;
-      return new Promise(r=>{confirmResolveF=r;confirmDialog.value?.showModal()});
+      return new Promise(r=>{confirmResolveF=r;openModal(confirmDialog)});
     }
 
     function applyDefaultPaidState(exp){
@@ -2344,7 +2349,8 @@ createApp({
       editMode.value=false;editingId.value=null;
       Object.assign(addForm,{name:'',amount:0,expenseType:type||'variable',date:todayStr(),category:'ovrigt',note:'',shared:true,initialPaidBy:'a',customSplitEnabled:false,customSplitVal:50,person:'a',tags:[],recurring:false});
       addAmountStr.value='';addCalcPreview.value='';
-      addDialog.value?.showModal();
+      addDialog.value?.close();
+      openModal(addDialog);
       nextTick(()=>addNameInput.value?.focus());
     }
     function onAddAmountInput(){
@@ -2418,7 +2424,7 @@ createApp({
       if(addForm.amount<=0){showToast('Ange ett belopp');return}
       if(addForm.amount>50000){
         largeAmountVal.value=addForm.amount;
-        const ok=await new Promise(r=>{largeAmountResolveF=r;largeAmountDialog.value?.showModal()});
+        const ok=await new Promise(r=>{largeAmountResolveF=r;openModal(largeAmountDialog)});
         if(!ok)return;
       }
       ensureMonth(data,currentMonth.value);
@@ -2451,7 +2457,8 @@ createApp({
     }
     function closeAddDialog(){
       if(addForm.name||addForm.amount){
-        if(!confirm('Stäng utan att spara?'))return;
+        showConfirm('Stäng','Stäng utan att spara?').then(ok=>{if(ok)addDialog.value?.close()});
+        return;
       }
       addDialog.value?.close();
     }
@@ -2476,7 +2483,7 @@ createApp({
       addAmountStr.value=formatMoneyValue(exp.amount);
       addCalcPreview.value='';
       showAddCalcStrip.value=false;
-      addDialog.value?.showModal();
+      openModal(addDialog);
     }
     function onEditAmountInput(){
       setEditAmountState(parseAmountInput(editAmountStr.value));
@@ -2778,14 +2785,14 @@ createApp({
     }
 
     // Savings
-    function openSavingsDialog(){Object.assign(savingsForm,{name:'',emoji:'🎯',target:0});savingsDialog.value?.showModal()}
+    function openSavingsDialog(){Object.assign(savingsForm,{name:'',emoji:'🎯',target:0});openModal(savingsDialog)}
     function addSavingsGoal(){
       if(!savingsForm.name||!savingsForm.target)return;
       if(!data.savingsGoals)data.savingsGoals=[];
       data.savingsGoals.push({id:crypto.randomUUID(),name:savingsForm.name,emoji:savingsForm.emoji||'🎯',target:savingsForm.target,saved:0});
       savingsDialog.value?.close();showToast('Sparmål tillagt ✓');
     }
-    function addToSavings(g){savingsAddTarget.value=g;savingsAddAmount.value=0;savingsAddDialog.value?.showModal()}
+    function addToSavings(g){savingsAddTarget.value=g;savingsAddAmount.value=0;openModal(savingsAddDialog)}
     function confirmAddSavings(){
       const g=data.savingsGoals?.find(x=>x.id===savingsAddTarget.value?.id);
       if(g&&savingsAddAmount.value>0){
@@ -2797,7 +2804,7 @@ createApp({
     function removeSavingsGoal(id){data.savingsGoals=data.savingsGoals.filter(g=>g.id!==id)}
 
     // Wishlist
-    function openWishDialog(){Object.assign(wishForm,{name:'',amount:0,note:''});wishDialog.value?.showModal()}
+    function openWishDialog(){Object.assign(wishForm,{name:'',amount:0,note:''});openModal(wishDialog)}
     function addWishItem(){
       if(!wishForm.name)return;
       if(!data.wishlist)data.wishlist=[];
@@ -2811,7 +2818,7 @@ createApp({
     function removeWish(id){data.wishlist=data.wishlist.filter(w=>w.id!==id)}
 
     // Settings
-    function openSettings(){settingsDialog.value?.showModal()}
+    function openSettings(){openModal(settingsDialog)}
     function setTheme(m){
       themeMode.value=m;localStorage.setItem('dark-mode',m);
       document.body.classList.remove('dark-override','light-override');
@@ -3283,7 +3290,7 @@ createApp({
         importDiff.items=items;
         pendingImportData=imported;
         pendingImportMeta=normalized;
-        diffDialog.value?.showModal();
+        openModal(diffDialog);
       }catch(e){showToast('Kunde inte läsa data')}
     }
     function applyImport(){
@@ -3400,6 +3407,21 @@ createApp({
     function setupDialogClose(dialogRef){
       if(!dialogRef)return;
       dialogRef.addEventListener('click',e=>{if(e.target===dialogRef)dialogRef.close()});
+      dialogRef.addEventListener('close',()=>{
+        if(!document.querySelector('dialog[open]')){
+          document.body.classList.remove('dialog-open');
+          document.body.style.top='';
+          window.scrollTo(0,parseInt(document.body.dataset.scrollY||'0'));
+        }
+      });
+    }
+    function openModal(ref){
+      if(!ref?.value)return;
+      const scrollY=window.scrollY;
+      document.body.dataset.scrollY=String(scrollY);
+      document.body.style.top=`-${scrollY}px`;
+      document.body.classList.add('dialog-open');
+      ref.value.showModal();
     }
     async function registerServiceWorker(){
       if(!('serviceWorker' in navigator))return;
