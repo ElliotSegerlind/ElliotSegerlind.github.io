@@ -387,7 +387,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .amount-display.has-math{font-size:22px}
 .amount-display .amount-result{color:var(--accent);font-size:28px}
 
-.calc-strip-inline{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.calc-strip-inline{display:flex;gap:4px;justify-content:center;margin-top:4px}
 .calc-strip-inline button{flex:1;max-width:48px;height:36px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-size:16px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .15s}
 .calc-strip-inline button:active{transform:scale(.88);background:var(--accent-light)}
 .calc-strip-inline .calc-eq{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px rgba(24,160,88,.25)}
@@ -398,7 +398,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .date-quick-btns button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .date-quick-btns button:active{transform:scale(.95)}
 
-.calc-preview{font-size:14px;color:var(--accent);margin-top:4px;font-weight:700;text-align:center}
+.calc-result-inline{font-size:20px;font-weight:700;text-align:center;color:var(--text);padding:0 14px 8px;line-height:1.2}
 @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
 @keyframes slideInReverse{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
 @keyframes popBounce{0%{transform:scale(0)}50%{transform:scale(1.15)}70%{transform:scale(.95)}100%{transform:scale(1)}}
@@ -1090,10 +1090,12 @@ body.standalone-app dialog#addDialog .dialog-footer{padding-bottom:calc(20px + v
 <!-- Amount Section -->
 <div class="dialog-section">
 <div style="margin-bottom:0">
-<div v-if="addCalcPreview" class="calc-preview" style="margin-bottom:4px;margin-top:0">{{addCalcPreview}}</div>
+<div class="amount-input-wrap">
 <div class="inset-field inset-center" :class="{'has-value':addAmountStr}">
-<input ref="addAmountInput" v-model="addAmountStr" @input="onAddAmountInput" @focus="onAddAmountFocus" @blur="onAddAmountBlur" inputmode="decimal" autocomplete="off" placeholder="0" style="font-size:20px;font-weight:700;padding:24px 14px 8px;text-align:center;letter-spacing:.02em">
+<input ref="addAmountInput" v-model="addAmountStr" @input="onAddAmountInput" @focus="onAddAmountFocus" @blur="onAddAmountBlur" inputmode="decimal" autocomplete="off" placeholder="0" :style="{fontSize:addCalcMath?'14px':'20px',fontWeight:addCalcMath?'500':'700',color:addCalcMath?'var(--text3)':'var(--text)',padding:'24px 14px '+(addCalcMath?'2px':'8px'),textAlign:'center',letterSpacing:'.02em'}">
 <label>Belopp (kr)</label>
+</div>
+<div v-if="addCalcMath" class="calc-result-inline">{{formatKr(addForm.amount)}}</div>
 </div>
 <div class="calc-strip-inline">
 <button @touchstart.prevent="insertCalcOp('+','add')" @mousedown.prevent="insertCalcOp('+','add')">+</button>
@@ -1877,6 +1879,7 @@ createApp({
     const addForm=reactive({name:'',amount:0,expenseType:'variable',date:todayStr(),category:'ovrigt',note:'',shared:true,initialPaidBy:'a',customSplitEnabled:false,customSplitVal:50,person:'a',tags:[],recurring:false,usePercent:false,pctValue:0});
     const addAmountStr=ref('');
     const addCalcPreview=ref('');
+    const addCalcMath=ref(false);
     const showAddCalcStrip=ref(false);
     const showEditCalcStrip=ref(false);
     const showRecurringList=ref(false);
@@ -2362,6 +2365,7 @@ createApp({
     function setAddAmountState(parsed){
       addForm.amount=parsed.valid?parsed.value:0;
       addCalcPreview.value=amountPreviewText(parsed);
+      addCalcMath.value=!!(parsed.valid&&parsed.isMath);
     }
     function setEditAmountState(parsed){
       if(editingExpense.value)editingExpense.value.amount=parsed.valid?parsed.value:0;
